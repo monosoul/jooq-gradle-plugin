@@ -2,7 +2,8 @@ import com.github.benmanes.gradle.versions.updates.gradle.GradleReleaseChannel.C
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
 import org.gradle.api.tasks.testing.logging.TestLogEvent.FAILED
 import org.gradle.api.tasks.testing.logging.TestLogEvent.PASSED
-import org.gradle.api.tasks.wrapper.Wrapper.DistributionType.BIN
+import org.gradle.api.tasks.testing.logging.TestLogEvent.STARTED
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     `kotlin-dsl`
@@ -18,13 +19,10 @@ repositories {
     mavenCentral()
 }
 
-kotlinDslPluginOptions {
-    experimentalWarning.set(false)
-}
-
+val targetJava = JavaVersion.VERSION_1_8
 java {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
+    sourceCompatibility = targetJava
+    targetCompatibility = targetJava
 }
 
 group = "com.revolut.jooq"
@@ -54,25 +52,28 @@ pluginBundle {
 }
 
 tasks {
-    withType<Test>().configureEach {
-        if (JavaVersion.current().isJava9Compatible) {
-            jvmArgs("--add-opens", "java.base/java.lang.invoke=ALL-UNNAMED")
-            jvmArgs("--illegal-access=deny")
-        }
+    withType<Test> {
+        useJUnitPlatform()
         testLogging {
-            events(PASSED, FAILED)
+            events(STARTED, PASSED, FAILED)
             showExceptions = true
             showStackTraces = true
             showCauses = true
             exceptionFormat = FULL
         }
-        useJUnitPlatform()
+    }
+
+    withType<KotlinCompile> {
+        kotlinOptions {
+            jvmTarget = "$targetJava"
+            freeCompilerArgs = listOf("-Xjsr305=strict")
+        }
     }
 
     jacocoTestReport {
         reports {
-            xml.isEnabled = true
-            html.isEnabled = false
+            xml.required.set(true)
+            html.required.set(false)
         }
         setDependsOn(withType<Test>())
     }
@@ -82,8 +83,8 @@ tasks {
             componentSelection {
                 all {
                     val rejected = listOf("alpha", "beta", "b", "rc", "cr", "m", "preview")
-                            .map { qualifier -> Regex("(?i).*[.-]$qualifier[.\\d-]?.*") }
-                            .any { it.matches(candidate.version) }
+                        .map { qualifier -> Regex("(?i).*[.-]$qualifier[.\\d-]?.*") }
+                        .any { it.matches(candidate.version) }
                     if (rejected) {
                         reject("Release candidate")
                     }
@@ -91,11 +92,6 @@ tasks {
             }
         }
         gradleReleaseChannel = CURRENT.id
-    }
-
-    wrapper {
-        gradleVersion = "7.4.2"
-        distributionType = BIN
     }
 }
 

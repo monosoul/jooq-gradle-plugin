@@ -9,7 +9,7 @@ plugins {
     groovy
     jacoco
     `maven-publish`
-    id("com.gradle.plugin-publish") version "0.17.0"
+    id("com.gradle.plugin-publish") version "0.21.0"
     id("pl.droidsonroids.jacoco.testkit") version "1.0.9"
 }
 

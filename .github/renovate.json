@@ -1,0 +1,26 @@
+{
+  "extends": [
+    "config:base",
+    ":timezone(Europe/Berlin)"
+  ],
+  "packageRules": [
+    {
+      "groupName": "Gradle dependencies",
+      "groupSlug": "gradle",
+      "matchLanguages": [ "java" ],
+      "labels": [ "gradle-dependencies" ],
+      "schedule": [ "before 9am on Monday every 1 week" ]
+    },
+    {
+      "groupName": "GH Actions dependencies",
+      "groupSlug": "ghactions",
+      "matchManagers": [ "github-actions" ],
+      "labels": [ "gh-actions-dependencies" ],
+      "schedule": [ "before 9am on Monday every 1 month" ]
+    }
+  ],
+  "ignoreDeps": [],
+  "reviewers": [
+    "monosoul"
+  ]
+}

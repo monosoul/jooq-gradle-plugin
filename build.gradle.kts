@@ -24,7 +24,6 @@ java {
 }
 
 group = "dev.monosoul.jooq"
-version = "0.3.7"
 
 gradlePlugin {
     plugins.create("jooqDockerPlugin") {

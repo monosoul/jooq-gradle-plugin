@@ -1,7 +1,7 @@
 # Gradle Docker jOOQ Plugin
 
-[![Build Status](https://travis-ci.com/revolut-engineering/jooq-plugin.svg?branch=master)](https://travis-ci.com/revolut-engineering/jooq-plugin)
-[![codecov](https://codecov.io/gh/revolut-engineering/jooq-plugin/branch/master/graph/badge.svg)](https://codecov.io/gh/revolut-engineering/jooq-plugin)
+![Build Status](https://github.com/monosoul/jooq-gradle-plugin/actions/workflows/build-on-push.yml/badge.svg?branch=master)
+[![codecov](https://codecov.io/gh/monosoul/jooq-gradle-plugin/branch/master/graph/badge.svg?token=7SWSOTIBMX)](https://codecov.io/gh/monosoul/jooq-gradle-plugin)
 [![Gradle Plugins Release](https://img.shields.io/github/release/revolut-engineering/jooq-plugin.svg)](https://plugins.gradle.org/plugin/com.revolut.jooq-docker)
 
 Copyright 2021 [Adrian Skrobacz](https://github.com/adrianskrobaczrevolut)

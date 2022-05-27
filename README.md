@@ -4,6 +4,12 @@
 [![codecov](https://codecov.io/gh/revolut-engineering/jooq-plugin/branch/master/graph/badge.svg)](https://codecov.io/gh/revolut-engineering/jooq-plugin)
 [![Gradle Plugins Release](https://img.shields.io/github/release/revolut-engineering/jooq-plugin.svg)](https://plugins.gradle.org/plugin/com.revolut.jooq-docker)
 
+Copyright 2021 [Adrian Skrobacz](https://github.com/adrianskrobaczrevolut)
+
+Copyright 2021 Revolut Ltd
+
+Copyright 2022 [Andrei Nevedomskii](https://github.com/monosoul)
+
 This repository contains Gradle plugin for generating jOOQ classes in dockerized databases.
 Plugin registers task `generateJooqClasses` that does following steps:
  * pulls docker image

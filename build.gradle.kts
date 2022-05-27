@@ -2,14 +2,13 @@ import com.github.benmanes.gradle.versions.updates.gradle.GradleReleaseChannel.C
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
 import org.gradle.api.tasks.testing.logging.TestLogEvent.FAILED
 import org.gradle.api.tasks.testing.logging.TestLogEvent.PASSED
-import org.gradle.api.tasks.wrapper.Wrapper.DistributionType.ALL
+import org.gradle.api.tasks.wrapper.Wrapper.DistributionType.BIN
 
 plugins {
     `kotlin-dsl`
     groovy
     jacoco
     `maven-publish`
-    id("java-gradle-plugin")
     id("com.gradle.plugin-publish") version "0.14.0"
     id("pl.droidsonroids.jacoco.testkit") version "1.0.8"
     id("com.github.ben-manes.versions").version("0.38.0")
@@ -67,6 +66,7 @@ tasks {
             showCauses = true
             exceptionFormat = FULL
         }
+        useJUnitPlatform()
     }
 
     jacocoTestReport {
@@ -94,8 +94,8 @@ tasks {
     }
 
     wrapper {
-        gradleVersion = "6.7"
-        distributionType = ALL
+        gradleVersion = "7.4.2"
+        distributionType = BIN
     }
 }
 
@@ -118,6 +118,8 @@ dependencies {
     implementation("org.zeroturnaround:zt-exec:1.12")
     compileOnly("javax.annotation:javax.annotation-api:1.3.2")
 
-    testImplementation("org.spockframework:spock-core:1.3-groovy-2.5")
+    testImplementation("org.spockframework:spock-core:2.1-groovy-3.0") {
+        exclude("org.codehaus.groovy")
+    }
     testCompileOnly(gradleTestKit())
 }

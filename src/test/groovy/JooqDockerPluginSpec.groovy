@@ -495,7 +495,7 @@ class JooqDockerPluginSpec extends Specification {
                       }
                       
                       dependencies {
-                          jdbc("mysql:mysql-connector-java:8.0.15")
+                          jdbc("mysql:mysql-connector-java:8.0.29")
                       }
                       """)
         copyResource("/V01__init_mysql.sql", "src/main/resources/db/migration/V01__init_mysql.sql")
@@ -504,7 +504,7 @@ class JooqDockerPluginSpec extends Specification {
         def result = GradleRunner.create()
                 .withProjectDir(projectDir)
                 .withPluginClasspath()
-                .withArguments("generateJooqClasses")
+                .withArguments("generateJooqClasses", "--stacktrace")
                 .build()
 
         then:

@@ -49,7 +49,7 @@ class JooqDockerPluginSpec extends Specification {
                       }
                       
                       dependencies {
-                          jdbc("org.postgresql:postgresql:42.2.5")
+                          jdbc("org.postgresql:postgresql:42.3.6")
                       }
                       """)
         copyResource("/V01__init.sql", "src/main/resources/db/migration/V01__init.sql")
@@ -87,7 +87,7 @@ class JooqDockerPluginSpec extends Specification {
                       }
                       
                       dependencies {
-                          jdbc("org.postgresql:postgresql:42.2.5")
+                          jdbc("org.postgresql:postgresql:42.3.6")
                       }
                       """)
         copyResource("/V01__init_multiple_schemas.sql", "src/main/resources/db/migration/V01__init_multiple_schemas.sql")
@@ -128,7 +128,7 @@ class JooqDockerPluginSpec extends Specification {
                       }
                       
                       dependencies {
-                          jdbc("org.postgresql:postgresql:42.2.5")
+                          jdbc("org.postgresql:postgresql:42.3.6")
                       }
                       """)
         copyResource("/V01__init_multiple_schemas.sql", "src/main/resources/db/migration/V01__init_multiple_schemas.sql")
@@ -169,7 +169,7 @@ class JooqDockerPluginSpec extends Specification {
                       }
                       
                       dependencies {
-                          jdbc("org.postgresql:postgresql:42.2.5")
+                          jdbc("org.postgresql:postgresql:42.3.6")
                       }
                       """)
         copyResource("/V01__init_multiple_schemas.sql", "src/main/resources/db/migration/V01__init_multiple_schemas.sql")
@@ -201,7 +201,7 @@ class JooqDockerPluginSpec extends Specification {
                       }
                       
                       dependencies {
-                          jdbc("org.postgresql:postgresql:42.2.5")
+                          jdbc("org.postgresql:postgresql:42.3.6")
                       }
                       """)
         copyResource("/V01__init.sql", "src/main/resources/db/migration/V01__init.sql")
@@ -242,7 +242,7 @@ class JooqDockerPluginSpec extends Specification {
                       }
                       
                       dependencies {
-                          jdbc("org.postgresql:postgresql:42.2.5")
+                          jdbc("org.postgresql:postgresql:42.3.6")
                       }
                       """)
         copyResource("/V01__init.sql", "src/main/resources/db/migration/V01__init.sql")
@@ -290,7 +290,7 @@ class JooqDockerPluginSpec extends Specification {
                 }
                 
                 dependencies {
-                    jdbc("org.postgresql:postgresql:42.2.5")
+                    jdbc("org.postgresql:postgresql:42.3.6")
                 }
                 """
         def extensionUpdatedBuildGradle =
@@ -310,7 +310,7 @@ class JooqDockerPluginSpec extends Specification {
                 }
                 
                 dependencies {
-                    jdbc("org.postgresql:postgresql:42.2.5")
+                    jdbc("org.postgresql:postgresql:42.3.6")
                 }
                 """
         prepareBuildGradleFile(initialBuildGradle)
@@ -362,7 +362,7 @@ class JooqDockerPluginSpec extends Specification {
                 }
                 
                 dependencies {
-                    jdbc("org.postgresql:postgresql:42.2.5")
+                    jdbc("org.postgresql:postgresql:42.3.6")
                 }
                 """
         def updatedBuildGradle =
@@ -385,7 +385,7 @@ class JooqDockerPluginSpec extends Specification {
                 }
                 
                 dependencies {
-                    jdbc("org.postgresql:postgresql:42.2.5")
+                    jdbc("org.postgresql:postgresql:42.3.6")
                 }
                 """
         copyResource("/V01__init_multiple_schemas.sql", "src/main/resources/db/migration/V01__init_multiple_schemas.sql")
@@ -437,7 +437,7 @@ class JooqDockerPluginSpec extends Specification {
                       }
                       
                       dependencies {
-                          jdbc("org.postgresql:postgresql:42.2.5")
+                          jdbc("org.postgresql:postgresql:42.3.6")
                       }
                       """)
         copyResource("/V01__init.sql", "src/main/resources/db/migration/V01__init.sql")
@@ -531,7 +531,7 @@ class JooqDockerPluginSpec extends Specification {
                       }
                       
                       dependencies {
-                          jdbc("org.postgresql:postgresql:42.2.5")
+                          jdbc("org.postgresql:postgresql:42.3.6")
                       }
                       """)
         copyResource("/V01__init_with_placeholders.sql", "src/main/resources/db/migration/V01__init_with_placeholders.sql")
@@ -567,7 +567,7 @@ class JooqDockerPluginSpec extends Specification {
                       }
                       
                       dependencies {
-                          jdbc("org.postgresql:postgresql:42.2.5")
+                          jdbc("org.postgresql:postgresql:42.3.6")
                       }
                       """)
         copyResource("/V01__init.sql", "src/main/resources/db/migration/V01__init.sql")
@@ -608,7 +608,7 @@ class JooqDockerPluginSpec extends Specification {
                       }
                       
                       dependencies {
-                          jdbc "org.postgresql:postgresql:42.2.5"
+                          jdbc "org.postgresql:postgresql:42.3.6"
                       }
                       """)
         copyResource("/V01__init_with_placeholders.sql", "src/main/resources/db/migration/V01__init_with_placeholders.sql")
@@ -647,7 +647,7 @@ class JooqDockerPluginSpec extends Specification {
                       }
                       
                       dependencies {
-                          jdbc("org.postgresql:postgresql:42.2.5")
+                          jdbc("org.postgresql:postgresql:42.3.6")
                       }
                       """)
         copyResource("/V01__init.sql", "src/main/resources/db/migration/V01__init.sql")
@@ -685,7 +685,7 @@ class JooqDockerPluginSpec extends Specification {
                       }
                       
                       dependencies {
-                          jdbc("org.postgresql:postgresql:42.2.5")
+                          jdbc("org.postgresql:postgresql:42.3.6")
                       }
                       """)
         copyResource("/V01__init.sql", "src/main/resources/db/migration/V01__init.sql")
@@ -725,7 +725,7 @@ class JooqDockerPluginSpec extends Specification {
                       }
                       
                       dependencies {
-                          jdbc("org.postgresql:postgresql:42.2.5")
+                          jdbc("org.postgresql:postgresql:42.3.6")
                       }
                       """)
         copyResource("/V01__init.sql", "src/main/resources/db/migration/V01__init.sql")
@@ -768,7 +768,7 @@ class JooqDockerPluginSpec extends Specification {
                       }
                       
                       dependencies {
-                          jdbc("org.postgresql:postgresql:42.2.5")
+                          jdbc("org.postgresql:postgresql:42.3.6")
                       }
                       """)
         copyResource("/V01__init_multiple_schemas.sql", "src/main/resources/db/migration/V01__init_multiple_schemas.sql")
@@ -808,7 +808,7 @@ class JooqDockerPluginSpec extends Specification {
                       }
                       
                       dependencies {
-                          jdbc("org.postgresql:postgresql:42.2.5")
+                          jdbc("org.postgresql:postgresql:42.3.6")
                       }
                       """)
         copyResource("/V01__init.sql", "src/main/resources/db/migration/V01__init.sql")
@@ -841,8 +841,8 @@ class JooqDockerPluginSpec extends Specification {
                       }
                       
                       dependencies {
-                          jdbc("org.postgresql:postgresql:42.2.5")
-                          implementation("org.jooq:jooq:3.14.8")
+                          jdbc("org.postgresql:postgresql:42.3.6")
+                          implementation("org.jooq:jooq:3.16.6")
                           implementation("javax.annotation:javax.annotation-api:1.3.2")
                       }
                       """)
@@ -890,8 +890,8 @@ class JooqDockerPluginSpec extends Specification {
                       
                       dependencies {
                           implementation(kotlin("stdlib"))
-                          jdbc("org.postgresql:postgresql:42.2.5")
-                          implementation("org.jooq:jooq:3.14.8")
+                          jdbc("org.postgresql:postgresql:42.3.6")
+                          implementation("org.jooq:jooq:3.16.6")
                           implementation("javax.annotation:javax.annotation-api:1.3.2")
                       }
                       """)
@@ -934,8 +934,8 @@ class JooqDockerPluginSpec extends Specification {
                       }
                       
                       dependencies {
-                          jdbc("org.postgresql:postgresql:42.2.5")
-                          "implementation"("org.jooq:jooq:3.14.8")
+                          jdbc("org.postgresql:postgresql:42.3.6")
+                          "implementation"("org.jooq:jooq:3.16.6")
                           "implementation"("javax.annotation:javax.annotation-api:1.3.2")
                       }
                       """)
@@ -982,8 +982,8 @@ class JooqDockerPluginSpec extends Specification {
                       }
                       
                       dependencies {
-                          jdbc("org.postgresql:postgresql:42.2.5")
-                          "implementation"("org.jooq:jooq:3.14.8")
+                          jdbc("org.postgresql:postgresql:42.3.6")
+                          "implementation"("org.jooq:jooq:3.16.6")
                           "implementation"("javax.annotation:javax.annotation-api:1.3.2")
                       }
                       """)
@@ -1037,8 +1037,8 @@ class JooqDockerPluginSpec extends Specification {
                       
                       dependencies {
                           "implementation"(kotlin("stdlib"))
-                          jdbc("org.postgresql:postgresql:42.2.5")
-                          "implementation"("org.jooq:jooq:3.14.8")
+                          jdbc("org.postgresql:postgresql:42.3.6")
+                          "implementation"("org.jooq:jooq:3.16.6")
                           "implementation"("javax.annotation:javax.annotation-api:1.3.2")
                       }
                       """)
@@ -1081,7 +1081,7 @@ class JooqDockerPluginSpec extends Specification {
                       }
                       
                       dependencies {
-                          jdbc("org.postgresql:postgresql:42.2.5")
+                          jdbc("org.postgresql:postgresql:42.3.6")
                       }
                       """)
         copyResource("/V01__init.sql", "src/main/resources/db/migration/V01__init.sql")
@@ -1148,7 +1148,7 @@ class JooqDockerPluginSpec extends Specification {
                 }
                 
                 dependencies {
-                    jdbc("org.postgresql:postgresql:42.2.5")
+                    jdbc("org.postgresql:postgresql:42.3.6")
                 }
                 """
         def updatedBuildFile =
@@ -1175,7 +1175,7 @@ class JooqDockerPluginSpec extends Specification {
                 }
                 
                 dependencies {
-                    jdbc("org.postgresql:postgresql:42.2.5")
+                    jdbc("org.postgresql:postgresql:42.3.6")
                 }
                 """
         prepareBuildGradleFile(initialBuildGradle)
@@ -1229,7 +1229,7 @@ class JooqDockerPluginSpec extends Specification {
                       }
                       
                       dependencies {
-                          jdbc("org.postgresql:postgresql:42.2.5")
+                          jdbc("org.postgresql:postgresql:42.3.6")
                       }
                       """)
         copyResource("/V01__init_multiple_schemas.sql", "src/main/resources/db/migration/V01__init_multiple_schemas.sql")
@@ -1271,7 +1271,7 @@ class JooqDockerPluginSpec extends Specification {
                       }
                       
                       dependencies {
-                          jdbc("org.postgresql:postgresql:42.2.5")
+                          jdbc("org.postgresql:postgresql:42.3.6")
                       }
                       """)
         copyResource("/V01__init.sql", "src/main/resources/db/migration/V01__init.sql")

@@ -1,4 +1,3 @@
-import com.github.benmanes.gradle.versions.updates.gradle.GradleReleaseChannel.CURRENT
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
 import org.gradle.api.tasks.testing.logging.TestLogEvent.FAILED
 import org.gradle.api.tasks.testing.logging.TestLogEvent.PASSED
@@ -10,9 +9,8 @@ plugins {
     groovy
     jacoco
     `maven-publish`
-    id("com.gradle.plugin-publish") version "0.14.0"
-    id("pl.droidsonroids.jacoco.testkit") version "1.0.8"
-    id("com.github.ben-manes.versions").version("0.38.0")
+    id("com.gradle.plugin-publish") version "0.17.0"
+    id("pl.droidsonroids.jacoco.testkit") version "1.0.9"
 }
 
 repositories {
@@ -76,22 +74,6 @@ tasks {
             html.required.set(false)
         }
         setDependsOn(withType<Test>())
-    }
-
-    dependencyUpdates {
-        resolutionStrategy {
-            componentSelection {
-                all {
-                    val rejected = listOf("alpha", "beta", "b", "rc", "cr", "m", "preview")
-                        .map { qualifier -> Regex("(?i).*[.-]$qualifier[.\\d-]?.*") }
-                        .any { it.matches(candidate.version) }
-                    if (rejected) {
-                        reject("Release candidate")
-                    }
-                }
-            }
-        }
-        gradleReleaseChannel = CURRENT.id
     }
 }
 

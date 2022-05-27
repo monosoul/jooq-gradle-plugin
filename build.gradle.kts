@@ -25,20 +25,20 @@ java {
     targetCompatibility = targetJava
 }
 
-group = "com.revolut.jooq"
+group = "dev.monosoul.jooq"
 version = "0.3.7"
 
 gradlePlugin {
     plugins.create("jooqDockerPlugin") {
-        id = "com.revolut.jooq-docker"
-        implementationClass = "com.revolut.jooq.JooqDockerPlugin"
+        id = "dev.monosoul.jooq-docker"
+        implementationClass = "dev.monosoul.jooq.JooqDockerPlugin"
         version = project.version
     }
 }
 
 pluginBundle {
-    website = "https://github.com/revolut-engineering/jooq-plugin"
-    vcsUrl = "https://github.com/revolut-engineering/jooq-plugin"
+    website = "https://github.com/monosoul/jooq-gradle-plugin"
+    vcsUrl = "https://github.com/monosoul/jooq-gradle-plugin"
 
     description = "Generates jOOQ classes using dockerized database"
 
@@ -99,7 +99,7 @@ afterEvaluate {
     tasks.jacocoTestReport {
         classDirectories.setFrom(classDirectories.files.map {
             fileTree(it) {
-                exclude("com/revolut/shaded/org/testcontainers/**/*")
+                exclude("dev/monosoul/shaded/org/testcontainers/**/*")
             }
         })
     }

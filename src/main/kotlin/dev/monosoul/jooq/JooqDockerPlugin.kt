@@ -1,4 +1,4 @@
-package com.revolut.jooq
+package dev.monosoul.jooq
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project

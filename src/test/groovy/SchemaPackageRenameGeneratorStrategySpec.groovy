@@ -1,4 +1,4 @@
-import com.revolut.jooq.SchemaPackageRenameGeneratorStrategy
+import dev.monosoul.jooq.SchemaPackageRenameGeneratorStrategy
 import org.jooq.meta.CatalogDefinition
 import org.jooq.meta.Database
 import org.jooq.meta.SchemaDefinition

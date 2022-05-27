@@ -1,4 +1,4 @@
-import com.revolut.jooq.DatabaseHostResolver
+import dev.monosoul.jooq.DatabaseHostResolver
 import spock.lang.Specification
 
 class DatabaseHostResolverSpec extends Specification {

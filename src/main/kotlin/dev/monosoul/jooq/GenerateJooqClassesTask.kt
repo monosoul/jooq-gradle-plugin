@@ -1,4 +1,4 @@
-package com.revolut.jooq
+package dev.monosoul.jooq
 
 import groovy.lang.Closure
 import org.flywaydb.core.Flyway
@@ -9,11 +9,26 @@ import org.gradle.api.Action
 import org.gradle.api.DefaultTask
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.plugins.JavaPluginConvention
-import org.gradle.api.tasks.*
+import org.gradle.api.tasks.CacheableTask
+import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.InputFiles
+import org.gradle.api.tasks.Internal
+import org.gradle.api.tasks.Optional
+import org.gradle.api.tasks.OutputDirectory
+import org.gradle.api.tasks.PathSensitive
+import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.SourceSet.MAIN_SOURCE_SET_NAME
+import org.gradle.api.tasks.TaskAction
 import org.jooq.codegen.GenerationTool
 import org.jooq.codegen.JavaGenerator
-import org.jooq.meta.jaxb.*
+import org.jooq.meta.jaxb.Configuration
+import org.jooq.meta.jaxb.Database
+import org.jooq.meta.jaxb.Generate
+import org.jooq.meta.jaxb.Generator
+import org.jooq.meta.jaxb.Jdbc
+import org.jooq.meta.jaxb.Logging
+import org.jooq.meta.jaxb.SchemaMappingType
+import org.jooq.meta.jaxb.Strategy
 import org.jooq.meta.jaxb.Target
 import java.io.IOException
 import java.net.URL

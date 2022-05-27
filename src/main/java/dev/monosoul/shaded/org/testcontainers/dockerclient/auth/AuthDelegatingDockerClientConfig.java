@@ -1,20 +1,18 @@
-package com.revolut.shaded.org.testcontainers.dockerclient.auth;
+package dev.monosoul.shaded.org.testcontainers.dockerclient.auth;
 
 import com.github.dockerjava.api.model.AuthConfig;
 import com.github.dockerjava.api.model.AuthConfigurations;
 import com.github.dockerjava.core.DockerClientConfig;
 import com.github.dockerjava.core.RemoteApiVersion;
 import com.github.dockerjava.core.SSLConfig;
+import dev.monosoul.shaded.org.testcontainers.utility.DockerImageName;
+import dev.monosoul.shaded.org.testcontainers.utility.RegistryAuthLocator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.revolut.shaded.org.testcontainers.utility.DockerImageName;
-import com.revolut.shaded.org.testcontainers.utility.RegistryAuthLocator;
 
 import javax.annotation.Generated;
 import java.lang.invoke.MethodHandles;
 import java.net.URI;
-
-import static com.revolut.shaded.org.testcontainers.utility.AuthConfigUtil.toSafeString;
 
 /**
  * Facade implementation for {@link DockerClientConfig} which overrides how authentication
@@ -84,7 +82,7 @@ public class AuthDelegatingDockerClientConfig implements DockerClientConfig {
         final AuthConfig effectiveAuthConfig = RegistryAuthLocator.instance()
             .lookupAuthConfig(parsed, fallbackAuthConfig);
 
-        log.debug("Effective auth config [{}]", toSafeString(effectiveAuthConfig));
+        log.debug("Effective auth config [{}]", dev.monosoul.shaded.org.testcontainers.utility.AuthConfigUtil.toSafeString(effectiveAuthConfig));
         return effectiveAuthConfig;
     }
 

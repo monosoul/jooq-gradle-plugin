@@ -1,4 +1,4 @@
-package com.revolut.jooq
+package dev.monosoul.jooq
 
 import org.jooq.codegen.DefaultGeneratorStrategy
 import org.jooq.meta.CatalogDefinition

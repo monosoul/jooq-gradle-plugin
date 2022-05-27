@@ -23,7 +23,7 @@ class JooqDockerPluginSpec extends Specification {
         given:
         prepareBuildGradleFile("""
                       plugins {
-                          id("com.revolut.jooq-docker")
+                          id("dev.monosoul.jooq-docker")
                       }
                       """)
 
@@ -41,7 +41,7 @@ class JooqDockerPluginSpec extends Specification {
         given:
         prepareBuildGradleFile("""
                       plugins {
-                          id("com.revolut.jooq-docker")
+                          id("dev.monosoul.jooq-docker")
                       }
                       
                       repositories {
@@ -73,7 +73,7 @@ class JooqDockerPluginSpec extends Specification {
         given:
         prepareBuildGradleFile("""
                       plugins {
-                          id("com.revolut.jooq-docker")
+                          id("dev.monosoul.jooq-docker")
                       }
                       
                       repositories {
@@ -113,7 +113,7 @@ class JooqDockerPluginSpec extends Specification {
         given:
         prepareBuildGradleFile("""
                       plugins {
-                          id("com.revolut.jooq-docker")
+                          id("dev.monosoul.jooq-docker")
                       }
                       
                       repositories {
@@ -152,7 +152,7 @@ class JooqDockerPluginSpec extends Specification {
         given:
         prepareBuildGradleFile("""
                       plugins {
-                          id("com.revolut.jooq-docker")
+                          id("dev.monosoul.jooq-docker")
                       }
                       
                       repositories {
@@ -193,7 +193,7 @@ class JooqDockerPluginSpec extends Specification {
         given:
         prepareBuildGradleFile("""
                       plugins {
-                          id("com.revolut.jooq-docker")
+                          id("dev.monosoul.jooq-docker")
                       }
                       
                       repositories {
@@ -234,7 +234,7 @@ class JooqDockerPluginSpec extends Specification {
         given:
         prepareBuildGradleFile("""
                       plugins {
-                          id("com.revolut.jooq-docker")
+                          id("dev.monosoul.jooq-docker")
                       }
                       
                       repositories {
@@ -276,7 +276,7 @@ class JooqDockerPluginSpec extends Specification {
         def initialBuildGradle =
                 """
                 plugins {
-                    id("com.revolut.jooq-docker")
+                    id("dev.monosoul.jooq-docker")
                 }
                 
                 jooq {
@@ -296,7 +296,7 @@ class JooqDockerPluginSpec extends Specification {
         def extensionUpdatedBuildGradle =
                 """
                 plugins {
-                    id("com.revolut.jooq-docker")
+                    id("dev.monosoul.jooq-docker")
                 }
                 
                 jooq {
@@ -345,7 +345,7 @@ class JooqDockerPluginSpec extends Specification {
         def initialBuildGradle =
                 """
                 plugins {
-                    id("com.revolut.jooq-docker")
+                    id("dev.monosoul.jooq-docker")
                 }
                 
                 repositories {
@@ -368,7 +368,7 @@ class JooqDockerPluginSpec extends Specification {
         def updatedBuildGradle =
                 """
                 plugins {
-                    id("com.revolut.jooq-docker")
+                    id("dev.monosoul.jooq-docker")
                 }
                 
                 repositories {
@@ -423,7 +423,7 @@ class JooqDockerPluginSpec extends Specification {
         given:
         prepareBuildGradleFile("""
                       plugins {
-                          id("com.revolut.jooq-docker")
+                          id("dev.monosoul.jooq-docker")
                       }
                       
                       repositories {
@@ -459,7 +459,7 @@ class JooqDockerPluginSpec extends Specification {
         given:
         prepareBuildGradleFile("""
                       plugins {
-                          id("com.revolut.jooq-docker")
+                          id("dev.monosoul.jooq-docker")
                       }
                       
                       repositories {
@@ -517,7 +517,7 @@ class JooqDockerPluginSpec extends Specification {
         given:
         prepareBuildGradleFile("""
                       plugins {
-                          id("com.revolut.jooq-docker")
+                          id("dev.monosoul.jooq-docker")
                       }
                       
                       repositories {
@@ -553,7 +553,7 @@ class JooqDockerPluginSpec extends Specification {
         given:
         prepareBuildGradleFile("""
                       plugins {
-                          id("com.revolut.jooq-docker")
+                          id("dev.monosoul.jooq-docker")
                       }
                       
                       repositories {
@@ -591,7 +591,7 @@ class JooqDockerPluginSpec extends Specification {
         buildGradleFile.write(
                 """
                       plugins {
-                          id "com.revolut.jooq-docker"
+                          id "dev.monosoul.jooq-docker"
                       }
                       
                       repositories {
@@ -633,7 +633,7 @@ class JooqDockerPluginSpec extends Specification {
         given:
         prepareBuildGradleFile("""
                       plugins {
-                          id("com.revolut.jooq-docker")
+                          id("dev.monosoul.jooq-docker")
                       }
                       
                       repositories {
@@ -671,7 +671,7 @@ class JooqDockerPluginSpec extends Specification {
         given:
         prepareBuildGradleFile("""
                       plugins {
-                          id("com.revolut.jooq-docker")
+                          id("dev.monosoul.jooq-docker")
                       }
                       
                       repositories {
@@ -710,7 +710,7 @@ class JooqDockerPluginSpec extends Specification {
         given:
         prepareBuildGradleFile("""
                       plugins {
-                          id("com.revolut.jooq-docker")
+                          id("dev.monosoul.jooq-docker")
                       }
                       
                       repositories {
@@ -750,7 +750,7 @@ class JooqDockerPluginSpec extends Specification {
         given:
         prepareBuildGradleFile("""
                       plugins {
-                          id("com.revolut.jooq-docker")
+                          id("dev.monosoul.jooq-docker")
                       }
                       
                       repositories {
@@ -794,7 +794,7 @@ class JooqDockerPluginSpec extends Specification {
         given:
         prepareBuildGradleFile("""
                       plugins {
-                          id("com.revolut.jooq-docker")
+                          id("dev.monosoul.jooq-docker")
                       }
                       
                       repositories {
@@ -833,7 +833,7 @@ class JooqDockerPluginSpec extends Specification {
         prepareBuildGradleFile("""
                       plugins {
                           java
-                          id("com.revolut.jooq-docker")
+                          id("dev.monosoul.jooq-docker")
                       }
                       
                       repositories {
@@ -881,7 +881,7 @@ class JooqDockerPluginSpec extends Specification {
         prepareBuildGradleFile("""
                       plugins {
                           kotlin("jvm").version("1.3.50")
-                          id("com.revolut.jooq-docker")
+                          id("dev.monosoul.jooq-docker")
                       }
                       
                       repositories {
@@ -925,7 +925,7 @@ class JooqDockerPluginSpec extends Specification {
         given:
         prepareBuildGradleFile("""
                       plugins {
-                          id("com.revolut.jooq-docker")
+                          id("dev.monosoul.jooq-docker")
                       }
                       apply(plugin = "java")
                       
@@ -973,7 +973,7 @@ class JooqDockerPluginSpec extends Specification {
         given:
         prepareBuildGradleFile("""
                       plugins {
-                          id("com.revolut.jooq-docker")
+                          id("dev.monosoul.jooq-docker")
                       }
                       apply(plugin = "java-library")
                       
@@ -1027,7 +1027,7 @@ class JooqDockerPluginSpec extends Specification {
                       }
                       
                       plugins {
-                          id("com.revolut.jooq-docker")
+                          id("dev.monosoul.jooq-docker")
                       }
                       apply(plugin = "org.jetbrains.kotlin.jvm")
                       
@@ -1073,7 +1073,7 @@ class JooqDockerPluginSpec extends Specification {
         configureLocalGradleCache();
         prepareBuildGradleFile("""
                       plugins {
-                          id("com.revolut.jooq-docker")
+                          id("dev.monosoul.jooq-docker")
                       }
                       
                       repositories {
@@ -1129,7 +1129,7 @@ class JooqDockerPluginSpec extends Specification {
                 import org.jooq.meta.jaxb.ForcedType
                 
                 plugins {
-                    id("com.revolut.jooq-docker")
+                    id("dev.monosoul.jooq-docker")
                 }
                 
                 repositories {
@@ -1156,7 +1156,7 @@ class JooqDockerPluginSpec extends Specification {
                 import org.jooq.meta.jaxb.ForcedType
                 
                 plugins {
-                    id("com.revolut.jooq-docker")
+                    id("dev.monosoul.jooq-docker")
                 }
                 
                 repositories {
@@ -1215,7 +1215,7 @@ class JooqDockerPluginSpec extends Specification {
         given:
         prepareBuildGradleFile("""
                       plugins {
-                          id("com.revolut.jooq-docker")
+                          id("dev.monosoul.jooq-docker")
                       }
                       
                       repositories {
@@ -1255,7 +1255,7 @@ class JooqDockerPluginSpec extends Specification {
         given:
         prepareBuildGradleFile("""
                       plugins {
-                          id("com.revolut.jooq-docker")
+                          id("dev.monosoul.jooq-docker")
                       }
                       
                       repositories {

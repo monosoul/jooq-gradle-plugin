@@ -1,4 +1,4 @@
-package com.revolut.jooq
+package dev.monosoul.jooq
 
 import com.github.dockerjava.api.DockerClient
 import com.github.dockerjava.api.command.PullImageResultCallback
@@ -11,10 +11,11 @@ import com.github.dockerjava.core.DockerClientConfig
 import com.github.dockerjava.core.DockerClientImpl
 import com.github.dockerjava.core.command.ExecStartResultCallback
 import com.github.dockerjava.okhttp.OkHttpDockerCmdExecFactory
+import dev.monosoul.shaded.org.testcontainers.dockerclient.auth.AuthDelegatingDockerClientConfig
 import org.gradle.api.Action
-import com.revolut.shaded.org.testcontainers.dockerclient.auth.AuthDelegatingDockerClientConfig
 import java.io.Closeable
-import java.lang.System.*
+import java.lang.System.err
+import java.lang.System.out
 import java.util.UUID.randomUUID
 
 class Docker(private val imageName: String,
@@ -24,9 +25,12 @@ class Docker(private val imageName: String,
              private val databaseHostResolver: DatabaseHostResolver,
              private val containerName: String = randomUUID().toString()) : Closeable {
     // https://github.com/docker-java/docker-java/issues/1048
-    private val config: DockerClientConfig = AuthDelegatingDockerClientConfig(DefaultDockerClientConfig
-            .createDefaultConfigBuilder()
-            .build())
+    private val config: DockerClientConfig =
+        AuthDelegatingDockerClientConfig(
+            DefaultDockerClientConfig
+                .createDefaultConfigBuilder()
+                .build()
+        )
     private val docker: DockerClient = DockerClientImpl.getInstance(config)
             .withDockerCmdExecFactory(OkHttpDockerCmdExecFactory())
 

@@ -1,4 +1,4 @@
-package com.revolut.shaded.org.testcontainers.utility;
+package dev.monosoul.shaded.org.testcontainers.utility;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -22,7 +22,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import static com.revolut.shaded.org.testcontainers.utility.AuthConfigUtil.toSafeString;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -109,10 +108,10 @@ public class RegistryAuthLocator {
         final Optional<AuthConfig> cachedAuth = cache.computeIfAbsent(registryName, __ -> lookupUncachedAuthConfig(registryName, dockerImageName));
 
         if (cachedAuth.isPresent()) {
-            log.debug("Cached auth found: [{}]", toSafeString(cachedAuth.get()));
+            log.debug("Cached auth found: [{}]", dev.monosoul.shaded.org.testcontainers.utility.AuthConfigUtil.toSafeString(cachedAuth.get()));
             return cachedAuth.get();
         } else {
-            log.debug("No matching Auth Configs - falling back to defaultAuthConfig [{}]", toSafeString(defaultAuthConfig));
+            log.debug("No matching Auth Configs - falling back to defaultAuthConfig [{}]", dev.monosoul.shaded.org.testcontainers.utility.AuthConfigUtil.toSafeString(defaultAuthConfig));
             // otherwise, defaultAuthConfig should already contain any credentials available
             return defaultAuthConfig;
         }
@@ -131,19 +130,19 @@ public class RegistryAuthLocator {
             // use helper preferentially (per https://docs.docker.com/engine/reference/commandline/cli/)
             final AuthConfig helperAuthConfig = authConfigUsingHelper(config, registryName);
             if (helperAuthConfig != null) {
-                log.debug("found helper auth config [{}]", toSafeString(helperAuthConfig));
+                log.debug("found helper auth config [{}]", dev.monosoul.shaded.org.testcontainers.utility.AuthConfigUtil.toSafeString(helperAuthConfig));
                 return Optional.of(helperAuthConfig);
             }
             // no credsHelper to use, using credsStore:
             final AuthConfig storeAuthConfig = authConfigUsingStore(config, registryName);
             if (storeAuthConfig != null) {
-                log.debug("found creds store auth config [{}]", toSafeString(storeAuthConfig));
+                log.debug("found creds store auth config [{}]", dev.monosoul.shaded.org.testcontainers.utility.AuthConfigUtil.toSafeString(storeAuthConfig));
                 return Optional.of(storeAuthConfig);
             }
             // fall back to base64 encoded auth hardcoded in config file
             final AuthConfig existingAuthConfig = findExistingAuthConfig(config, registryName);
             if (existingAuthConfig != null) {
-                log.debug("found existing auth config [{}]", toSafeString(existingAuthConfig));
+                log.debug("found existing auth config [{}]", dev.monosoul.shaded.org.testcontainers.utility.AuthConfigUtil.toSafeString(existingAuthConfig));
                 return Optional.of(existingAuthConfig);
             }
         } catch (Exception e) {

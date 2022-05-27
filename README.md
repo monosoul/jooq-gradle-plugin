@@ -2,13 +2,20 @@
 
 [![Build Status](https://github.com/monosoul/jooq-gradle-plugin/actions/workflows/build-on-push.yml/badge.svg?branch=master)](https://github.com/monosoul/jooq-gradle-plugin/actions/workflows/build-on-push.yml?query=master)
 [![codecov](https://codecov.io/gh/monosoul/jooq-gradle-plugin/branch/master/graph/badge.svg?token=7SWSOTIBMX)](https://codecov.io/gh/monosoul/jooq-gradle-plugin)
-[![Gradle Plugins Release](https://img.shields.io/github/release/revolut-engineering/jooq-plugin.svg)](https://plugins.gradle.org/plugin/com.revolut.jooq-docker)
+[![Gradle Plugins Release](https://img.shields.io/github/release/monosoul/jooq-gradle-plugin.svg)](https://plugins.gradle.org/plugin/dev.monosoul.jooq-docker)
 
 Copyright 2021 [Adrian Skrobacz](https://github.com/adrianskrobaczrevolut)
 
 Copyright 2021 Revolut Ltd
 
 Copyright 2022 [Andrei Nevedomskii](https://github.com/monosoul)
+
+---
+
+Notice: this plugin was originally developed [here](https://github.com/revolut-engineering/jooq-plugin), but since 
+I can't publish it under the same group, I had to change the group from `com.revolut` to `dev.monosoul`.
+
+---
 
 This repository contains Gradle plugin for generating jOOQ classes in dockerized databases.
 Plugin registers task `generateJooqClasses` that does following steps:
@@ -27,7 +34,7 @@ Plugin registers task `generateJooqClasses` that does following steps:
 By default plugin is configured to work with PostgreSQL, so the following minimal config is enough:
 ```kotlin
 plugins {
-  id("com.revolut.jooq-docker")
+  id("dev.monosoul.jooq-docker")
 }
 
 repositories {
@@ -46,7 +53,7 @@ as shown in examples below.
 Configuring schema names and other parameters of the task:
 ```kotlin
 plugins {
-  id("com.revolut.jooq-docker")
+  id("dev.monosoul.jooq-docker")
 }
 
 repositories {
@@ -78,7 +85,7 @@ dependencies {
 To configure the plugin to work with another DB like MySQL following config can be applied:
 ```kotlin
 plugins {
-  id("com.revolut.jooq-docker")
+  id("dev.monosoul.jooq-docker")
 }
 
 repositories {
@@ -122,7 +129,7 @@ dependencies {
 To register custom types:
 ```kotlin
 plugins {
-  id("com.revolut.jooq-docker")
+  id("dev.monosoul.jooq-docker")
 }
 
 repositories {
@@ -151,7 +158,7 @@ dependencies {
 To exclude flyway schema history table from generated classes:
 ```kotlin
 plugins {
-  id("com.revolut.jooq-docker")
+  id("dev.monosoul.jooq-docker")
 }
 
 repositories {
@@ -176,7 +183,7 @@ dependencies {
 To enforce version of the plugin dependencies:
 ```kotlin
 plugins {
-  id("com.revolut.jooq-docker")
+  id("dev.monosoul.jooq-docker")
 }
 
 buildscript {
@@ -210,7 +217,7 @@ if it fail you can override it the following way:
 
 ```kotlin
 plugins {
-  id("com.revolut.jooq-docker")
+  id("dev.monosoul.jooq-docker")
 }
 
 
@@ -226,7 +233,7 @@ If for whatever reason you need to override this you can do that by specifying i
 
 ```kotlin
  plugins {
-   id("com.revolut.jooq-docker")
+   id("dev.monosoul.jooq-docker")
  }
  
  

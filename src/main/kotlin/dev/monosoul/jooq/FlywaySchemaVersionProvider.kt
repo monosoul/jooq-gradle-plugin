@@ -1,6 +1,9 @@
-package com.revolut.jooq
+package dev.monosoul.jooq
 
-import org.jooq.impl.DSL.*
+import org.jooq.impl.DSL.field
+import org.jooq.impl.DSL.max
+import org.jooq.impl.DSL.name
+import org.jooq.impl.DSL.table
 import org.jooq.meta.SchemaDefinition
 import org.jooq.meta.SchemaVersionProvider
 
@@ -10,8 +13,8 @@ class FlywaySchemaVersionProvider : SchemaVersionProvider {
         private val flywayTableName = ThreadLocal<String>()
 
         fun setup(defaultSchemaName: String, flywayTableName: String) {
-            this.defaultSchemaName.set(defaultSchemaName)
-            this.flywayTableName.set(flywayTableName)
+            Companion.defaultSchemaName.set(defaultSchemaName)
+            Companion.flywayTableName.set(flywayTableName)
         }
     }
 

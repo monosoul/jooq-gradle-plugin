@@ -28,5 +28,5 @@ jobs:
           check_name: JUnit Test Report
           report_paths: '**/build/test-results/**/TEST-*.xml'
       - name: Coverage Report
-        uses: codecov/codecov-action@v2
+        uses: codecov/codecov-action@v3
 

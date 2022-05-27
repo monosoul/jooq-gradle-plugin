@@ -1,6 +1,6 @@
 # Gradle Docker jOOQ Plugin
 
-![Build Status](https://github.com/monosoul/jooq-gradle-plugin/actions/workflows/build-on-push.yml/badge.svg?branch=master)
+[![Build Status](https://github.com/monosoul/jooq-gradle-plugin/actions/workflows/build-on-push.yml/badge.svg?branch=master)](https://github.com/monosoul/jooq-gradle-plugin/actions/workflows/build-on-push.yml?query=master)
 [![codecov](https://codecov.io/gh/monosoul/jooq-gradle-plugin/branch/master/graph/badge.svg?token=7SWSOTIBMX)](https://codecov.io/gh/monosoul/jooq-gradle-plugin)
 [![Gradle Plugins Release](https://img.shields.io/github/release/revolut-engineering/jooq-plugin.svg)](https://plugins.gradle.org/plugin/com.revolut.jooq-docker)
 

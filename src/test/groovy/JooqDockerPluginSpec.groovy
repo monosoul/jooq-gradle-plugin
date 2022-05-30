@@ -166,7 +166,7 @@ class JooqDockerPluginSpec extends Specification {
                       tasks {
                           generateJooqClasses {
                               schemas = arrayOf("public", "other")
-                              customizeGenerator {
+                              generateUsingJavaConfig {
                                   database.withExcludes("BAR")
                               }
                           }
@@ -453,7 +453,7 @@ class JooqDockerPluginSpec extends Specification {
                 tasks {
                     generateJooqClasses {
                         schemas = arrayOf("public", "other")
-                        customizeGenerator {
+                        generateUsingJavaConfig {
                             database.withExcludes("BAR")
                         }
                     }
@@ -476,7 +476,7 @@ class JooqDockerPluginSpec extends Specification {
                 tasks {
                     generateJooqClasses {
                         schemas = arrayOf("public", "other")
-                        customizeGenerator {
+                        generateUsingJavaConfig {
                             database.withExcludes(".*")
                         }
                     }
@@ -706,7 +706,7 @@ class JooqDockerPluginSpec extends Specification {
                       tasks {
                           generateJooqClasses {
                               flywayProperties = ["flyway.placeholderReplacement": "false"]
-                              customizeGenerator {
+                              generateUsingJavaConfig {
                                   database.withExcludes("BAR")
                               }
                           }
@@ -724,7 +724,7 @@ class JooqDockerPluginSpec extends Specification {
                 .withProjectDir(projectDir)
                 .withPluginClasspath()
                 .forwardOutput()
-                .withArguments("generateJooqClasses", "--stacktrace", "--stacktrace", "--debug")
+                .withArguments("generateJooqClasses", "--stacktrace", "--debug")
                 .build()
 
         then:
@@ -870,7 +870,7 @@ class JooqDockerPluginSpec extends Specification {
                           generateJooqClasses {
                               excludeFlywayTable = true
                               schemas = arrayOf("public", "other")
-                              customizeGenerator {
+                              generateUsingJavaConfig {
                                   database.withExcludes("BAR")
                               }
                           }
@@ -1257,7 +1257,7 @@ class JooqDockerPluginSpec extends Specification {
                 
                 tasks {
                     generateJooqClasses {
-                        customizeGenerator {
+                        generateUsingJavaConfig {
                             database.withForcedTypes(ForcedType()
                                 .withUserType("com.example.UniqueClassForFirstGeneration")
                                 .withBinding("com.example.PostgresJSONGsonBinding")
@@ -1284,7 +1284,7 @@ class JooqDockerPluginSpec extends Specification {
                 
                 tasks {
                     generateJooqClasses {
-                        customizeGenerator {
+                        generateUsingJavaConfig {
                             database.withForcedTypes(ForcedType()
                                 .withUserType("com.example.UniqueClassForSecondGeneration")
                                 .withBinding("com.example.PostgresJSONGsonBinding")
@@ -1386,7 +1386,7 @@ class JooqDockerPluginSpec extends Specification {
                       
                       tasks {
                           generateJooqClasses {
-                              customizeGenerator {
+                              generateUsingJavaConfig {
                                   generate.setDeprecated(true)
                               }
                           }

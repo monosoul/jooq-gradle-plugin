@@ -10,7 +10,6 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.plugins.JavaPluginExtension
-import org.gradle.api.provider.Property
 import org.gradle.api.provider.ProviderFactory
 import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
@@ -65,7 +64,7 @@ open class GenerateJooqClassesTask @Inject constructor(
     var excludeFlywayTable = false
 
     @Input
-    val generatorConfig: Property<Configuration> = objectFactory.property<Configuration>().convention(
+    val generatorConfig = objectFactory.property<Configuration>().convention(
         providerFactory.provider(::defaultGeneratorConfig)
     )
 

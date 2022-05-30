@@ -141,6 +141,7 @@ open class GenerateJooqClassesTask @Inject constructor(
 
     private fun getExtension() = project.extensions.getByName("jooq") as JooqExtension
 
+    @Suppress("unused")
     fun generateUsingFile(
         file: File = project.file("src/main/resources/db/jooq.xml"),
         customizer: Action<Generator> = Action<Generator> { }

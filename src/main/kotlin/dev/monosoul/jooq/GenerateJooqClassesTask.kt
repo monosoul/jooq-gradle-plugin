@@ -155,7 +155,7 @@ open class GenerateJooqClassesTask @Inject constructor(
     }
 
     @Suppress("unused")
-    fun customizeGenerator(customizer: Action<Generator>) {
+    fun generateUsingJavaConfig(customizer: Action<Generator>) {
         generatorConfig.set(
             providerFactory.provider {
                 defaultGeneratorConfig().also {
@@ -165,15 +165,18 @@ open class GenerateJooqClassesTask @Inject constructor(
         )
     }
 
-    @Suppress("unused")
-    fun customizeGenerator(closure: Closure<Generator>) {
-        generatorConfig.set(
-            providerFactory.provider {
-                defaultGeneratorConfig().also {
-                    closure.rehydrate(it.generator, it.generator, it.generator).call(it.generator)
-                }
-            }
-        )
+    @Deprecated(
+        message = "Use generateUsingJavaConfig instead",
+        replaceWith = ReplaceWith("generateUsingJavaConfig(customizer)"),
+    )
+    fun customizeGenerator(customizer: Action<Generator>) = generateUsingJavaConfig(customizer)
+
+    @Deprecated(
+        message = "Use generateUsingJavaConfig instead",
+        replaceWith = ReplaceWith("generateUsingJavaConfig(closure)"),
+    )
+    fun customizeGenerator(closure: Closure<Generator>) = generateUsingJavaConfig {
+        closure.rehydrate(this, this, this).call(this)
     }
 
     @TaskAction

@@ -45,8 +45,8 @@ repositories {
 }
 
 dependencies {
-    implementation("org.jooq:jooq:3.14.8")
-    jdbc("org.postgresql:postgresql:42.2.5")
+    implementation("org.jooq:jooq:3.16.5")
+    jdbc("org.postgresql:postgresql:42.3.6")
 }
 ```
 
@@ -82,8 +82,8 @@ tasks {
 }
 
 dependencies {
-    implementation("org.jooq:jooq:3.14.8")
-    jdbc("org.postgresql:postgresql:42.2.5")
+    implementation("org.jooq:jooq:3.16.5")
+    jdbc("org.postgresql:postgresql:42.3.6")
 }
 ```
 
@@ -128,7 +128,7 @@ jooq {
 }
 
 dependencies {
-    implementation("org.jooq:jooq:3.14.8")
+    implementation("org.jooq:jooq:3.16.5")
     jdbc("mysql:mysql-connector-java:8.0.15")
 }
 ```
@@ -158,9 +158,51 @@ tasks {
 }
 
 dependencies {
-    implementation("org.jooq:jooq:3.14.8")
-    jdbc("org.postgresql:postgresql:42.2.5")
+    implementation("org.jooq:jooq:3.16.5")
+    jdbc("org.postgresql:postgresql:42.3.6")
 }
+```
+
+To use XML-based configuration:
+
+```kotlin
+plugins {
+    id("dev.monosoul.jooq-docker")
+}
+
+repositories {
+    mavenCentral()
+}
+
+tasks {
+    generateJooqClasses {
+        generateUsingXmlConfig()
+    }
+}
+
+dependencies {
+    implementation("org.jooq:jooq:3.16.5")
+    jdbc("org.postgresql:postgresql:42.3.6")
+}
+```
+where `src/main/resources/db/jooq.xml` looks as following:
+```xml
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<configuration xmlns="http://www.jooq.org/xsd/jooq-codegen-3.16.5.xsd">
+    <generator>
+        <database>
+            <inputSchema>public</inputSchema>
+            <includes>.*</includes>
+            <forcedTypes>
+                <forcedType>
+                    <includeTypes>JSONB</includeTypes>
+                    <userType>com.google.gson.JsonElement</userType>
+                    <binding>com.example.PostgresJSONGsonBinding</binding>
+                </forcedType>
+            </forcedTypes>
+        </database>
+    </generator>
+</configuration>
 ```
 
 To exclude flyway schema history table from generated classes:
@@ -184,8 +226,8 @@ tasks {
 }
 
 dependencies {
-    implementation("org.jooq:jooq:3.14.8")
-    jdbc("org.postgresql:postgresql:42.2.5")
+    implementation("org.jooq:jooq:3.16.5")
+    jdbc("org.postgresql:postgresql:42.3.6")
 }
 ```
 
@@ -214,7 +256,7 @@ repositories {
 
 dependencies {
     implementation("org.jooq:jooq:3.12.0")
-    jdbc("org.postgresql:postgresql:42.2.5")
+    jdbc("org.postgresql:postgresql:42.3.6")
 }
 ```
 

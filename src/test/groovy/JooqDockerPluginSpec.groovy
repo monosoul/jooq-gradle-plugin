@@ -29,6 +29,7 @@ class JooqDockerPluginSpec extends Specification {
 
         when:
         def result = GradleRunner.create()
+                .forwardOutput()
                 .withProjectDir(projectDir)
                 .withPluginClasspath()
                 .build()
@@ -58,7 +59,8 @@ class JooqDockerPluginSpec extends Specification {
         def result = GradleRunner.create()
                 .withProjectDir(projectDir)
                 .withPluginClasspath()
-                .withArguments("generateJooqClasses")
+                .forwardOutput()
+                .withArguments("generateJooqClasses", "--stacktrace", "--debug")
                 .build()
 
         then:
@@ -96,7 +98,8 @@ class JooqDockerPluginSpec extends Specification {
         def result = GradleRunner.create()
                 .withProjectDir(projectDir)
                 .withPluginClasspath()
-                .withArguments("generateJooqClasses")
+                .forwardOutput()
+                .withArguments("generateJooqClasses", "--stacktrace", "--debug")
                 .build()
 
         then:
@@ -137,7 +140,8 @@ class JooqDockerPluginSpec extends Specification {
         def result = GradleRunner.create()
                 .withProjectDir(projectDir)
                 .withPluginClasspath()
-                .withArguments("generateJooqClasses")
+                .forwardOutput()
+                .withArguments("generateJooqClasses", "--stacktrace", "--debug")
                 .build()
 
         then:
@@ -178,7 +182,8 @@ class JooqDockerPluginSpec extends Specification {
         def result = GradleRunner.create()
                 .withProjectDir(projectDir)
                 .withPluginClasspath()
-                .withArguments("generateJooqClasses")
+                .forwardOutput()
+                .withArguments("generateJooqClasses", "--stacktrace", "--debug")
                 .build()
 
         then:
@@ -216,9 +221,9 @@ class JooqDockerPluginSpec extends Specification {
 
         when:
         def result = GradleRunner.create()
-                .forwardOutput()
                 .withProjectDir(projectDir)
                 .withPluginClasspath()
+                .forwardOutput()
                 .withArguments("generateJooqClasses", "--stacktrace", "--debug")
                 .build()
 
@@ -251,18 +256,21 @@ class JooqDockerPluginSpec extends Specification {
         def firstRun = GradleRunner.create()
                 .withProjectDir(projectDir)
                 .withPluginClasspath()
-                .withArguments("generateJooqClasses")
+                .forwardOutput()
+                .withArguments("generateJooqClasses", "--stacktrace", "--debug")
                 .build()
         def secondRun = GradleRunner.create()
                 .withProjectDir(projectDir)
                 .withPluginClasspath()
-                .withArguments("generateJooqClasses")
+                .forwardOutput()
+                .withArguments("generateJooqClasses", "--stacktrace", "--debug")
                 .build()
         Paths.get(projectDir.path, "build/generated-jooq").toFile().deleteDir()
         def runAfterDeletion = GradleRunner.create()
                 .withProjectDir(projectDir)
                 .withPluginClasspath()
-                .withArguments("generateJooqClasses")
+                .forwardOutput()
+                .withArguments("generateJooqClasses", "--stacktrace", "--debug")
                 .build()
 
         then:
@@ -292,18 +300,21 @@ class JooqDockerPluginSpec extends Specification {
         def firstRun = GradleRunner.create()
                 .withProjectDir(projectDir)
                 .withPluginClasspath()
-                .withArguments("generateJooqClasses")
+                .forwardOutput()
+                .withArguments("generateJooqClasses", "--stacktrace", "--debug")
                 .build()
         def secondRun = GradleRunner.create()
                 .withProjectDir(projectDir)
                 .withPluginClasspath()
-                .withArguments("generateJooqClasses")
+                .forwardOutput()
+                .withArguments("generateJooqClasses", "--stacktrace", "--debug")
                 .build()
         copyResource("/V02__add_bar.sql", "src/main/resources/db/migration/V02__add_bar.sql")
         def runAfterDeletion = GradleRunner.create()
                 .withProjectDir(projectDir)
                 .withPluginClasspath()
-                .withArguments("generateJooqClasses")
+                .forwardOutput()
+                .withArguments("generateJooqClasses", "--stacktrace", "--debug")
                 .build()
 
         then:
@@ -361,18 +372,21 @@ class JooqDockerPluginSpec extends Specification {
         def initialResult = GradleRunner.create()
                 .withProjectDir(projectDir)
                 .withPluginClasspath()
-                .withArguments("generateJooqClasses")
+                .forwardOutput()
+                .withArguments("generateJooqClasses", "--stacktrace", "--debug")
                 .build()
         prepareBuildGradleFile(extensionUpdatedBuildGradle)
         def resultAfterChangeToExtension = GradleRunner.create()
                 .withProjectDir(projectDir)
                 .withPluginClasspath()
-                .withArguments("generateJooqClasses")
+                .forwardOutput()
+                .withArguments("generateJooqClasses", "--stacktrace", "--debug")
                 .build()
         def finalRunNoChanges = GradleRunner.create()
                 .withProjectDir(projectDir)
                 .withPluginClasspath()
-                .withArguments("generateJooqClasses")
+                .forwardOutput()
+                .withArguments("generateJooqClasses", "--stacktrace", "--debug")
                 .build()
 
         then:
@@ -436,18 +450,21 @@ class JooqDockerPluginSpec extends Specification {
         def initialRun = GradleRunner.create()
                 .withProjectDir(projectDir)
                 .withPluginClasspath()
-                .withArguments("generateJooqClasses")
+                .forwardOutput()
+                .withArguments("generateJooqClasses", "--stacktrace", "--debug")
                 .build()
         prepareBuildGradleFile(updatedBuildGradle)
         def runAfterUpdate = GradleRunner.create()
                 .withProjectDir(projectDir)
                 .withPluginClasspath()
-                .withArguments("generateJooqClasses")
+                .forwardOutput()
+                .withArguments("generateJooqClasses", "--stacktrace", "--debug")
                 .build()
         def finalRunNoChanges = GradleRunner.create()
                 .withProjectDir(projectDir)
                 .withPluginClasspath()
-                .withArguments("generateJooqClasses")
+                .forwardOutput()
+                .withArguments("generateJooqClasses", "--stacktrace", "--debug")
                 .build()
 
         then:
@@ -487,7 +504,8 @@ class JooqDockerPluginSpec extends Specification {
         def result = GradleRunner.create()
                 .withProjectDir(projectDir)
                 .withPluginClasspath()
-                .withArguments("generateJooqClasses")
+                .forwardOutput()
+                .withArguments("generateJooqClasses", "--stacktrace", "--debug")
                 .build()
 
         then:
@@ -545,7 +563,8 @@ class JooqDockerPluginSpec extends Specification {
         def result = GradleRunner.create()
                 .withProjectDir(projectDir)
                 .withPluginClasspath()
-                .withArguments("generateJooqClasses", "--stacktrace")
+                .forwardOutput()
+                .withArguments("generateJooqClasses", "--stacktrace", "--stacktrace", "--debug")
                 .build()
 
         then:
@@ -581,7 +600,8 @@ class JooqDockerPluginSpec extends Specification {
         def result = GradleRunner.create()
                 .withProjectDir(projectDir)
                 .withPluginClasspath()
-                .withArguments("generateJooqClasses")
+                .forwardOutput()
+                .withArguments("generateJooqClasses", "--stacktrace", "--debug")
                 .build()
 
         then:
@@ -617,7 +637,8 @@ class JooqDockerPluginSpec extends Specification {
         def result = GradleRunner.create()
                 .withProjectDir(projectDir)
                 .withPluginClasspath()
-                .withArguments("generateJooqClasses")
+                .forwardOutput()
+                .withArguments("generateJooqClasses", "--stacktrace", "--debug")
                 .build()
 
         then:
@@ -659,7 +680,8 @@ class JooqDockerPluginSpec extends Specification {
         def result = GradleRunner.create()
                 .withProjectDir(projectDir)
                 .withPluginClasspath()
-                .withArguments("generateJooqClasses", "--stacktrace")
+                .forwardOutput()
+                .withArguments("generateJooqClasses", "--stacktrace", "--stacktrace", "--debug")
                 .build()
 
         then:
@@ -697,7 +719,8 @@ class JooqDockerPluginSpec extends Specification {
         def result = GradleRunner.create()
                 .withProjectDir(projectDir)
                 .withPluginClasspath()
-                .withArguments("generateJooqClasses")
+                .forwardOutput()
+                .withArguments("generateJooqClasses", "--stacktrace", "--debug")
                 .build()
 
         then:
@@ -735,7 +758,8 @@ class JooqDockerPluginSpec extends Specification {
         def result = GradleRunner.create()
                 .withProjectDir(projectDir)
                 .withPluginClasspath()
-                .withArguments("generateJooqClasses")
+                .forwardOutput()
+                .withArguments("generateJooqClasses", "--stacktrace", "--debug")
                 .build()
 
         then:
@@ -775,7 +799,8 @@ class JooqDockerPluginSpec extends Specification {
         def result = GradleRunner.create()
                 .withProjectDir(projectDir)
                 .withPluginClasspath()
-                .withArguments("generateJooqClasses")
+                .forwardOutput()
+                .withArguments("generateJooqClasses", "--stacktrace", "--debug")
                 .build()
 
         then:
@@ -818,7 +843,8 @@ class JooqDockerPluginSpec extends Specification {
         def result = GradleRunner.create()
                 .withProjectDir(projectDir)
                 .withPluginClasspath()
-                .withArguments("generateJooqClasses")
+                .forwardOutput()
+                .withArguments("generateJooqClasses", "--stacktrace", "--debug")
                 .build()
 
         then:
@@ -858,7 +884,8 @@ class JooqDockerPluginSpec extends Specification {
         def result = GradleRunner.create()
                 .withProjectDir(projectDir)
                 .withPluginClasspath()
-                .withArguments("generateJooqClasses")
+                .forwardOutput()
+                .withArguments("generateJooqClasses", "--stacktrace", "--debug")
                 .build()
 
         then:
@@ -905,7 +932,8 @@ class JooqDockerPluginSpec extends Specification {
         def result = GradleRunner.create()
                 .withProjectDir(projectDir)
                 .withPluginClasspath()
-                .withArguments("classes")
+                .forwardOutput()
+                .withArguments("classes", "--stacktrace", "--debug")
                 .build()
 
         then:
@@ -950,7 +978,8 @@ class JooqDockerPluginSpec extends Specification {
         def result = GradleRunner.create()
                 .withProjectDir(projectDir)
                 .withPluginClasspath()
-                .withArguments("classes")
+                .forwardOutput()
+                .withArguments("classes", "--stacktrace", "--debug")
                 .build()
 
         then:
@@ -998,7 +1027,8 @@ class JooqDockerPluginSpec extends Specification {
         def result = GradleRunner.create()
                 .withProjectDir(projectDir)
                 .withPluginClasspath()
-                .withArguments("classes")
+                .forwardOutput()
+                .withArguments("classes", "--stacktrace", "--debug")
                 .build()
 
         then:
@@ -1046,7 +1076,8 @@ class JooqDockerPluginSpec extends Specification {
         def result = GradleRunner.create()
                 .withProjectDir(projectDir)
                 .withPluginClasspath()
-                .withArguments("classes")
+                .forwardOutput()
+                .withArguments("classes", "--stacktrace", "--debug")
                 .build()
 
         then:
@@ -1097,7 +1128,8 @@ class JooqDockerPluginSpec extends Specification {
         def result = GradleRunner.create()
                 .withProjectDir(projectDir)
                 .withPluginClasspath()
-                .withArguments("classes")
+                .forwardOutput()
+                .withArguments("classes", "--stacktrace", "--debug")
                 .build()
 
         then:
@@ -1132,14 +1164,16 @@ class JooqDockerPluginSpec extends Specification {
         def firstRun = GradleRunner.create()
                 .withProjectDir(projectDir)
                 .withPluginClasspath()
-                .withArguments("generateJooqClasses", "--build-cache")
+                .forwardOutput()
+                .withArguments("generateJooqClasses", "--build-cache", "--stacktrace", "--debug")
                 .build()
         //second run uses from cache
         new File(projectDir, 'build').deleteDir()
         def secondRun = GradleRunner.create()
                 .withProjectDir(projectDir)
                 .withPluginClasspath()
-                .withArguments("generateJooqClasses", "--build-cache")
+                .forwardOutput()
+                .withArguments("generateJooqClasses", "--build-cache", "--stacktrace", "--debug")
                 .build()
         //third run got changes and can't use cached output
         new File(projectDir, 'build').deleteDir()
@@ -1147,7 +1181,8 @@ class JooqDockerPluginSpec extends Specification {
         def thirdRun = GradleRunner.create()
                 .withProjectDir(projectDir)
                 .withPluginClasspath()
-                .withArguments("generateJooqClasses", "--build-cache")
+                .forwardOutput()
+                .withArguments("generateJooqClasses", "--build-cache", "--stacktrace", "--debug")
                 .build()
 
         then:
@@ -1226,7 +1261,8 @@ class JooqDockerPluginSpec extends Specification {
         def firstRun = GradleRunner.create()
                 .withProjectDir(projectDir)
                 .withPluginClasspath()
-                .withArguments("generateJooqClasses")
+                .forwardOutput()
+                .withArguments("generateJooqClasses", "--stacktrace", "--debug")
                 .build()
 
         then:
@@ -1241,7 +1277,8 @@ class JooqDockerPluginSpec extends Specification {
         def secondRun = GradleRunner.create()
                 .withProjectDir(projectDir)
                 .withPluginClasspath()
-                .withArguments("generateJooqClasses")
+                .forwardOutput()
+                .withArguments("generateJooqClasses", "--stacktrace", "--debug")
                 .build()
 
         then:
@@ -1279,7 +1316,8 @@ class JooqDockerPluginSpec extends Specification {
         def result = GradleRunner.create()
                 .withProjectDir(projectDir)
                 .withPluginClasspath()
-                .withArguments("generateJooqClasses")
+                .forwardOutput()
+                .withArguments("generateJooqClasses", "--stacktrace", "--debug")
                 .build()
 
         then:
@@ -1321,7 +1359,8 @@ class JooqDockerPluginSpec extends Specification {
         def result = GradleRunner.create()
                 .withProjectDir(projectDir)
                 .withPluginClasspath()
-                .withArguments("generateJooqClasses")
+                .forwardOutput()
+                .withArguments("generateJooqClasses", "--stacktrace", "--debug")
                 .build()
 
         then:

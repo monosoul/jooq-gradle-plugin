@@ -66,7 +66,7 @@ open class GenerateJooqClassesTask @Inject constructor(
 
     @Input
     val generatorConfig: Property<Configuration> = objectFactory.property<Configuration>().convention(
-        providerFactory.provider(::prepareGeneratorConfig)
+        providerFactory.provider(::defaultGeneratorConfig)
     )
 
     @InputFiles
@@ -158,7 +158,7 @@ open class GenerateJooqClassesTask @Inject constructor(
     fun customizeGenerator(customizer: Action<Generator>) {
         generatorConfig.set(
             providerFactory.provider {
-                prepareGeneratorConfig().also {
+                defaultGeneratorConfig().also {
                     customizer.execute(it.generator)
                 }
             }
@@ -169,7 +169,7 @@ open class GenerateJooqClassesTask @Inject constructor(
     fun customizeGenerator(closure: Closure<Generator>) {
         generatorConfig.set(
             providerFactory.provider {
-                prepareGeneratorConfig().also {
+                defaultGeneratorConfig().also {
                     closure.rehydrate(it.generator, it.generator, it.generator).call(it.generator)
                 }
             }
@@ -235,7 +235,7 @@ open class GenerateJooqClassesTask @Inject constructor(
         }.run(tool::run)
     }
 
-    private fun prepareGeneratorConfig() = Generator()
+    private fun defaultGeneratorConfig() = Generator()
         .withName(JavaGenerator::class.qualifiedName)
         .withDatabase(
             Database()

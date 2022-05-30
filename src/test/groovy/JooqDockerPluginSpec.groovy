@@ -208,7 +208,7 @@ class JooqDockerPluginSpec extends Specification {
                       tasks {
                           generateJooqClasses {
                               schemas = arrayOf("public", "other")
-                              generateUsingFile()
+                              generateUsingXmlConfig()
                           }
                       }
                       
@@ -249,7 +249,7 @@ class JooqDockerPluginSpec extends Specification {
                       tasks {
                           generateJooqClasses {
                               schemas = arrayOf("public", "other")
-                              generateUsingFile {
+                              generateUsingXmlConfig {
                                  database.withExcludes("BAR")
                               }
                           }

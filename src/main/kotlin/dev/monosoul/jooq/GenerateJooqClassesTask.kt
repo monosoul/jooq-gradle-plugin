@@ -1,7 +1,5 @@
 package dev.monosoul.jooq
 
-import dev.monosoul.jooq.GeneratorConfig.CodeBased
-import dev.monosoul.jooq.GeneratorConfig.FileBased
 import groovy.lang.Closure
 import org.flywaydb.core.Flyway
 import org.flywaydb.core.api.Location.FILESYSTEM_PREFIX
@@ -67,7 +65,7 @@ open class GenerateJooqClassesTask @Inject constructor(
     var excludeFlywayTable = false
 
     @Input
-    val generatorConfig: Property<GeneratorConfig> = objectFactory.property<GeneratorConfig>().convention(
+    val generatorConfig: Property<Configuration> = objectFactory.property<Configuration>().convention(
         providerFactory.provider(::prepareGeneratorConfig)
     )
 
@@ -143,9 +141,16 @@ open class GenerateJooqClassesTask @Inject constructor(
 
     private fun getExtension() = project.extensions.getByName("jooq") as JooqExtension
 
-    fun generateUsingFile(file: File = project.file("src/main/resources/db/jooq.xml")) {
+    fun generateUsingFile(
+        file: File = project.file("src/main/resources/db/jooq.xml"),
+        customizer: Action<Generator> = Action<Generator> { }
+    ) {
         generatorConfig.set(
-            GeneratorConfig.FileBased(file)
+            providerFactory.provider {
+                file.inputStream().use(GenerationTool::load).applyCommonConfiguration().also {
+                    it.generator.apply(customizer::execute)
+                }
+            }
         )
     }
 
@@ -217,22 +222,9 @@ open class GenerateJooqClassesTask @Inject constructor(
         SchemaPackageRenameGeneratorStrategy.schemaToPackageMapping.set(schemaToPackageMapping.toMap())
         val tool = GenerationTool()
         tool.setClassLoader(jdbcAwareClassLoader)
-        when (val evaluatedGeneratorConfig = generatorConfig.get()) {
-            is CodeBased -> {
-                val generator = evaluatedGeneratorConfig.generator
-                excludeFlywaySchemaIfNeeded(generator)
-                Configuration().withGenerator(generator)
-            }
-            is FileBased -> {
-                evaluatedGeneratorConfig.configFile.inputStream().use {
-                    GenerationTool.load(it)
-                }.apply {
-                    excludeFlywaySchemaIfNeeded(generator)
-                    generator.target = codeGenTarget()
-                }
-            }
+        generatorConfig.get().also {
+            excludeFlywaySchemaIfNeeded(it.generator)
         }.apply {
-            withLogging(Logging.DEBUG)
             withJdbc(
                 Jdbc()
                     .withDriver(jdbc.driverClassName)
@@ -245,21 +237,29 @@ open class GenerateJooqClassesTask @Inject constructor(
 
     private fun prepareGeneratorConfig() = Generator()
         .withName(JavaGenerator::class.qualifiedName)
-        .withStrategy(
-            Strategy()
-                .withName(SchemaPackageRenameGeneratorStrategy::class.qualifiedName)
-        )
         .withDatabase(
             Database()
                 .withName(getJdbc().jooqMetaName)
                 .withSchemata(schemas.map(this::toSchemaMappingType))
-                .withSchemaVersionProvider(FlywaySchemaVersionProvider::class.qualifiedName)
                 .withIncludes(".*")
                 .withExcludes("")
         )
-        .withTarget(codeGenTarget())
         .withGenerate(Generate())
-        .let(GeneratorConfig::CodeBased)
+        .let {
+            Configuration().withGenerator(it)
+        }
+        .applyCommonConfiguration()
+
+    private fun Configuration.applyCommonConfiguration() = also {
+        it.generator.apply {
+            withLogging(Logging.DEBUG)
+            withTarget(codeGenTarget())
+            withStrategy(
+                Strategy().withName(SchemaPackageRenameGeneratorStrategy::class.qualifiedName)
+            )
+            database.withSchemaVersionProvider(FlywaySchemaVersionProvider::class.qualifiedName)
+        }
+    }
 
     private fun codeGenTarget() = Target()
         .withPackageName(basePackageName)

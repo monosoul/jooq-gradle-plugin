@@ -607,7 +607,7 @@ class JooqDockerPluginSpec extends Specification {
                 .withProjectDir(projectDir)
                 .withPluginClasspath()
                 .forwardOutput()
-                .withArguments("generateJooqClasses", "--stacktrace", "--stacktrace", "--debug")
+                .withArguments("generateJooqClasses", "--stacktrace", "--debug")
                 .build()
 
         then:

@@ -7,8 +7,11 @@ import org.flywaydb.core.internal.configuration.ConfigUtils.DEFAULT_SCHEMA
 import org.flywaydb.core.internal.configuration.ConfigUtils.TABLE
 import org.gradle.api.Action
 import org.gradle.api.DefaultTask
+import org.gradle.api.model.ObjectFactory
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.plugins.JavaPluginExtension
+import org.gradle.api.provider.Property
+import org.gradle.api.provider.ProviderFactory
 import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
@@ -20,6 +23,7 @@ import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.SourceSet.MAIN_SOURCE_SET_NAME
 import org.gradle.api.tasks.TaskAction
 import org.gradle.kotlin.dsl.getByType
+import org.gradle.kotlin.dsl.property
 import org.jooq.codegen.GenerationTool
 import org.jooq.codegen.JavaGenerator
 import org.jooq.meta.jaxb.Configuration
@@ -34,9 +38,13 @@ import org.jooq.meta.jaxb.Target
 import java.io.IOException
 import java.net.URL
 import java.net.URLClassLoader
+import javax.inject.Inject
 
 @CacheableTask
-open class GenerateJooqClassesTask : DefaultTask() {
+open class GenerateJooqClassesTask @Inject constructor(
+    private val objectFactory: ObjectFactory,
+    private val providerFactory: ProviderFactory,
+) : DefaultTask() {
     @Input
     var schemas = arrayOf("public")
 
@@ -55,16 +63,17 @@ open class GenerateJooqClassesTask : DefaultTask() {
     @Input
     var excludeFlywayTable = false
 
-    @Internal
-    var generatorConfig = project.provider(this::prepareGeneratorConfig)
-        private set
+    @Input
+    val generatorConfig: Property<Generator> = objectFactory.property<Generator>().convention(
+        providerFactory.provider(::prepareGeneratorConfig)
+    )
 
     @InputFiles
     @PathSensitive(PathSensitivity.RELATIVE)
-    val inputDirectory = project.objects.fileCollection().from("src/main/resources/db/migration")
+    val inputDirectory = objectFactory.fileCollection().from("src/main/resources/db/migration")
 
     @OutputDirectory
-    val outputDirectory = project.objects.directoryProperty().convention(project.layout.buildDirectory.dir("generated-jooq"))
+    val outputDirectory = objectFactory.directoryProperty().convention(project.layout.buildDirectory.dir("generated-jooq"))
 
     @Internal
     fun getDb() = getExtension().db
@@ -118,11 +127,6 @@ open class GenerateJooqClassesTask : DefaultTask() {
     @Input
     fun getReadinessCommand() = getImage().getReadinessCommand()
 
-    @Input
-    fun getCleanedGeneratorConfig() = generatorConfig.get().apply {
-        target.withDirectory("ignored")
-    }
-
     init {
         project.plugins.withType(JavaPlugin::class.java) {
             project.extensions.getByType<JavaPluginExtension>().sourceSets.named(MAIN_SOURCE_SET_NAME) {
@@ -138,18 +142,22 @@ open class GenerateJooqClassesTask : DefaultTask() {
 
     @Suppress("unused")
     fun customizeGenerator(customizer: Action<Generator>) {
-        generatorConfig = generatorConfig.map {
-            customizer.execute(it)
-            it
-        }
+        generatorConfig.set(
+            providerFactory.provider {
+                prepareGeneratorConfig().apply(customizer::execute)
+            }
+        )
     }
 
     @Suppress("unused")
     fun customizeGenerator(closure: Closure<Generator>) {
-        generatorConfig = generatorConfig.map {
-            closure.rehydrate(it, it, it).call(it)
-            it
-        }
+        generatorConfig.set(
+            providerFactory.provider {
+                prepareGeneratorConfig().also {
+                    closure.rehydrate(it, it, it).call(it)
+                }
+            }
+        )
     }
 
     @TaskAction

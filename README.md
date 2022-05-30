@@ -70,7 +70,7 @@ tasks {
     excludeFlywayTable = true
     outputSchemaToDefault = setOf("public")
     schemaToPackageMapping = mapOf("public" to "fancy_name")
-    customizeGenerator {
+    generateUsingJavaConfig {
       /* "this" here is the org.jooq.meta.jaxb.Generator configure it as you please */
     }
   }
@@ -138,7 +138,7 @@ repositories {
 
 tasks {
   generateJooqClasses {
-    customizeGenerator {
+    generateUsingJavaConfig {
       database.withForcedTypes(
               ForcedType()
                       .withUserType("com.google.gson.JsonElement")
@@ -168,7 +168,7 @@ repositories {
 tasks {
   generateJooqClasses {
     schemas = arrayOf("other")
-    customizeGenerator {
+    generateUsingJavaConfig {
       database.withExcludes("flyway_schema_history")
     }
   }

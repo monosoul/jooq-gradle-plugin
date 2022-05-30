@@ -5,7 +5,9 @@ import spock.lang.TempDir
 import java.nio.file.Files
 import java.nio.file.Paths
 
-import static org.gradle.testkit.runner.TaskOutcome.*
+import static org.gradle.testkit.runner.TaskOutcome.FROM_CACHE
+import static org.gradle.testkit.runner.TaskOutcome.SUCCESS
+import static org.gradle.testkit.runner.TaskOutcome.UP_TO_DATE
 
 class JooqDockerPluginSpec extends Specification {
 
@@ -21,26 +23,28 @@ class JooqDockerPluginSpec extends Specification {
 
     def "plugin is applicable"() {
         given:
-        prepareBuildGradleFile("""
+            prepareBuildGradleFile(
+                    """
                       plugins {
                           id("dev.monosoul.jooq-docker")
                       }
-                      """)
+                      """
+            )
 
         when:
-        def result = GradleRunner.create()
-                .forwardOutput()
-                .withProjectDir(projectDir)
-                .withPluginClasspath()
-                .build()
+            def result = GradleRunner.create()
+                    .forwardOutput()
+                    .withProjectDir(projectDir)
+                    .withPluginClasspath()
+                    .build()
 
         then:
-        result != null
+            result != null
     }
 
     def "generates jooq classes for PostgreSQL db with default config"() {
         given:
-        prepareBuildGradleFile("""
+            prepareBuildGradleFile("""
                       plugins {
                           id("dev.monosoul.jooq-docker")
                       }
@@ -53,27 +57,27 @@ class JooqDockerPluginSpec extends Specification {
                           jdbc("org.postgresql:postgresql:42.3.6")
                       }
                       """)
-        copyResource("/V01__init.sql", "src/main/resources/db/migration/V01__init.sql")
+            copyResource("/V01__init.sql", "src/main/resources/db/migration/V01__init.sql")
 
         when:
-        def result = GradleRunner.create()
-                .withProjectDir(projectDir)
-                .withPluginClasspath()
-                .forwardOutput()
-                .withArguments("generateJooqClasses", "--stacktrace", "--debug")
-                .build()
+            def result = GradleRunner.create()
+                    .withProjectDir(projectDir)
+                    .withPluginClasspath()
+                    .forwardOutput()
+                    .withArguments("generateJooqClasses", "--stacktrace", "--debug")
+                    .build()
 
         then:
-        result.task(":generateJooqClasses").outcome == SUCCESS
-        def generatedFooClass = Paths.get(projectDir.getPath(), "build/generated-jooq/org/jooq/generated/tables/Foo.java")
-        def generatedFlywayClass = Paths.get(projectDir.getPath(), "build/generated-jooq/org/jooq/generated/tables/FlywaySchemaHistory.java")
-        Files.exists(generatedFooClass)
-        Files.exists(generatedFlywayClass)
+            result.task(":generateJooqClasses").outcome == SUCCESS
+            def generatedFooClass = Paths.get(projectDir.getPath(), "build/generated-jooq/org/jooq/generated/tables/Foo.java")
+            def generatedFlywayClass = Paths.get(projectDir.getPath(), "build/generated-jooq/org/jooq/generated/tables/FlywaySchemaHistory.java")
+            Files.exists(generatedFooClass)
+            Files.exists(generatedFlywayClass)
     }
 
     def "generates jooq classes for PostgreSQL db with default config for multiple schemas"() {
         given:
-        prepareBuildGradleFile("""
+            prepareBuildGradleFile("""
                       plugins {
                           id("dev.monosoul.jooq-docker")
                       }
@@ -92,29 +96,29 @@ class JooqDockerPluginSpec extends Specification {
                           jdbc("org.postgresql:postgresql:42.3.6")
                       }
                       """)
-        copyResource("/V01__init_multiple_schemas.sql", "src/main/resources/db/migration/V01__init_multiple_schemas.sql")
+            copyResource("/V01__init_multiple_schemas.sql", "src/main/resources/db/migration/V01__init_multiple_schemas.sql")
 
         when:
-        def result = GradleRunner.create()
-                .withProjectDir(projectDir)
-                .withPluginClasspath()
-                .forwardOutput()
-                .withArguments("generateJooqClasses", "--stacktrace", "--debug")
-                .build()
+            def result = GradleRunner.create()
+                    .withProjectDir(projectDir)
+                    .withPluginClasspath()
+                    .forwardOutput()
+                    .withArguments("generateJooqClasses", "--stacktrace", "--debug")
+                    .build()
 
         then:
-        result.task(":generateJooqClasses").outcome == SUCCESS
-        def generatedPublic = Paths.get(projectDir.getPath(), "build/generated-jooq/org/jooq/generated/public_/tables/Foo.java")
-        def generatedOther = Paths.get(projectDir.getPath(), "build/generated-jooq/org/jooq/generated/other/tables/Bar.java")
-        def generatedFlywaySchemaClass = Paths.get(projectDir.getPath(), "build/generated-jooq/org/jooq/generated/public_/tables/FlywaySchemaHistory.java")
-        Files.exists(generatedPublic)
-        Files.exists(generatedOther)
-        Files.exists(generatedFlywaySchemaClass)
+            result.task(":generateJooqClasses").outcome == SUCCESS
+            def generatedPublic = Paths.get(projectDir.getPath(), "build/generated-jooq/org/jooq/generated/public_/tables/Foo.java")
+            def generatedOther = Paths.get(projectDir.getPath(), "build/generated-jooq/org/jooq/generated/other/tables/Bar.java")
+            def generatedFlywaySchemaClass = Paths.get(projectDir.getPath(), "build/generated-jooq/org/jooq/generated/public_/tables/FlywaySchemaHistory.java")
+            Files.exists(generatedPublic)
+            Files.exists(generatedOther)
+            Files.exists(generatedFlywaySchemaClass)
     }
 
     def "generates jooq classes for PostgreSQL db with default config for multiple schemas and renames package"() {
         given:
-        prepareBuildGradleFile("""
+            prepareBuildGradleFile("""
                       plugins {
                           id("dev.monosoul.jooq-docker")
                       }
@@ -134,27 +138,27 @@ class JooqDockerPluginSpec extends Specification {
                           jdbc("org.postgresql:postgresql:42.3.6")
                       }
                       """)
-        copyResource("/V01__init_multiple_schemas.sql", "src/main/resources/db/migration/V01__init_multiple_schemas.sql")
+            copyResource("/V01__init_multiple_schemas.sql", "src/main/resources/db/migration/V01__init_multiple_schemas.sql")
 
         when:
-        def result = GradleRunner.create()
-                .withProjectDir(projectDir)
-                .withPluginClasspath()
-                .forwardOutput()
-                .withArguments("generateJooqClasses", "--stacktrace", "--debug")
-                .build()
+            def result = GradleRunner.create()
+                    .withProjectDir(projectDir)
+                    .withPluginClasspath()
+                    .forwardOutput()
+                    .withArguments("generateJooqClasses", "--stacktrace", "--debug")
+                    .build()
 
         then:
-        result.task(":generateJooqClasses").outcome == SUCCESS
-        def generatedPublic = Paths.get(projectDir.getPath(), "build/generated-jooq/org/jooq/generated/fancy_name/tables/Foo.java")
-        def generatedOther = Paths.get(projectDir.getPath(), "build/generated-jooq/org/jooq/generated/other/tables/Bar.java")
-        Files.exists(generatedPublic)
-        Files.exists(generatedOther)
+            result.task(":generateJooqClasses").outcome == SUCCESS
+            def generatedPublic = Paths.get(projectDir.getPath(), "build/generated-jooq/org/jooq/generated/fancy_name/tables/Foo.java")
+            def generatedOther = Paths.get(projectDir.getPath(), "build/generated-jooq/org/jooq/generated/other/tables/Bar.java")
+            Files.exists(generatedPublic)
+            Files.exists(generatedOther)
     }
 
     def "respects the generator customizations"() {
         given:
-        prepareBuildGradleFile("""
+            prepareBuildGradleFile("""
                       plugins {
                           id("dev.monosoul.jooq-docker")
                       }
@@ -176,27 +180,27 @@ class JooqDockerPluginSpec extends Specification {
                           jdbc("org.postgresql:postgresql:42.3.6")
                       }
                       """)
-        copyResource("/V01__init_multiple_schemas.sql", "src/main/resources/db/migration/V01__init_multiple_schemas.sql")
+            copyResource("/V01__init_multiple_schemas.sql", "src/main/resources/db/migration/V01__init_multiple_schemas.sql")
 
         when:
-        def result = GradleRunner.create()
-                .withProjectDir(projectDir)
-                .withPluginClasspath()
-                .forwardOutput()
-                .withArguments("generateJooqClasses", "--stacktrace", "--debug")
-                .build()
+            def result = GradleRunner.create()
+                    .withProjectDir(projectDir)
+                    .withPluginClasspath()
+                    .forwardOutput()
+                    .withArguments("generateJooqClasses", "--stacktrace", "--debug")
+                    .build()
 
         then:
-        result.task(":generateJooqClasses").outcome == SUCCESS
-        def generatedPublic = Paths.get(projectDir.getPath(), "build/generated-jooq/org/jooq/generated/public_/tables/Foo.java")
-        def generatedOther = Paths.get(projectDir.getPath(), "build/generated-jooq/org/jooq/generated/other/tables/Bar.java")
-        Files.exists(generatedPublic)
-        !Files.exists(generatedOther)
+            result.task(":generateJooqClasses").outcome == SUCCESS
+            def generatedPublic = Paths.get(projectDir.getPath(), "build/generated-jooq/org/jooq/generated/public_/tables/Foo.java")
+            def generatedOther = Paths.get(projectDir.getPath(), "build/generated-jooq/org/jooq/generated/other/tables/Bar.java")
+            Files.exists(generatedPublic)
+            !Files.exists(generatedOther)
     }
 
     def "can generate jOOQ classes using xml generator definition"() {
         given:
-        prepareBuildGradleFile("""
+            prepareBuildGradleFile("""
                       plugins {
                           id("dev.monosoul.jooq-docker")
                       }
@@ -216,28 +220,28 @@ class JooqDockerPluginSpec extends Specification {
                           jdbc("org.postgresql:postgresql:42.3.6")
                       }
                       """)
-        copyResource("/V01__init_multiple_schemas.sql", "src/main/resources/db/migration/V01__init_multiple_schemas.sql")
-        copyResource("/jooq-generator.xml", "src/main/resources/db/jooq.xml")
+            copyResource("/V01__init_multiple_schemas.sql", "src/main/resources/db/migration/V01__init_multiple_schemas.sql")
+            copyResource("/jooq-generator.xml", "src/main/resources/db/jooq.xml")
 
         when:
-        def result = GradleRunner.create()
-                .withProjectDir(projectDir)
-                .withPluginClasspath()
-                .forwardOutput()
-                .withArguments("generateJooqClasses", "--stacktrace", "--debug")
-                .build()
+            def result = GradleRunner.create()
+                    .withProjectDir(projectDir)
+                    .withPluginClasspath()
+                    .forwardOutput()
+                    .withArguments("generateJooqClasses", "--stacktrace", "--debug")
+                    .build()
 
         then:
-        result.task(":generateJooqClasses").outcome == SUCCESS
-        def generatedPublic = Paths.get(projectDir.getPath(), "build/generated-jooq/org/jooq/generated/public_/tables/Foo.java")
-        def generatedOther = Paths.get(projectDir.getPath(), "build/generated-jooq/org/jooq/generated/other/tables/Bar.java")
-        Files.exists(generatedPublic)
-        !Files.exists(generatedOther)
+            result.task(":generateJooqClasses").outcome == SUCCESS
+            def generatedPublic = Paths.get(projectDir.getPath(), "build/generated-jooq/org/jooq/generated/public_/tables/Foo.java")
+            def generatedOther = Paths.get(projectDir.getPath(), "build/generated-jooq/org/jooq/generated/other/tables/Bar.java")
+            Files.exists(generatedPublic)
+            !Files.exists(generatedOther)
     }
 
     def "can apply customizations to XML-based code generation configuration"() {
         given:
-        prepareBuildGradleFile("""
+            prepareBuildGradleFile("""
                       plugins {
                           id("dev.monosoul.jooq-docker")
                       }
@@ -259,28 +263,28 @@ class JooqDockerPluginSpec extends Specification {
                           jdbc("org.postgresql:postgresql:42.3.6")
                       }
                       """)
-        copyResource("/V01__init_multiple_schemas.sql", "src/main/resources/db/migration/V01__init_multiple_schemas.sql")
-        copyResource("/jooq-generator-without-excludes.xml", "src/main/resources/db/jooq.xml")
+            copyResource("/V01__init_multiple_schemas.sql", "src/main/resources/db/migration/V01__init_multiple_schemas.sql")
+            copyResource("/jooq-generator-without-excludes.xml", "src/main/resources/db/jooq.xml")
 
         when:
-        def result = GradleRunner.create()
-                .withProjectDir(projectDir)
-                .withPluginClasspath()
-                .forwardOutput()
-                .withArguments("generateJooqClasses", "--stacktrace", "--debug")
-                .build()
+            def result = GradleRunner.create()
+                    .withProjectDir(projectDir)
+                    .withPluginClasspath()
+                    .forwardOutput()
+                    .withArguments("generateJooqClasses", "--stacktrace", "--debug")
+                    .build()
 
         then:
-        result.task(":generateJooqClasses").outcome == SUCCESS
-        def generatedPublic = Paths.get(projectDir.getPath(), "build/generated-jooq/org/jooq/generated/public_/tables/Foo.java")
-        def generatedOther = Paths.get(projectDir.getPath(), "build/generated-jooq/org/jooq/generated/other/tables/Bar.java")
-        Files.exists(generatedPublic)
-        !Files.exists(generatedOther)
+            result.task(":generateJooqClasses").outcome == SUCCESS
+            def generatedPublic = Paths.get(projectDir.getPath(), "build/generated-jooq/org/jooq/generated/public_/tables/Foo.java")
+            def generatedOther = Paths.get(projectDir.getPath(), "build/generated-jooq/org/jooq/generated/other/tables/Bar.java")
+            Files.exists(generatedPublic)
+            !Files.exists(generatedOther)
     }
 
     def "up to date check works for output dir"() {
         given:
-        prepareBuildGradleFile("""
+            prepareBuildGradleFile("""
                       plugins {
                           id("dev.monosoul.jooq-docker")
                       }
@@ -293,38 +297,38 @@ class JooqDockerPluginSpec extends Specification {
                           jdbc("org.postgresql:postgresql:42.3.6")
                       }
                       """)
-        copyResource("/V01__init.sql", "src/main/resources/db/migration/V01__init.sql")
+            copyResource("/V01__init.sql", "src/main/resources/db/migration/V01__init.sql")
 
         when:
-        def firstRun = GradleRunner.create()
-                .withProjectDir(projectDir)
-                .withPluginClasspath()
-                .forwardOutput()
-                .withArguments("generateJooqClasses", "--stacktrace", "--debug")
-                .build()
-        def secondRun = GradleRunner.create()
-                .withProjectDir(projectDir)
-                .withPluginClasspath()
-                .forwardOutput()
-                .withArguments("generateJooqClasses", "--stacktrace", "--debug")
-                .build()
-        Paths.get(projectDir.path, "build/generated-jooq").toFile().deleteDir()
-        def runAfterDeletion = GradleRunner.create()
-                .withProjectDir(projectDir)
-                .withPluginClasspath()
-                .forwardOutput()
-                .withArguments("generateJooqClasses", "--stacktrace", "--debug")
-                .build()
+            def firstRun = GradleRunner.create()
+                    .withProjectDir(projectDir)
+                    .withPluginClasspath()
+                    .forwardOutput()
+                    .withArguments("generateJooqClasses", "--stacktrace", "--debug")
+                    .build()
+            def secondRun = GradleRunner.create()
+                    .withProjectDir(projectDir)
+                    .withPluginClasspath()
+                    .forwardOutput()
+                    .withArguments("generateJooqClasses", "--stacktrace", "--debug")
+                    .build()
+            Paths.get(projectDir.path, "build/generated-jooq").toFile().deleteDir()
+            def runAfterDeletion = GradleRunner.create()
+                    .withProjectDir(projectDir)
+                    .withPluginClasspath()
+                    .forwardOutput()
+                    .withArguments("generateJooqClasses", "--stacktrace", "--debug")
+                    .build()
 
         then:
-        firstRun.task(":generateJooqClasses").outcome == SUCCESS
-        secondRun.task(":generateJooqClasses").outcome == UP_TO_DATE
-        runAfterDeletion.task(":generateJooqClasses").outcome == SUCCESS
+            firstRun.task(":generateJooqClasses").outcome == SUCCESS
+            secondRun.task(":generateJooqClasses").outcome == UP_TO_DATE
+            runAfterDeletion.task(":generateJooqClasses").outcome == SUCCESS
     }
 
     def "up to date check works for input dir"() {
         given:
-        prepareBuildGradleFile("""
+            prepareBuildGradleFile("""
                       plugins {
                           id("dev.monosoul.jooq-docker")
                       }
@@ -337,39 +341,39 @@ class JooqDockerPluginSpec extends Specification {
                           jdbc("org.postgresql:postgresql:42.3.6")
                       }
                       """)
-        copyResource("/V01__init.sql", "src/main/resources/db/migration/V01__init.sql")
+            copyResource("/V01__init.sql", "src/main/resources/db/migration/V01__init.sql")
 
         when:
-        def firstRun = GradleRunner.create()
-                .withProjectDir(projectDir)
-                .withPluginClasspath()
-                .forwardOutput()
-                .withArguments("generateJooqClasses", "--stacktrace", "--debug")
-                .build()
-        def secondRun = GradleRunner.create()
-                .withProjectDir(projectDir)
-                .withPluginClasspath()
-                .forwardOutput()
-                .withArguments("generateJooqClasses", "--stacktrace", "--debug")
-                .build()
-        copyResource("/V02__add_bar.sql", "src/main/resources/db/migration/V02__add_bar.sql")
-        def runAfterDeletion = GradleRunner.create()
-                .withProjectDir(projectDir)
-                .withPluginClasspath()
-                .forwardOutput()
-                .withArguments("generateJooqClasses", "--stacktrace", "--debug")
-                .build()
+            def firstRun = GradleRunner.create()
+                    .withProjectDir(projectDir)
+                    .withPluginClasspath()
+                    .forwardOutput()
+                    .withArguments("generateJooqClasses", "--stacktrace", "--debug")
+                    .build()
+            def secondRun = GradleRunner.create()
+                    .withProjectDir(projectDir)
+                    .withPluginClasspath()
+                    .forwardOutput()
+                    .withArguments("generateJooqClasses", "--stacktrace", "--debug")
+                    .build()
+            copyResource("/V02__add_bar.sql", "src/main/resources/db/migration/V02__add_bar.sql")
+            def runAfterDeletion = GradleRunner.create()
+                    .withProjectDir(projectDir)
+                    .withPluginClasspath()
+                    .forwardOutput()
+                    .withArguments("generateJooqClasses", "--stacktrace", "--debug")
+                    .build()
 
         then:
-        firstRun.task(":generateJooqClasses").outcome == SUCCESS
-        secondRun.task(":generateJooqClasses").outcome == UP_TO_DATE
-        runAfterDeletion.task(":generateJooqClasses").outcome == SUCCESS
+            firstRun.task(":generateJooqClasses").outcome == SUCCESS
+            secondRun.task(":generateJooqClasses").outcome == UP_TO_DATE
+            runAfterDeletion.task(":generateJooqClasses").outcome == SUCCESS
     }
 
     def "up to date check works for extension changes"() {
         given:
-        def initialBuildGradle =
-                """
+            def initialBuildGradle =
+                    """
                 plugins {
                     id("dev.monosoul.jooq-docker")
                 }
@@ -388,8 +392,8 @@ class JooqDockerPluginSpec extends Specification {
                     jdbc("org.postgresql:postgresql:42.3.6")
                 }
                 """
-        def extensionUpdatedBuildGradle =
-                """
+            def extensionUpdatedBuildGradle =
+                    """
                 plugins {
                     id("dev.monosoul.jooq-docker")
                 }
@@ -408,40 +412,40 @@ class JooqDockerPluginSpec extends Specification {
                     jdbc("org.postgresql:postgresql:42.3.6")
                 }
                 """
-        prepareBuildGradleFile(initialBuildGradle)
-        copyResource("/V01__init.sql", "src/main/resources/db/migration/V01__init.sql")
+            prepareBuildGradleFile(initialBuildGradle)
+            copyResource("/V01__init.sql", "src/main/resources/db/migration/V01__init.sql")
 
         when:
-        def initialResult = GradleRunner.create()
-                .withProjectDir(projectDir)
-                .withPluginClasspath()
-                .forwardOutput()
-                .withArguments("generateJooqClasses", "--stacktrace", "--debug")
-                .build()
-        prepareBuildGradleFile(extensionUpdatedBuildGradle)
-        def resultAfterChangeToExtension = GradleRunner.create()
-                .withProjectDir(projectDir)
-                .withPluginClasspath()
-                .forwardOutput()
-                .withArguments("generateJooqClasses", "--stacktrace", "--debug")
-                .build()
-        def finalRunNoChanges = GradleRunner.create()
-                .withProjectDir(projectDir)
-                .withPluginClasspath()
-                .forwardOutput()
-                .withArguments("generateJooqClasses", "--stacktrace", "--debug")
-                .build()
+            def initialResult = GradleRunner.create()
+                    .withProjectDir(projectDir)
+                    .withPluginClasspath()
+                    .forwardOutput()
+                    .withArguments("generateJooqClasses", "--stacktrace", "--debug")
+                    .build()
+            prepareBuildGradleFile(extensionUpdatedBuildGradle)
+            def resultAfterChangeToExtension = GradleRunner.create()
+                    .withProjectDir(projectDir)
+                    .withPluginClasspath()
+                    .forwardOutput()
+                    .withArguments("generateJooqClasses", "--stacktrace", "--debug")
+                    .build()
+            def finalRunNoChanges = GradleRunner.create()
+                    .withProjectDir(projectDir)
+                    .withPluginClasspath()
+                    .forwardOutput()
+                    .withArguments("generateJooqClasses", "--stacktrace", "--debug")
+                    .build()
 
         then:
-        initialResult.task(":generateJooqClasses").outcome == SUCCESS
-        resultAfterChangeToExtension.task(":generateJooqClasses").outcome == SUCCESS
-        finalRunNoChanges.task(":generateJooqClasses").outcome == UP_TO_DATE
+            initialResult.task(":generateJooqClasses").outcome == SUCCESS
+            resultAfterChangeToExtension.task(":generateJooqClasses").outcome == SUCCESS
+            finalRunNoChanges.task(":generateJooqClasses").outcome == UP_TO_DATE
     }
 
     def "up to date check works for generator customizations"() {
         given:
-        def initialBuildGradle =
-                """
+            def initialBuildGradle =
+                    """
                 plugins {
                     id("dev.monosoul.jooq-docker")
                 }
@@ -463,8 +467,8 @@ class JooqDockerPluginSpec extends Specification {
                     jdbc("org.postgresql:postgresql:42.3.6")
                 }
                 """
-        def updatedBuildGradle =
-                """
+            def updatedBuildGradle =
+                    """
                 plugins {
                     id("dev.monosoul.jooq-docker")
                 }
@@ -486,43 +490,43 @@ class JooqDockerPluginSpec extends Specification {
                     jdbc("org.postgresql:postgresql:42.3.6")
                 }
                 """
-        copyResource("/V01__init_multiple_schemas.sql", "src/main/resources/db/migration/V01__init_multiple_schemas.sql")
-        prepareBuildGradleFile(initialBuildGradle)
+            copyResource("/V01__init_multiple_schemas.sql", "src/main/resources/db/migration/V01__init_multiple_schemas.sql")
+            prepareBuildGradleFile(initialBuildGradle)
 
         when:
-        def initialRun = GradleRunner.create()
-                .withProjectDir(projectDir)
-                .withPluginClasspath()
-                .forwardOutput()
-                .withArguments("generateJooqClasses", "--stacktrace", "--debug")
-                .build()
-        prepareBuildGradleFile(updatedBuildGradle)
-        def runAfterUpdate = GradleRunner.create()
-                .withProjectDir(projectDir)
-                .withPluginClasspath()
-                .forwardOutput()
-                .withArguments("generateJooqClasses", "--stacktrace", "--debug")
-                .build()
-        def finalRunNoChanges = GradleRunner.create()
-                .withProjectDir(projectDir)
-                .withPluginClasspath()
-                .forwardOutput()
-                .withArguments("generateJooqClasses", "--stacktrace", "--debug")
-                .build()
+            def initialRun = GradleRunner.create()
+                    .withProjectDir(projectDir)
+                    .withPluginClasspath()
+                    .forwardOutput()
+                    .withArguments("generateJooqClasses", "--stacktrace", "--debug")
+                    .build()
+            prepareBuildGradleFile(updatedBuildGradle)
+            def runAfterUpdate = GradleRunner.create()
+                    .withProjectDir(projectDir)
+                    .withPluginClasspath()
+                    .forwardOutput()
+                    .withArguments("generateJooqClasses", "--stacktrace", "--debug")
+                    .build()
+            def finalRunNoChanges = GradleRunner.create()
+                    .withProjectDir(projectDir)
+                    .withPluginClasspath()
+                    .forwardOutput()
+                    .withArguments("generateJooqClasses", "--stacktrace", "--debug")
+                    .build()
 
         then:
-        initialRun.task(":generateJooqClasses").outcome == SUCCESS
-        runAfterUpdate.task(":generateJooqClasses").outcome == SUCCESS
-        finalRunNoChanges.task(":generateJooqClasses").outcome == UP_TO_DATE
-        def generatedPublic = Paths.get(projectDir.getPath(), "build/generated-jooq/org/jooq/generated/public_/tables/Foo.java")
-        def generatedOther = Paths.get(projectDir.getPath(), "build/generated-jooq/org/jooq/generated/other/tables/Bar.java")
-        !Files.exists(generatedPublic)
-        !Files.exists(generatedOther)
+            initialRun.task(":generateJooqClasses").outcome == SUCCESS
+            runAfterUpdate.task(":generateJooqClasses").outcome == SUCCESS
+            finalRunNoChanges.task(":generateJooqClasses").outcome == UP_TO_DATE
+            def generatedPublic = Paths.get(projectDir.getPath(), "build/generated-jooq/org/jooq/generated/public_/tables/Foo.java")
+            def generatedOther = Paths.get(projectDir.getPath(), "build/generated-jooq/org/jooq/generated/other/tables/Bar.java")
+            !Files.exists(generatedPublic)
+            !Files.exists(generatedOther)
     }
 
     def "generates jooq classes in a given package"() {
         given:
-        prepareBuildGradleFile("""
+            prepareBuildGradleFile("""
                       plugins {
                           id("dev.monosoul.jooq-docker")
                       }
@@ -541,25 +545,25 @@ class JooqDockerPluginSpec extends Specification {
                           jdbc("org.postgresql:postgresql:42.3.6")
                       }
                       """)
-        copyResource("/V01__init.sql", "src/main/resources/db/migration/V01__init.sql")
+            copyResource("/V01__init.sql", "src/main/resources/db/migration/V01__init.sql")
 
         when:
-        def result = GradleRunner.create()
-                .withProjectDir(projectDir)
-                .withPluginClasspath()
-                .forwardOutput()
-                .withArguments("generateJooqClasses", "--stacktrace", "--debug")
-                .build()
+            def result = GradleRunner.create()
+                    .withProjectDir(projectDir)
+                    .withPluginClasspath()
+                    .forwardOutput()
+                    .withArguments("generateJooqClasses", "--stacktrace", "--debug")
+                    .build()
 
         then:
-        result.task(":generateJooqClasses").outcome == SUCCESS
-        def generatedClass = Paths.get(projectDir.getPath(), "build/generated-jooq/com/example/tables/Foo.java")
-        Files.exists(generatedClass)
+            result.task(":generateJooqClasses").outcome == SUCCESS
+            def generatedClass = Paths.get(projectDir.getPath(), "build/generated-jooq/com/example/tables/Foo.java")
+            Files.exists(generatedClass)
     }
 
     def "plugin is configurable"() {
         given:
-        prepareBuildGradleFile("""
+            prepareBuildGradleFile("""
                       plugins {
                           id("dev.monosoul.jooq-docker")
                       }
@@ -600,25 +604,25 @@ class JooqDockerPluginSpec extends Specification {
                           jdbc("mysql:mysql-connector-java:8.0.29")
                       }
                       """)
-        copyResource("/V01__init_mysql.sql", "src/main/resources/db/migration/V01__init_mysql.sql")
+            copyResource("/V01__init_mysql.sql", "src/main/resources/db/migration/V01__init_mysql.sql")
 
         when:
-        def result = GradleRunner.create()
-                .withProjectDir(projectDir)
-                .withPluginClasspath()
-                .forwardOutput()
-                .withArguments("generateJooqClasses", "--stacktrace", "--debug")
-                .build()
+            def result = GradleRunner.create()
+                    .withProjectDir(projectDir)
+                    .withPluginClasspath()
+                    .forwardOutput()
+                    .withArguments("generateJooqClasses", "--stacktrace", "--debug")
+                    .build()
 
         then:
-        result.task(":generateJooqClasses").outcome == SUCCESS
-        def generatedClass = Paths.get(projectDir.getPath(), "build/generated-jooq/org/jooq/generated/tables/Foo.java")
-        Files.exists(generatedClass)
+            result.task(":generateJooqClasses").outcome == SUCCESS
+            def generatedClass = Paths.get(projectDir.getPath(), "build/generated-jooq/org/jooq/generated/tables/Foo.java")
+            Files.exists(generatedClass)
     }
 
     def "flyway configuration overridden with flywayProperties task input"() {
         given:
-        prepareBuildGradleFile("""
+            prepareBuildGradleFile("""
                       plugins {
                           id("dev.monosoul.jooq-docker")
                       }
@@ -637,25 +641,25 @@ class JooqDockerPluginSpec extends Specification {
                           jdbc("org.postgresql:postgresql:42.3.6")
                       }
                       """)
-        copyResource("/V01__init_with_placeholders.sql", "src/main/resources/db/migration/V01__init_with_placeholders.sql")
+            copyResource("/V01__init_with_placeholders.sql", "src/main/resources/db/migration/V01__init_with_placeholders.sql")
 
         when:
-        def result = GradleRunner.create()
-                .withProjectDir(projectDir)
-                .withPluginClasspath()
-                .forwardOutput()
-                .withArguments("generateJooqClasses", "--stacktrace", "--debug")
-                .build()
+            def result = GradleRunner.create()
+                    .withProjectDir(projectDir)
+                    .withPluginClasspath()
+                    .forwardOutput()
+                    .withArguments("generateJooqClasses", "--stacktrace", "--debug")
+                    .build()
 
         then:
-        result.task(":generateJooqClasses").outcome == SUCCESS
-        def generatedClass = Paths.get(projectDir.getPath(), "build/generated-jooq/org/jooq/generated/tables/Foo.java")
-        Files.exists(generatedClass)
+            result.task(":generateJooqClasses").outcome == SUCCESS
+            def generatedClass = Paths.get(projectDir.getPath(), "build/generated-jooq/org/jooq/generated/tables/Foo.java")
+            Files.exists(generatedClass)
     }
 
     def "schema version provider is aware of flyway table name override"() {
         given:
-        prepareBuildGradleFile("""
+            prepareBuildGradleFile("""
                       plugins {
                           id("dev.monosoul.jooq-docker")
                       }
@@ -674,27 +678,27 @@ class JooqDockerPluginSpec extends Specification {
                           jdbc("org.postgresql:postgresql:42.3.6")
                       }
                       """)
-        copyResource("/V01__init.sql", "src/main/resources/db/migration/V01__init.sql")
+            copyResource("/V01__init.sql", "src/main/resources/db/migration/V01__init.sql")
 
         when:
-        def result = GradleRunner.create()
-                .withProjectDir(projectDir)
-                .withPluginClasspath()
-                .forwardOutput()
-                .withArguments("generateJooqClasses", "--stacktrace", "--debug")
-                .build()
+            def result = GradleRunner.create()
+                    .withProjectDir(projectDir)
+                    .withPluginClasspath()
+                    .forwardOutput()
+                    .withArguments("generateJooqClasses", "--stacktrace", "--debug")
+                    .build()
 
         then:
-        result.task(":generateJooqClasses").outcome == SUCCESS
-        def generatedFlywayClass = Paths.get(projectDir.getPath(), "build/generated-jooq/org/jooq/generated/tables/SomeSchemaTable.java")
-        Files.exists(generatedFlywayClass)
+            result.task(":generateJooqClasses").outcome == SUCCESS
+            def generatedFlywayClass = Paths.get(projectDir.getPath(), "build/generated-jooq/org/jooq/generated/tables/SomeSchemaTable.java")
+            Files.exists(generatedFlywayClass)
     }
 
     def "plugin works in Groovy gradle file"() {
         given:
-        def buildGradleFile = new File(projectDir, "build.gradle")
-        buildGradleFile.write(
-                """
+            def buildGradleFile = new File(projectDir, "build.gradle")
+            buildGradleFile.write(
+                    """
                       plugins {
                           id "dev.monosoul.jooq-docker"
                       }
@@ -716,28 +720,28 @@ class JooqDockerPluginSpec extends Specification {
                           jdbc "org.postgresql:postgresql:42.3.6"
                       }
                       """)
-        copyResource("/V01__init_with_placeholders.sql", "src/main/resources/db/migration/V01__init_with_placeholders.sql")
-        copyResource("/V02__add_bar.sql", "src/main/resources/db/migration/V02__add_bar.sql")
+            copyResource("/V01__init_with_placeholders.sql", "src/main/resources/db/migration/V01__init_with_placeholders.sql")
+            copyResource("/V02__add_bar.sql", "src/main/resources/db/migration/V02__add_bar.sql")
 
         when:
-        def result = GradleRunner.create()
-                .withProjectDir(projectDir)
-                .withPluginClasspath()
-                .forwardOutput()
-                .withArguments("generateJooqClasses", "--stacktrace", "--debug")
-                .build()
+            def result = GradleRunner.create()
+                    .withProjectDir(projectDir)
+                    .withPluginClasspath()
+                    .forwardOutput()
+                    .withArguments("generateJooqClasses", "--stacktrace", "--debug")
+                    .build()
 
         then:
-        result.task(":generateJooqClasses").outcome == SUCCESS
-        def generatedFoo = Paths.get(projectDir.getPath(), "build/generated-jooq/org/jooq/generated/tables/Foo.java")
-        def generatedBar = Paths.get(projectDir.getPath(), "build/generated-jooq/org/jooq/generated/tables/Bar.java")
-        Files.exists(generatedFoo)
-        !Files.exists(generatedBar)
+            result.task(":generateJooqClasses").outcome == SUCCESS
+            def generatedFoo = Paths.get(projectDir.getPath(), "build/generated-jooq/org/jooq/generated/tables/Foo.java")
+            def generatedBar = Paths.get(projectDir.getPath(), "build/generated-jooq/org/jooq/generated/tables/Bar.java")
+            Files.exists(generatedFoo)
+            !Files.exists(generatedBar)
     }
 
     def "output schema to default properly passed to jOOQ generator"() {
         given:
-        prepareBuildGradleFile("""
+            prepareBuildGradleFile("""
                       plugins {
                           id("dev.monosoul.jooq-docker")
                       }
@@ -756,27 +760,27 @@ class JooqDockerPluginSpec extends Specification {
                           jdbc("org.postgresql:postgresql:42.3.6")
                       }
                       """)
-        copyResource("/V01__init.sql", "src/main/resources/db/migration/V01__init.sql")
+            copyResource("/V01__init.sql", "src/main/resources/db/migration/V01__init.sql")
 
         when:
-        def result = GradleRunner.create()
-                .withProjectDir(projectDir)
-                .withPluginClasspath()
-                .forwardOutput()
-                .withArguments("generateJooqClasses", "--stacktrace", "--debug")
-                .build()
+            def result = GradleRunner.create()
+                    .withProjectDir(projectDir)
+                    .withPluginClasspath()
+                    .forwardOutput()
+                    .withArguments("generateJooqClasses", "--stacktrace", "--debug")
+                    .build()
 
         then:
-        result.task(":generateJooqClasses").outcome == SUCCESS
-        def generatedTableClass = Paths.get(projectDir.getPath(), "build/generated-jooq/org/jooq/generated/tables/Foo.java")
-        def generatedSchemaClass = Paths.get(projectDir.getPath(), "build/generated-jooq/org/jooq/generated/DefaultSchema.java")
-        Files.exists(generatedTableClass)
-        Files.exists(generatedSchemaClass)
+            result.task(":generateJooqClasses").outcome == SUCCESS
+            def generatedTableClass = Paths.get(projectDir.getPath(), "build/generated-jooq/org/jooq/generated/tables/Foo.java")
+            def generatedSchemaClass = Paths.get(projectDir.getPath(), "build/generated-jooq/org/jooq/generated/DefaultSchema.java")
+            Files.exists(generatedTableClass)
+            Files.exists(generatedSchemaClass)
     }
 
     def "exclude flyway schema history"() {
         given:
-        prepareBuildGradleFile("""
+            prepareBuildGradleFile("""
                       plugins {
                           id("dev.monosoul.jooq-docker")
                       }
@@ -795,28 +799,28 @@ class JooqDockerPluginSpec extends Specification {
                           jdbc("org.postgresql:postgresql:42.3.6")
                       }
                       """)
-        copyResource("/V01__init.sql", "src/main/resources/db/migration/V01__init.sql")
+            copyResource("/V01__init.sql", "src/main/resources/db/migration/V01__init.sql")
 
         when:
-        def result = GradleRunner.create()
-                .withProjectDir(projectDir)
-                .withPluginClasspath()
-                .forwardOutput()
-                .withArguments("generateJooqClasses", "--stacktrace", "--debug")
-                .build()
+            def result = GradleRunner.create()
+                    .withProjectDir(projectDir)
+                    .withPluginClasspath()
+                    .forwardOutput()
+                    .withArguments("generateJooqClasses", "--stacktrace", "--debug")
+                    .build()
 
         then:
-        result.task(":generateJooqClasses").outcome == SUCCESS
-        def generatedFooClass = Paths.get(projectDir.getPath(), "build/generated-jooq/org/jooq/generated/tables/Foo.java")
-        def generatedFlywayClass = Paths.get(projectDir.getPath(), "build/generated-jooq/org/jooq/generated/tables/FlywaySchemaHistory.java")
-        Files.exists(generatedFooClass)
-        Files.notExists(generatedFlywayClass)
+            result.task(":generateJooqClasses").outcome == SUCCESS
+            def generatedFooClass = Paths.get(projectDir.getPath(), "build/generated-jooq/org/jooq/generated/tables/Foo.java")
+            def generatedFlywayClass = Paths.get(projectDir.getPath(), "build/generated-jooq/org/jooq/generated/tables/FlywaySchemaHistory.java")
+            Files.exists(generatedFooClass)
+            Files.notExists(generatedFlywayClass)
     }
 
 
     def "exclude flyway schema history given custom Flyway table name"() {
         given:
-        prepareBuildGradleFile("""
+            prepareBuildGradleFile("""
                       plugins {
                           id("dev.monosoul.jooq-docker")
                       }
@@ -836,28 +840,28 @@ class JooqDockerPluginSpec extends Specification {
                           jdbc("org.postgresql:postgresql:42.3.6")
                       }
                       """)
-        copyResource("/V01__init.sql", "src/main/resources/db/migration/V01__init.sql")
+            copyResource("/V01__init.sql", "src/main/resources/db/migration/V01__init.sql")
 
         when:
-        def result = GradleRunner.create()
-                .withProjectDir(projectDir)
-                .withPluginClasspath()
-                .forwardOutput()
-                .withArguments("generateJooqClasses", "--stacktrace", "--debug")
-                .build()
+            def result = GradleRunner.create()
+                    .withProjectDir(projectDir)
+                    .withPluginClasspath()
+                    .forwardOutput()
+                    .withArguments("generateJooqClasses", "--stacktrace", "--debug")
+                    .build()
 
         then:
-        result.task(":generateJooqClasses").outcome == SUCCESS
-        def generatedFooClass = Paths.get(projectDir.getPath(), "build/generated-jooq/org/jooq/generated/tables/Foo.java")
-        def generatedCustomFlywayClass = Paths.get(projectDir.getPath(), "build/generated-jooq/org/jooq/generated/tables/SomeSchemaTable.java")
-        Files.exists(generatedFooClass)
-        Files.notExists(generatedCustomFlywayClass)
+            result.task(":generateJooqClasses").outcome == SUCCESS
+            def generatedFooClass = Paths.get(projectDir.getPath(), "build/generated-jooq/org/jooq/generated/tables/Foo.java")
+            def generatedCustomFlywayClass = Paths.get(projectDir.getPath(), "build/generated-jooq/org/jooq/generated/tables/SomeSchemaTable.java")
+            Files.exists(generatedFooClass)
+            Files.notExists(generatedCustomFlywayClass)
     }
 
 
     def "exclude flyway schema history without overriding existing excludes"() {
         given:
-        prepareBuildGradleFile("""
+            prepareBuildGradleFile("""
                       plugins {
                           id("dev.monosoul.jooq-docker")
                       }
@@ -880,29 +884,29 @@ class JooqDockerPluginSpec extends Specification {
                           jdbc("org.postgresql:postgresql:42.3.6")
                       }
                       """)
-        copyResource("/V01__init_multiple_schemas.sql", "src/main/resources/db/migration/V01__init_multiple_schemas.sql")
+            copyResource("/V01__init_multiple_schemas.sql", "src/main/resources/db/migration/V01__init_multiple_schemas.sql")
 
         when:
-        def result = GradleRunner.create()
-                .withProjectDir(projectDir)
-                .withPluginClasspath()
-                .forwardOutput()
-                .withArguments("generateJooqClasses", "--stacktrace", "--debug")
-                .build()
+            def result = GradleRunner.create()
+                    .withProjectDir(projectDir)
+                    .withPluginClasspath()
+                    .forwardOutput()
+                    .withArguments("generateJooqClasses", "--stacktrace", "--debug")
+                    .build()
 
         then:
-        result.task(":generateJooqClasses").outcome == SUCCESS
-        def generatedFooClass = Paths.get(projectDir.getPath(), "build/generated-jooq/org/jooq/generated/public_/tables/Foo.java")
-        def generatedBarClass = Paths.get(projectDir.getPath(), "build/generated-jooq/org/jooq/generated/other/tables/Bar.java")
-        def generatedFlywaySchemaClass = Paths.get(projectDir.getPath(), "build/generated-jooq/org/jooq/generated/public_/tables/FlywaySchemaHistory.java")
-        Files.exists(generatedFooClass)
-        Files.notExists(generatedBarClass)
-        Files.notExists(generatedFlywaySchemaClass)
+            result.task(":generateJooqClasses").outcome == SUCCESS
+            def generatedFooClass = Paths.get(projectDir.getPath(), "build/generated-jooq/org/jooq/generated/public_/tables/Foo.java")
+            def generatedBarClass = Paths.get(projectDir.getPath(), "build/generated-jooq/org/jooq/generated/other/tables/Bar.java")
+            def generatedFlywaySchemaClass = Paths.get(projectDir.getPath(), "build/generated-jooq/org/jooq/generated/public_/tables/FlywaySchemaHistory.java")
+            Files.exists(generatedFooClass)
+            Files.notExists(generatedBarClass)
+            Files.notExists(generatedFlywaySchemaClass)
     }
 
     def "outputDirectory task property is respected"() {
         given:
-        prepareBuildGradleFile("""
+            prepareBuildGradleFile("""
                       plugins {
                           id("dev.monosoul.jooq-docker")
                       }
@@ -921,27 +925,27 @@ class JooqDockerPluginSpec extends Specification {
                           jdbc("org.postgresql:postgresql:42.3.6")
                       }
                       """)
-        copyResource("/V01__init.sql", "src/main/resources/db/migration/V01__init.sql")
+            copyResource("/V01__init.sql", "src/main/resources/db/migration/V01__init.sql")
 
         when:
-        def result = GradleRunner.create()
-                .withProjectDir(projectDir)
-                .withPluginClasspath()
-                .forwardOutput()
-                .withArguments("generateJooqClasses", "--stacktrace", "--debug")
-                .build()
+            def result = GradleRunner.create()
+                    .withProjectDir(projectDir)
+                    .withPluginClasspath()
+                    .forwardOutput()
+                    .withArguments("generateJooqClasses", "--stacktrace", "--debug")
+                    .build()
 
         then:
-        result.task(":generateJooqClasses").outcome == SUCCESS
-        def generatedFooClass = Paths.get(projectDir.getPath(), "build/gen/org/jooq/generated/tables/Foo.java")
-        def generatedFlywayClass = Paths.get(projectDir.getPath(), "build/gen/org/jooq/generated/tables/FlywaySchemaHistory.java")
-        Files.exists(generatedFooClass)
-        Files.exists(generatedFlywayClass)
+            result.task(":generateJooqClasses").outcome == SUCCESS
+            def generatedFooClass = Paths.get(projectDir.getPath(), "build/gen/org/jooq/generated/tables/Foo.java")
+            def generatedFlywayClass = Paths.get(projectDir.getPath(), "build/gen/org/jooq/generated/tables/FlywaySchemaHistory.java")
+            Files.exists(generatedFooClass)
+            Files.exists(generatedFlywayClass)
     }
 
     def "source sets and tasks are configured for java project"() {
         given:
-        prepareBuildGradleFile("""
+            prepareBuildGradleFile("""
                       plugins {
                           java
                           id("dev.monosoul.jooq-docker")
@@ -957,9 +961,9 @@ class JooqDockerPluginSpec extends Specification {
                           implementation("javax.annotation:javax.annotation-api:1.3.2")
                       }
                       """)
-        copyResource("/V01__init.sql", "src/main/resources/db/migration/V01__init.sql")
-        writeProjectFile("src/main/java/com/test/Main.java",
-                """
+            copyResource("/V01__init.sql", "src/main/resources/db/migration/V01__init.sql")
+            writeProjectFile("src/main/java/com/test/Main.java",
+                    """
                 package com.test;
                 
                 import static org.jooq.generated.Tables.FOO;
@@ -972,25 +976,25 @@ class JooqDockerPluginSpec extends Specification {
                 """);
 
         when:
-        def result = GradleRunner.create()
-                .withProjectDir(projectDir)
-                .withPluginClasspath()
-                .forwardOutput()
-                .withArguments("classes", "--stacktrace", "--debug")
-                .build()
+            def result = GradleRunner.create()
+                    .withProjectDir(projectDir)
+                    .withPluginClasspath()
+                    .forwardOutput()
+                    .withArguments("classes", "--stacktrace", "--debug")
+                    .build()
 
         then:
-        result.task(":generateJooqClasses").outcome == SUCCESS
-        result.task(":classes").outcome == SUCCESS
-        def generatedFooClass = Paths.get(projectDir.getPath(), "build/generated-jooq/org/jooq/generated/tables/Foo.java")
-        def mainClass = Paths.get(projectDir.getPath(), "build/classes/java/main/com/test/Main.class")
-        Files.exists(generatedFooClass)
-        Files.exists(mainClass)
+            result.task(":generateJooqClasses").outcome == SUCCESS
+            result.task(":classes").outcome == SUCCESS
+            def generatedFooClass = Paths.get(projectDir.getPath(), "build/generated-jooq/org/jooq/generated/tables/Foo.java")
+            def mainClass = Paths.get(projectDir.getPath(), "build/classes/java/main/com/test/Main.class")
+            Files.exists(generatedFooClass)
+            Files.exists(mainClass)
     }
 
     def "source sets and tasks are configured for kotlin project"() {
         given:
-        prepareBuildGradleFile("""
+            prepareBuildGradleFile("""
                       plugins {
                           kotlin("jvm").version("1.3.50")
                           id("dev.monosoul.jooq-docker")
@@ -1007,9 +1011,9 @@ class JooqDockerPluginSpec extends Specification {
                           implementation("javax.annotation:javax.annotation-api:1.3.2")
                       }
                       """)
-        copyResource("/V01__init.sql", "src/main/resources/db/migration/V01__init.sql")
-        writeProjectFile("src/main/kotlin/com/test/Main.kt",
-                """
+            copyResource("/V01__init.sql", "src/main/resources/db/migration/V01__init.sql")
+            writeProjectFile("src/main/kotlin/com/test/Main.kt",
+                    """
                 package com.test
                 
                 import org.jooq.generated.Tables.FOO
@@ -1018,25 +1022,25 @@ class JooqDockerPluginSpec extends Specification {
                 """);
 
         when:
-        def result = GradleRunner.create()
-                .withProjectDir(projectDir)
-                .withPluginClasspath()
-                .forwardOutput()
-                .withArguments("classes", "--stacktrace", "--debug")
-                .build()
+            def result = GradleRunner.create()
+                    .withProjectDir(projectDir)
+                    .withPluginClasspath()
+                    .forwardOutput()
+                    .withArguments("classes", "--stacktrace", "--debug")
+                    .build()
 
         then:
-        result.task(":generateJooqClasses").outcome == SUCCESS
-        result.task(":classes").outcome == SUCCESS
-        def generatedFooClass = Paths.get(projectDir.getPath(), "build/generated-jooq/org/jooq/generated/tables/Foo.java")
-        def mainClass = Paths.get(projectDir.getPath(), "build/classes/kotlin/main/com/test/MainKt.class")
-        Files.exists(generatedFooClass)
-        Files.exists(mainClass)
+            result.task(":generateJooqClasses").outcome == SUCCESS
+            result.task(":classes").outcome == SUCCESS
+            def generatedFooClass = Paths.get(projectDir.getPath(), "build/generated-jooq/org/jooq/generated/tables/Foo.java")
+            def mainClass = Paths.get(projectDir.getPath(), "build/classes/kotlin/main/com/test/MainKt.class")
+            Files.exists(generatedFooClass)
+            Files.exists(mainClass)
     }
 
     def "source sets and tasks are configured for java project when jooq plugin is applied before java plugin"() {
         given:
-        prepareBuildGradleFile("""
+            prepareBuildGradleFile("""
                       plugins {
                           id("dev.monosoul.jooq-docker")
                       }
@@ -1052,9 +1056,9 @@ class JooqDockerPluginSpec extends Specification {
                           "implementation"("javax.annotation:javax.annotation-api:1.3.2")
                       }
                       """)
-        copyResource("/V01__init.sql", "src/main/resources/db/migration/V01__init.sql")
-        writeProjectFile("src/main/java/com/test/Main.java",
-                """
+            copyResource("/V01__init.sql", "src/main/resources/db/migration/V01__init.sql")
+            writeProjectFile("src/main/java/com/test/Main.java",
+                    """
                 package com.test;
                 
                 import static org.jooq.generated.Tables.FOO;
@@ -1067,25 +1071,25 @@ class JooqDockerPluginSpec extends Specification {
                 """);
 
         when:
-        def result = GradleRunner.create()
-                .withProjectDir(projectDir)
-                .withPluginClasspath()
-                .forwardOutput()
-                .withArguments("classes", "--stacktrace", "--debug")
-                .build()
+            def result = GradleRunner.create()
+                    .withProjectDir(projectDir)
+                    .withPluginClasspath()
+                    .forwardOutput()
+                    .withArguments("classes", "--stacktrace", "--debug")
+                    .build()
 
         then:
-        result.task(":generateJooqClasses").outcome == SUCCESS
-        result.task(":classes").outcome == SUCCESS
-        def generatedFooClass = Paths.get(projectDir.getPath(), "build/generated-jooq/org/jooq/generated/tables/Foo.java")
-        def mainClass = Paths.get(projectDir.getPath(), "build/classes/java/main/com/test/Main.class")
-        Files.exists(generatedFooClass)
-        Files.exists(mainClass)
+            result.task(":generateJooqClasses").outcome == SUCCESS
+            result.task(":classes").outcome == SUCCESS
+            def generatedFooClass = Paths.get(projectDir.getPath(), "build/generated-jooq/org/jooq/generated/tables/Foo.java")
+            def mainClass = Paths.get(projectDir.getPath(), "build/classes/java/main/com/test/Main.class")
+            Files.exists(generatedFooClass)
+            Files.exists(mainClass)
     }
 
     def "source sets and tasks are configured for java project when jooq plugin is applied before java-library plugin"() {
         given:
-        prepareBuildGradleFile("""
+            prepareBuildGradleFile("""
                       plugins {
                           id("dev.monosoul.jooq-docker")
                       }
@@ -1101,9 +1105,9 @@ class JooqDockerPluginSpec extends Specification {
                           "implementation"("javax.annotation:javax.annotation-api:1.3.2")
                       }
                       """)
-        copyResource("/V01__init.sql", "src/main/resources/db/migration/V01__init.sql")
-        writeProjectFile("src/main/java/com/test/Main.java",
-                """
+            copyResource("/V01__init.sql", "src/main/resources/db/migration/V01__init.sql")
+            writeProjectFile("src/main/java/com/test/Main.java",
+                    """
                 package com.test;
                 
                 import static org.jooq.generated.Tables.FOO;
@@ -1116,25 +1120,25 @@ class JooqDockerPluginSpec extends Specification {
                 """);
 
         when:
-        def result = GradleRunner.create()
-                .withProjectDir(projectDir)
-                .withPluginClasspath()
-                .forwardOutput()
-                .withArguments("classes", "--stacktrace", "--debug")
-                .build()
+            def result = GradleRunner.create()
+                    .withProjectDir(projectDir)
+                    .withPluginClasspath()
+                    .forwardOutput()
+                    .withArguments("classes", "--stacktrace", "--debug")
+                    .build()
 
         then:
-        result.task(":generateJooqClasses").outcome == SUCCESS
-        result.task(":classes").outcome == SUCCESS
-        def generatedFooClass = Paths.get(projectDir.getPath(), "build/generated-jooq/org/jooq/generated/tables/Foo.java")
-        def mainClass = Paths.get(projectDir.getPath(), "build/classes/java/main/com/test/Main.class")
-        Files.exists(generatedFooClass)
-        Files.exists(mainClass)
+            result.task(":generateJooqClasses").outcome == SUCCESS
+            result.task(":classes").outcome == SUCCESS
+            def generatedFooClass = Paths.get(projectDir.getPath(), "build/generated-jooq/org/jooq/generated/tables/Foo.java")
+            def mainClass = Paths.get(projectDir.getPath(), "build/classes/java/main/com/test/Main.class")
+            Files.exists(generatedFooClass)
+            Files.exists(mainClass)
     }
 
     def "source sets and tasks are configured for kotlin project when jooq plugin is applied before kotlin plugin"() {
         given:
-        prepareBuildGradleFile("""
+            prepareBuildGradleFile("""
                       buildscript {
                           dependencies {
                               classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.50")
@@ -1157,9 +1161,9 @@ class JooqDockerPluginSpec extends Specification {
                           "implementation"("javax.annotation:javax.annotation-api:1.3.2")
                       }
                       """)
-        copyResource("/V01__init.sql", "src/main/resources/db/migration/V01__init.sql")
-        writeProjectFile("src/main/kotlin/com/test/Main.kt",
-                """
+            copyResource("/V01__init.sql", "src/main/resources/db/migration/V01__init.sql")
+            writeProjectFile("src/main/kotlin/com/test/Main.kt",
+                    """
                 package com.test
                 
                 import org.jooq.generated.Tables.FOO
@@ -1168,26 +1172,26 @@ class JooqDockerPluginSpec extends Specification {
                 """);
 
         when:
-        def result = GradleRunner.create()
-                .withProjectDir(projectDir)
-                .withPluginClasspath()
-                .forwardOutput()
-                .withArguments("classes", "--stacktrace", "--debug")
-                .build()
+            def result = GradleRunner.create()
+                    .withProjectDir(projectDir)
+                    .withPluginClasspath()
+                    .forwardOutput()
+                    .withArguments("classes", "--stacktrace", "--debug")
+                    .build()
 
         then:
-        result.task(":generateJooqClasses").outcome == SUCCESS
-        result.task(":classes").outcome == SUCCESS
-        def generatedFooClass = Paths.get(projectDir.getPath(), "build/generated-jooq/org/jooq/generated/tables/Foo.java")
-        def mainClass = Paths.get(projectDir.getPath(), "build/classes/kotlin/main/com/test/MainKt.class")
-        Files.exists(generatedFooClass)
-        Files.exists(mainClass)
+            result.task(":generateJooqClasses").outcome == SUCCESS
+            result.task(":classes").outcome == SUCCESS
+            def generatedFooClass = Paths.get(projectDir.getPath(), "build/generated-jooq/org/jooq/generated/tables/Foo.java")
+            def mainClass = Paths.get(projectDir.getPath(), "build/classes/kotlin/main/com/test/MainKt.class")
+            Files.exists(generatedFooClass)
+            Files.exists(mainClass)
     }
 
     def "generateJooqClasses task output is loaded from cache"() {
         given:
-        configureLocalGradleCache();
-        prepareBuildGradleFile("""
+            configureLocalGradleCache();
+            prepareBuildGradleFile("""
                       plugins {
                           id("dev.monosoul.jooq-docker")
                       }
@@ -1200,51 +1204,51 @@ class JooqDockerPluginSpec extends Specification {
                           jdbc("org.postgresql:postgresql:42.3.6")
                       }
                       """)
-        copyResource("/V01__init.sql", "src/main/resources/db/migration/V01__init.sql")
+            copyResource("/V01__init.sql", "src/main/resources/db/migration/V01__init.sql")
 
         when:
-        //first run loads to cache
-        def firstRun = GradleRunner.create()
-                .withProjectDir(projectDir)
-                .withPluginClasspath()
-                .forwardOutput()
-                .withArguments("generateJooqClasses", "--build-cache", "--stacktrace", "--debug")
-                .build()
-        //second run uses from cache
-        new File(projectDir, 'build').deleteDir()
-        def secondRun = GradleRunner.create()
-                .withProjectDir(projectDir)
-                .withPluginClasspath()
-                .forwardOutput()
-                .withArguments("generateJooqClasses", "--build-cache", "--stacktrace", "--debug")
-                .build()
-        //third run got changes and can't use cached output
-        new File(projectDir, 'build').deleteDir()
-        copyResource("/V02__add_bar.sql", "src/main/resources/db/migration/V02__add_bar.sql")
-        def thirdRun = GradleRunner.create()
-                .withProjectDir(projectDir)
-                .withPluginClasspath()
-                .forwardOutput()
-                .withArguments("generateJooqClasses", "--build-cache", "--stacktrace", "--debug")
-                .build()
+            //first run loads to cache
+            def firstRun = GradleRunner.create()
+                    .withProjectDir(projectDir)
+                    .withPluginClasspath()
+                    .forwardOutput()
+                    .withArguments("generateJooqClasses", "--build-cache", "--stacktrace", "--debug")
+                    .build()
+            //second run uses from cache
+            new File(projectDir, 'build').deleteDir()
+            def secondRun = GradleRunner.create()
+                    .withProjectDir(projectDir)
+                    .withPluginClasspath()
+                    .forwardOutput()
+                    .withArguments("generateJooqClasses", "--build-cache", "--stacktrace", "--debug")
+                    .build()
+            //third run got changes and can't use cached output
+            new File(projectDir, 'build').deleteDir()
+            copyResource("/V02__add_bar.sql", "src/main/resources/db/migration/V02__add_bar.sql")
+            def thirdRun = GradleRunner.create()
+                    .withProjectDir(projectDir)
+                    .withPluginClasspath()
+                    .forwardOutput()
+                    .withArguments("generateJooqClasses", "--build-cache", "--stacktrace", "--debug")
+                    .build()
 
         then:
-        firstRun.task(":generateJooqClasses").outcome == SUCCESS
-        secondRun.task(":generateJooqClasses").outcome == FROM_CACHE
-        thirdRun.task(":generateJooqClasses").outcome == SUCCESS
+            firstRun.task(":generateJooqClasses").outcome == SUCCESS
+            secondRun.task(":generateJooqClasses").outcome == FROM_CACHE
+            thirdRun.task(":generateJooqClasses").outcome == SUCCESS
 
-        def generatedFooClass = Paths.get(projectDir.getPath(), "build/generated-jooq/org/jooq/generated/tables/Foo.java")
-        def generatedFlywayClass = Paths.get(projectDir.getPath(), "build/generated-jooq/org/jooq/generated/tables/FlywaySchemaHistory.java")
-        def generatedBarClass = Paths.get(projectDir.getPath(), "build/generated-jooq/org/jooq/generated/tables/Bar.java")
-        Files.exists(generatedFooClass)
-        Files.exists(generatedBarClass)
-        Files.exists(generatedFlywayClass)
+            def generatedFooClass = Paths.get(projectDir.getPath(), "build/generated-jooq/org/jooq/generated/tables/Foo.java")
+            def generatedFlywayClass = Paths.get(projectDir.getPath(), "build/generated-jooq/org/jooq/generated/tables/FlywaySchemaHistory.java")
+            def generatedBarClass = Paths.get(projectDir.getPath(), "build/generated-jooq/org/jooq/generated/tables/Bar.java")
+            Files.exists(generatedFooClass)
+            Files.exists(generatedBarClass)
+            Files.exists(generatedFlywayClass)
     }
 
     def "regenerates jooq classes when out of date even though output directory already has classes generated"() {
         given:
-        def initialBuildGradle =
-                """
+            def initialBuildGradle =
+                    """
                 import org.jooq.meta.jaxb.ForcedType
                 
                 plugins {
@@ -1270,8 +1274,8 @@ class JooqDockerPluginSpec extends Specification {
                     jdbc("org.postgresql:postgresql:42.3.6")
                 }
                 """
-        def updatedBuildFile =
-                """
+            def updatedBuildFile =
+                    """
                 import org.jooq.meta.jaxb.ForcedType
                 
                 plugins {
@@ -1297,44 +1301,44 @@ class JooqDockerPluginSpec extends Specification {
                     jdbc("org.postgresql:postgresql:42.3.6")
                 }
                 """
-        prepareBuildGradleFile(initialBuildGradle)
-        copyResource("/V01__init.sql", "src/main/resources/db/migration/V01__init.sql")
+            prepareBuildGradleFile(initialBuildGradle)
+            copyResource("/V01__init.sql", "src/main/resources/db/migration/V01__init.sql")
 
         when:
-        def firstRun = GradleRunner.create()
-                .withProjectDir(projectDir)
-                .withPluginClasspath()
-                .forwardOutput()
-                .withArguments("generateJooqClasses", "--stacktrace", "--debug")
-                .build()
+            def firstRun = GradleRunner.create()
+                    .withProjectDir(projectDir)
+                    .withPluginClasspath()
+                    .forwardOutput()
+                    .withArguments("generateJooqClasses", "--stacktrace", "--debug")
+                    .build()
 
         then:
-        firstRun.task(":generateJooqClasses").outcome == SUCCESS
-        with(Paths.get(projectDir.getPath(), "build/generated-jooq/org/jooq/generated/tables/Foo.java")) {
-            Files.exists(it)
-            Files.readAllLines(it).any { it.contains("com.example.UniqueClassForFirstGeneration") }
-        }
+            firstRun.task(":generateJooqClasses").outcome == SUCCESS
+            with(Paths.get(projectDir.getPath(), "build/generated-jooq/org/jooq/generated/tables/Foo.java")) {
+                Files.exists(it)
+                Files.readAllLines(it).any { it.contains("com.example.UniqueClassForFirstGeneration") }
+            }
 
         when:
-        prepareBuildGradleFile(updatedBuildFile)
-        def secondRun = GradleRunner.create()
-                .withProjectDir(projectDir)
-                .withPluginClasspath()
-                .forwardOutput()
-                .withArguments("generateJooqClasses", "--stacktrace", "--debug")
-                .build()
+            prepareBuildGradleFile(updatedBuildFile)
+            def secondRun = GradleRunner.create()
+                    .withProjectDir(projectDir)
+                    .withPluginClasspath()
+                    .forwardOutput()
+                    .withArguments("generateJooqClasses", "--stacktrace", "--debug")
+                    .build()
 
         then:
-        secondRun.task(":generateJooqClasses").outcome == SUCCESS
-        with(Paths.get(projectDir.getPath(), "build/generated-jooq/org/jooq/generated/tables/Foo.java")) {
-            Files.exists(it)
-            Files.readAllLines(it).any { it.contains("com.example.UniqueClassForSecondGeneration") }
-        }
+            secondRun.task(":generateJooqClasses").outcome == SUCCESS
+            with(Paths.get(projectDir.getPath(), "build/generated-jooq/org/jooq/generated/tables/Foo.java")) {
+                Files.exists(it)
+                Files.readAllLines(it).any { it.contains("com.example.UniqueClassForSecondGeneration") }
+            }
     }
 
     def "generates flyway table in first schema by default"() {
         given:
-        prepareBuildGradleFile("""
+            prepareBuildGradleFile("""
                       plugins {
                           id("dev.monosoul.jooq-docker")
                       }
@@ -1353,29 +1357,29 @@ class JooqDockerPluginSpec extends Specification {
                           jdbc("org.postgresql:postgresql:42.3.6")
                       }
                       """)
-        copyResource("/V01__init_multiple_schemas.sql", "src/main/resources/db/migration/V01__init_multiple_schemas.sql")
+            copyResource("/V01__init_multiple_schemas.sql", "src/main/resources/db/migration/V01__init_multiple_schemas.sql")
 
         when:
-        def result = GradleRunner.create()
-                .withProjectDir(projectDir)
-                .withPluginClasspath()
-                .forwardOutput()
-                .withArguments("generateJooqClasses", "--stacktrace", "--debug")
-                .build()
+            def result = GradleRunner.create()
+                    .withProjectDir(projectDir)
+                    .withPluginClasspath()
+                    .forwardOutput()
+                    .withArguments("generateJooqClasses", "--stacktrace", "--debug")
+                    .build()
 
         then:
-        result.task(":generateJooqClasses").outcome == SUCCESS
-        def generatedPublic = Paths.get(projectDir.getPath(), "build/generated-jooq/org/jooq/generated/public_/tables/Foo.java")
-        def generatedOther = Paths.get(projectDir.getPath(), "build/generated-jooq/org/jooq/generated/other/tables/Bar.java")
-        def generatedFlywaySchemaClass = Paths.get(projectDir.getPath(), "build/generated-jooq/org/jooq/generated/other/tables/FlywaySchemaHistory.java")
-        Files.exists(generatedPublic)
-        Files.exists(generatedOther)
-        Files.exists(generatedFlywaySchemaClass)
+            result.task(":generateJooqClasses").outcome == SUCCESS
+            def generatedPublic = Paths.get(projectDir.getPath(), "build/generated-jooq/org/jooq/generated/public_/tables/Foo.java")
+            def generatedOther = Paths.get(projectDir.getPath(), "build/generated-jooq/org/jooq/generated/other/tables/Bar.java")
+            def generatedFlywaySchemaClass = Paths.get(projectDir.getPath(), "build/generated-jooq/org/jooq/generated/other/tables/FlywaySchemaHistory.java")
+            Files.exists(generatedPublic)
+            Files.exists(generatedOther)
+            Files.exists(generatedFlywaySchemaClass)
     }
 
     def "customizer has default generate object defined"() {
         given:
-        prepareBuildGradleFile("""
+            prepareBuildGradleFile("""
                       plugins {
                           id("dev.monosoul.jooq-docker")
                       }
@@ -1396,22 +1400,22 @@ class JooqDockerPluginSpec extends Specification {
                           jdbc("org.postgresql:postgresql:42.3.6")
                       }
                       """)
-        copyResource("/V01__init.sql", "src/main/resources/db/migration/V01__init.sql")
+            copyResource("/V01__init.sql", "src/main/resources/db/migration/V01__init.sql")
 
         when:
-        def result = GradleRunner.create()
-                .withProjectDir(projectDir)
-                .withPluginClasspath()
-                .forwardOutput()
-                .withArguments("generateJooqClasses", "--stacktrace", "--debug")
-                .build()
+            def result = GradleRunner.create()
+                    .withProjectDir(projectDir)
+                    .withPluginClasspath()
+                    .forwardOutput()
+                    .withArguments("generateJooqClasses", "--stacktrace", "--debug")
+                    .build()
 
         then:
-        result.task(":generateJooqClasses").outcome == SUCCESS
-        def generatedFooClass = Paths.get(projectDir.getPath(), "build/generated-jooq/org/jooq/generated/tables/Foo.java")
-        def generatedFlywayClass = Paths.get(projectDir.getPath(), "build/generated-jooq/org/jooq/generated/tables/FlywaySchemaHistory.java")
-        Files.exists(generatedFooClass)
-        Files.exists(generatedFlywayClass)
+            result.task(":generateJooqClasses").outcome == SUCCESS
+            def generatedFooClass = Paths.get(projectDir.getPath(), "build/generated-jooq/org/jooq/generated/tables/Foo.java")
+            def generatedFlywayClass = Paths.get(projectDir.getPath(), "build/generated-jooq/org/jooq/generated/tables/FlywaySchemaHistory.java")
+            Files.exists(generatedFooClass)
+            Files.exists(generatedFlywayClass)
     }
 
     def configureLocalGradleCache() {

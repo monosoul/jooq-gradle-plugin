@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<configuration xmlns="http://www.jooq.org/xsd/jooq-codegen-3.16.5.xsd">
+    <generator>
+        <database>
+            <schemata>
+                <schema>
+                    <inputSchema>public</inputSchema>
+                </schema>
+                <schema>
+                    <inputSchema>other</inputSchema>
+                </schema>
+            </schemata>
+            <includes>.*</includes>
+        </database>
+    </generator>
+</configuration>

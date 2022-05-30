@@ -7,8 +7,10 @@ import org.flywaydb.core.internal.configuration.ConfigUtils.DEFAULT_SCHEMA
 import org.flywaydb.core.internal.configuration.ConfigUtils.TABLE
 import org.gradle.api.Action
 import org.gradle.api.DefaultTask
+import org.gradle.api.model.ObjectFactory
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.plugins.JavaPluginExtension
+import org.gradle.api.provider.ProviderFactory
 import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
@@ -20,6 +22,7 @@ import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.SourceSet.MAIN_SOURCE_SET_NAME
 import org.gradle.api.tasks.TaskAction
 import org.gradle.kotlin.dsl.getByType
+import org.gradle.kotlin.dsl.property
 import org.jooq.codegen.GenerationTool
 import org.jooq.codegen.JavaGenerator
 import org.jooq.meta.jaxb.Configuration
@@ -31,12 +34,17 @@ import org.jooq.meta.jaxb.Logging
 import org.jooq.meta.jaxb.SchemaMappingType
 import org.jooq.meta.jaxb.Strategy
 import org.jooq.meta.jaxb.Target
+import java.io.File
 import java.io.IOException
 import java.net.URL
 import java.net.URLClassLoader
+import javax.inject.Inject
 
 @CacheableTask
-open class GenerateJooqClassesTask : DefaultTask() {
+open class GenerateJooqClassesTask @Inject constructor(
+    private val objectFactory: ObjectFactory,
+    private val providerFactory: ProviderFactory,
+) : DefaultTask() {
     @Input
     var schemas = arrayOf("public")
 
@@ -55,16 +63,18 @@ open class GenerateJooqClassesTask : DefaultTask() {
     @Input
     var excludeFlywayTable = false
 
-    @Internal
-    var generatorConfig = project.provider(this::prepareGeneratorConfig)
-        private set
+    @Input
+    val generatorConfig = objectFactory.property<Configuration>().convention(
+        providerFactory.provider(::defaultGeneratorConfig)
+    )
 
     @InputFiles
     @PathSensitive(PathSensitivity.RELATIVE)
-    val inputDirectory = project.objects.fileCollection().from("src/main/resources/db/migration")
+    val inputDirectory = objectFactory.fileCollection().from("src/main/resources/db/migration")
 
     @OutputDirectory
-    val outputDirectory = project.objects.directoryProperty().convention(project.layout.buildDirectory.dir("generated-jooq"))
+    val outputDirectory =
+        objectFactory.directoryProperty().convention(project.layout.buildDirectory.dir("generated-jooq"))
 
     @Internal
     fun getDb() = getExtension().db
@@ -118,11 +128,6 @@ open class GenerateJooqClassesTask : DefaultTask() {
     @Input
     fun getReadinessCommand() = getImage().getReadinessCommand()
 
-    @Input
-    fun getCleanedGeneratorConfig() = generatorConfig.get().apply {
-        target.withDirectory("ignored")
-    }
-
     init {
         project.plugins.withType(JavaPlugin::class.java) {
             project.extensions.getByType<JavaPluginExtension>().sourceSets.named(MAIN_SOURCE_SET_NAME) {
@@ -135,21 +140,43 @@ open class GenerateJooqClassesTask : DefaultTask() {
 
     private fun getExtension() = project.extensions.getByName("jooq") as JooqExtension
 
-
     @Suppress("unused")
-    fun customizeGenerator(customizer: Action<Generator>) {
-        generatorConfig = generatorConfig.map {
-            customizer.execute(it)
-            it
-        }
+    fun generateUsingXmlConfig(
+        file: File = project.file("src/main/resources/db/jooq.xml"),
+        customizer: Action<Generator> = Action<Generator> { }
+    ) {
+        generatorConfig.set(
+            providerFactory.provider {
+                file.inputStream().use(GenerationTool::load).applyCommonConfiguration().also {
+                    it.generator.apply(customizer::execute)
+                }
+            }
+        )
     }
 
     @Suppress("unused")
-    fun customizeGenerator(closure: Closure<Generator>) {
-        generatorConfig = generatorConfig.map {
-            closure.rehydrate(it, it, it).call(it)
-            it
-        }
+    fun generateUsingJavaConfig(customizer: Action<Generator>) {
+        generatorConfig.set(
+            providerFactory.provider {
+                defaultGeneratorConfig().also {
+                    customizer.execute(it.generator)
+                }
+            }
+        )
+    }
+
+    @Deprecated(
+        message = "Use generateUsingJavaConfig instead",
+        replaceWith = ReplaceWith("generateUsingJavaConfig(customizer)"),
+    )
+    fun customizeGenerator(customizer: Action<Generator>) = generateUsingJavaConfig(customizer)
+
+    @Deprecated(
+        message = "Use generateUsingJavaConfig instead",
+        replaceWith = ReplaceWith("generateUsingJavaConfig(closure)"),
+    )
+    fun customizeGenerator(closure: Closure<Generator>) = generateUsingJavaConfig {
+        closure.rehydrate(this, this, this).call(this)
     }
 
     @TaskAction
@@ -158,12 +185,13 @@ open class GenerateJooqClassesTask : DefaultTask() {
         val db = getDb()
         val jdbcAwareClassLoader = buildJdbcArtifactsAwareClassLoader()
         val docker = Docker(
-                image.getImageName(),
-                image.envVars,
-                db.port to db.exposedPort,
-                image.getReadinessCommand(),
-                DatabaseHostResolver(db.hostOverride),
-                image.containerName)
+            image.getImageName(),
+            image.envVars,
+            db.port to db.exposedPort,
+            image.getReadinessCommand(),
+            DatabaseHostResolver(db.hostOverride),
+            image.containerName
+        )
         docker.use {
             it.runInContainer {
                 migrateDb(jdbcAwareClassLoader, this)
@@ -175,14 +203,14 @@ open class GenerateJooqClassesTask : DefaultTask() {
     private fun migrateDb(jdbcAwareClassLoader: ClassLoader, dbHost: String) {
         val db = getDb()
         Flyway.configure(jdbcAwareClassLoader)
-                .dataSource(db.getUrl(dbHost), db.username, db.password)
-                .schemas(*schemas)
-                .locations(*inputDirectory.map { "$FILESYSTEM_PREFIX${it.absolutePath}" }.toTypedArray())
-                .defaultSchema(defaultFlywaySchema())
-                .table(flywayTableName())
-                .configuration(flywayProperties)
-                .load()
-                .migrate()
+            .dataSource(db.getUrl(dbHost), db.username, db.password)
+            .schemas(*schemas)
+            .locations(*inputDirectory.map { "$FILESYSTEM_PREFIX${it.absolutePath}" }.toTypedArray())
+            .defaultSchema(defaultFlywaySchema())
+            .table(flywayTableName())
+            .configuration(flywayProperties)
+            .load()
+            .migrate()
     }
 
     private fun defaultFlywaySchema() = flywayProperties[DEFAULT_SCHEMA] ?: schemas.first()
@@ -195,42 +223,57 @@ open class GenerateJooqClassesTask : DefaultTask() {
         val jdbc = getJdbc()
         FlywaySchemaVersionProvider.setup(defaultFlywaySchema(), flywayTableName())
         SchemaPackageRenameGeneratorStrategy.schemaToPackageMapping.set(schemaToPackageMapping.toMap())
-        val generator = generatorConfig.get()
-        excludeFlywaySchemaIfNeeded(generator)
         val tool = GenerationTool()
         tool.setClassLoader(jdbcAwareClassLoader)
-        tool.run(Configuration()
-                .withLogging(Logging.DEBUG)
-                .withJdbc(Jdbc()
-                        .withDriver(jdbc.driverClassName)
-                        .withUrl(db.getUrl(dbHost))
-                        .withUser(db.username)
-                        .withPassword(db.password))
-                .withGenerator(generator))
+        generatorConfig.get().also {
+            excludeFlywaySchemaIfNeeded(it.generator)
+        }.apply {
+            withJdbc(
+                Jdbc()
+                    .withDriver(jdbc.driverClassName)
+                    .withUrl(db.getUrl(dbHost))
+                    .withUser(db.username)
+                    .withPassword(db.password)
+            )
+        }.run(tool::run)
     }
 
-    private fun prepareGeneratorConfig(): Generator {
-        return Generator()
-                .withName(JavaGenerator::class.qualifiedName)
-                .withStrategy(Strategy()
-                        .withName(SchemaPackageRenameGeneratorStrategy::class.qualifiedName))
-                .withDatabase(Database()
-                        .withName(getJdbc().jooqMetaName)
-                        .withSchemata(schemas.map(this::toSchemaMappingType))
-                        .withSchemaVersionProvider(FlywaySchemaVersionProvider::class.qualifiedName)
-                        .withIncludes(".*")
-                        .withExcludes(""))
-                .withTarget(Target()
-                        .withPackageName(basePackageName)
-                        .withDirectory(outputDirectory.asFile.get().toString())
-                        .withClean(true))
-                .withGenerate(Generate())
+    private fun defaultGeneratorConfig() = Generator()
+        .withName(JavaGenerator::class.qualifiedName)
+        .withDatabase(
+            Database()
+                .withName(getJdbc().jooqMetaName)
+                .withSchemata(schemas.map(this::toSchemaMappingType))
+                .withIncludes(".*")
+                .withExcludes("")
+        )
+        .withGenerate(Generate())
+        .let {
+            Configuration().withGenerator(it)
+        }
+        .applyCommonConfiguration()
+
+    private fun Configuration.applyCommonConfiguration() = also {
+        it.generator.apply {
+            withLogging(Logging.DEBUG)
+            withTarget(codeGenTarget())
+            withStrategy(
+                Strategy().withName(SchemaPackageRenameGeneratorStrategy::class.qualifiedName)
+            )
+            database.withSchemaVersionProvider(FlywaySchemaVersionProvider::class.qualifiedName)
+        }
     }
+
+    private fun codeGenTarget() = Target()
+        .withPackageName(basePackageName)
+        .withDirectory(outputDirectory.asFile.get().toString())
+        .withEncoding("UTF-8")
+        .withClean(true)
 
     private fun toSchemaMappingType(schemaName: String): SchemaMappingType {
         return SchemaMappingType()
-                .withInputSchema(schemaName)
-                .withOutputSchemaToDefault(outputSchemaToDefault.contains(schemaName))
+            .withInputSchema(schemaName)
+            .withOutputSchemaToDefault(outputSchemaToDefault.contains(schemaName))
     }
 
     private fun excludeFlywaySchemaIfNeeded(generator: Generator) {
@@ -240,8 +283,8 @@ open class GenerateJooqClassesTask : DefaultTask() {
 
     private fun addFlywaySchemaHistoryToExcludes(currentExcludes: String?): String {
         return listOf(currentExcludes, flywayTableName())
-                .filterNot(String?::isNullOrEmpty)
-                .joinToString("|")
+            .filterNot(String?::isNullOrEmpty)
+            .joinToString("|")
     }
 
     private fun buildJdbcArtifactsAwareClassLoader(): ClassLoader {

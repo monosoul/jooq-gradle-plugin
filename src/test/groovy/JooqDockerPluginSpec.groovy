@@ -235,6 +235,49 @@ class JooqDockerPluginSpec extends Specification {
         !Files.exists(generatedOther)
     }
 
+    def "can apply customizations to XML-based code generation configuration"() {
+        given:
+        prepareBuildGradleFile("""
+                      plugins {
+                          id("dev.monosoul.jooq-docker")
+                      }
+                      
+                      repositories {
+                          mavenCentral()
+                      }
+                      
+                      tasks {
+                          generateJooqClasses {
+                              schemas = arrayOf("public", "other")
+                              generateUsingFile {
+                                 database.withExcludes("BAR")
+                              }
+                          }
+                      }
+                      
+                      dependencies {
+                          jdbc("org.postgresql:postgresql:42.3.6")
+                      }
+                      """)
+        copyResource("/V01__init_multiple_schemas.sql", "src/main/resources/db/migration/V01__init_multiple_schemas.sql")
+        copyResource("/jooq-generator-without-excludes.xml", "src/main/resources/db/jooq.xml")
+
+        when:
+        def result = GradleRunner.create()
+                .withProjectDir(projectDir)
+                .withPluginClasspath()
+                .forwardOutput()
+                .withArguments("generateJooqClasses", "--stacktrace", "--debug")
+                .build()
+
+        then:
+        result.task(":generateJooqClasses").outcome == SUCCESS
+        def generatedPublic = Paths.get(projectDir.getPath(), "build/generated-jooq/org/jooq/generated/public_/tables/Foo.java")
+        def generatedOther = Paths.get(projectDir.getPath(), "build/generated-jooq/org/jooq/generated/other/tables/Bar.java")
+        Files.exists(generatedPublic)
+        !Files.exists(generatedOther)
+    }
+
     def "up to date check works for output dir"() {
         given:
         prepareBuildGradleFile("""

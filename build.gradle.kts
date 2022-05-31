@@ -98,6 +98,9 @@ dependencies {
     implementation("org.apache.commons:commons-lang3:3.12.0")
     compileOnly("javax.annotation:javax.annotation-api:1.3.2")
 
+    testImplementation(enforcedPlatform("org.junit:junit-bom:5.8.2"))
+    testImplementation("org.junit.jupiter:junit-jupiter")
+    testImplementation("io.strikt:strikt-jvm:0.34.1")
     testImplementation("org.spockframework:spock-core:2.1-groovy-3.0") {
         exclude("org.codehaus.groovy")
     }

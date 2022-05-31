@@ -21,27 +21,6 @@ class JooqDockerPluginSpec extends Specification {
         copyResource("testkit-gradle.properties", "gradle.properties")
     }
 
-    def "plugin is applicable"() {
-        given:
-            prepareBuildGradleFile(
-                    """
-                      plugins {
-                          id("dev.monosoul.jooq-docker")
-                      }
-                      """
-            )
-
-        when:
-            def result = GradleRunner.create()
-                    .forwardOutput()
-                    .withProjectDir(projectDir)
-                    .withPluginClasspath()
-                    .build()
-
-        then:
-            result != null
-    }
-
     def "generates jooq classes for PostgreSQL db with default config"() {
         given:
             prepareBuildGradleFile("""
@@ -220,50 +199,6 @@ class JooqDockerPluginSpec extends Specification {
                       
                       dependencies {
                           jdbc("org.postgresql:postgresql:42.3.6")
-                      }
-                      """)
-            copyResource("/V01__init_multiple_schemas.sql", "src/main/resources/db/migration/V01__init_multiple_schemas.sql")
-
-        when:
-            def result = GradleRunner.create()
-                    .withProjectDir(projectDir)
-                    .withPluginClasspath()
-                    .forwardOutput()
-                    .withArguments("generateJooqClasses", "--stacktrace", "--debug")
-                    .build()
-
-        then:
-            result.task(":generateJooqClasses").outcome == SUCCESS
-            def generatedPublic = Paths.get(projectDir.getPath(), "build/generated-jooq/org/jooq/generated/public_/tables/Foo.java")
-            def generatedOther = Paths.get(projectDir.getPath(), "build/generated-jooq/org/jooq/generated/other/tables/Bar.java")
-            Files.exists(generatedPublic)
-            !Files.exists(generatedOther)
-    }
-
-    def "respects the generator customizations when using deprecated method with Groovy"() {
-        given:
-            def buildGradleFile = new File(projectDir, "build.gradle")
-            // language=Groovy
-            buildGradleFile.write("""
-                      plugins {
-                          id "dev.monosoul.jooq-docker"
-                      }
-                      
-                      repositories {
-                          mavenCentral()
-                      }
-                      
-                      tasks {
-                          generateJooqClasses {
-                              schemas = [ "public", "other" ]
-                              customizeGenerator {
-                                  database.withExcludes("BAR")
-                              }
-                          }
-                      }
-                      
-                      dependencies {
-                          jdbc "org.postgresql:postgresql:42.3.6"
                       }
                       """)
             copyResource("/V01__init_multiple_schemas.sql", "src/main/resources/db/migration/V01__init_multiple_schemas.sql")
@@ -778,51 +713,6 @@ class JooqDockerPluginSpec extends Specification {
             result.task(":generateJooqClasses").outcome == SUCCESS
             def generatedFlywayClass = Paths.get(projectDir.getPath(), "build/generated-jooq/org/jooq/generated/tables/SomeSchemaTable.java")
             Files.exists(generatedFlywayClass)
-    }
-
-    def "plugin works in Groovy gradle file"() {
-        given:
-            def buildGradleFile = new File(projectDir, "build.gradle")
-            buildGradleFile.write(
-                    """
-                      plugins {
-                          id "dev.monosoul.jooq-docker"
-                      }
-                      
-                      repositories {
-                          mavenCentral()
-                      }
-                      
-                      tasks {
-                          generateJooqClasses {
-                              flywayProperties = ["flyway.placeholderReplacement": "false"]
-                              generateUsingJavaConfig {
-                                  database.withExcludes("BAR")
-                              }
-                          }
-                      }
-                      
-                      dependencies {
-                          jdbc "org.postgresql:postgresql:42.3.6"
-                      }
-                      """)
-            copyResource("/V01__init_with_placeholders.sql", "src/main/resources/db/migration/V01__init_with_placeholders.sql")
-            copyResource("/V02__add_bar.sql", "src/main/resources/db/migration/V02__add_bar.sql")
-
-        when:
-            def result = GradleRunner.create()
-                    .withProjectDir(projectDir)
-                    .withPluginClasspath()
-                    .forwardOutput()
-                    .withArguments("generateJooqClasses", "--stacktrace", "--debug")
-                    .build()
-
-        then:
-            result.task(":generateJooqClasses").outcome == SUCCESS
-            def generatedFoo = Paths.get(projectDir.getPath(), "build/generated-jooq/org/jooq/generated/tables/Foo.java")
-            def generatedBar = Paths.get(projectDir.getPath(), "build/generated-jooq/org/jooq/generated/tables/Bar.java")
-            Files.exists(generatedFoo)
-            !Files.exists(generatedBar)
     }
 
     def "output schema to default properly passed to jOOQ generator"() {

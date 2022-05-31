@@ -1,6 +1,7 @@
 package dev.monosoul.jooq.functional
 
 import org.gradle.testkit.runner.BuildResult
+import org.gradle.testkit.runner.BuildTask
 import org.gradle.testkit.runner.GradleRunner
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.io.TempDir
@@ -61,6 +62,9 @@ abstract class JooqDockerPluginFunctionalTestBase {
     protected fun Assertion.Builder<BuildResult>.getTask(taskName: String) = get { task(":$taskName") }
         .describedAs("Task $taskName")
 
-    protected fun Assertion.Builder<BuildResult>.getTaskOutcome(taskName: String) =
-        getTask(taskName).isNotNull().get { outcome }
+    protected val Assertion.Builder<BuildTask?>.outcome get() = isNotNull().get { outcome }
+
+    protected fun Assertion.Builder<BuildResult>.getTaskOutcome(taskName: String) = getTask(taskName).outcome
+
+    protected val Assertion.Builder<BuildResult>.generateJooqClassesTask get() = getTask("generateJooqClasses")
 }

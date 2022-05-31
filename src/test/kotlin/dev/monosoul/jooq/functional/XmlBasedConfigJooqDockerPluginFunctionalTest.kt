@@ -45,7 +45,7 @@ class XmlBasedConfigJooqDockerPluginFunctionalTest : JooqDockerPluginFunctionalT
 
         // then
         expect {
-            that(result).getTaskOutcome("generateJooqClasses") isEqualTo SUCCESS
+            that(result).generateJooqClassesTask.outcome isEqualTo SUCCESS
             that(
                 projectFile("build/generated-jooq/org/jooq/generated/public_/tables/Foo.java")
             ).exists()

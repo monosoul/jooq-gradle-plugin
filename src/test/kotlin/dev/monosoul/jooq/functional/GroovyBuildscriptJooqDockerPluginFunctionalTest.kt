@@ -48,7 +48,7 @@ class GroovyBuildscriptJooqDockerPluginFunctionalTest : JooqDockerPluginFunction
 
         // then
         expect {
-            that(result).getTaskOutcome("generateJooqClasses") isEqualTo SUCCESS
+            that(result).generateJooqClassesTask.outcome isEqualTo SUCCESS
             that(
                 projectFile("build/generated-jooq/org/jooq/generated/tables/Foo.java")
             ).exists()
@@ -96,7 +96,7 @@ class GroovyBuildscriptJooqDockerPluginFunctionalTest : JooqDockerPluginFunction
 
         // then
         expect {
-            that(result).getTaskOutcome("generateJooqClasses") isEqualTo SUCCESS
+            that(result).generateJooqClassesTask.outcome isEqualTo SUCCESS
             that(
                 projectFile("build/generated-jooq/org/jooq/generated/public_/tables/Foo.java")
             ).exists()

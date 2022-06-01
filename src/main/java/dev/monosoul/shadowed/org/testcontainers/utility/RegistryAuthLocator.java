@@ -1,11 +1,13 @@
-package dev.monosoul.shaded.org.testcontainers.utility;
+package dev.monosoul.shadowed.org.testcontainers.utility;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.dockerjava.api.model.AuthConfig;
 import com.google.common.annotations.VisibleForTesting;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.SystemUtils;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.zeroturnaround.exec.InvalidResultException;
 import org.zeroturnaround.exec.ProcessExecutor;
 
@@ -22,24 +24,26 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import static dev.monosoul.shaded.org.testcontainers.utility.AuthConfigUtil.toSafeString;
-import static org.apache.commons.lang3.StringUtils.isBlank;
-import static org.slf4j.LoggerFactory.getLogger;
+import static dev.monosoul.shadowed.org.testcontainers.utility.AuthConfigUtil.toSafeString;
 
 /**
  * Utility to look up registry authentication information for an image.
  */
-@Generated("https://github.com/testcontainers/testcontainers-java/blob/7d5f4c9e35b5d671f24125395aed3f741f6c3d9e/core/src/main/java/org/testcontainers/utility/RegistryAuthLocator.java")
+@Generated("https://github.com/testcontainers/testcontainers-java/blob/de1324ed2800eff4da326d0c23d281399d006bc0/core/src/main/java/org/testcontainers/utility/RegistryAuthLocator.java")
 public class RegistryAuthLocator {
 
-    private static final Logger log = getLogger(RegistryAuthLocator.class);
-    private static final String DEFAULT_REGISTRY_NAME = "index.docker.io";
+    private static final Logger log = LoggerFactory.getLogger(RegistryAuthLocator.class);
+
+    private static final String DEFAULT_REGISTRY_NAME = "https://index.docker.io/v1/";
+
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     private static RegistryAuthLocator instance;
 
     private final String commandPathPrefix;
+
     private final String commandExtension;
+
     private final File configFile;
 
     private final Map<String, Optional<AuthConfig>> cache = new ConcurrentHashMap<>();
@@ -51,8 +55,12 @@ public class RegistryAuthLocator {
     private final Map<String, String> CREDENTIALS_HELPERS_NOT_FOUND_MESSAGE_CACHE;
 
     @VisibleForTesting
-    RegistryAuthLocator(File configFile, String commandPathPrefix, String commandExtension,
-                        Map<String, String> notFoundMessageHolderReference) {
+    RegistryAuthLocator(
+            File configFile,
+            String commandPathPrefix,
+            String commandExtension,
+            Map<String, String> notFoundMessageHolderReference
+    ) {
         this.configFile = configFile;
         this.commandPathPrefix = commandPathPrefix;
         this.commandExtension = commandExtension;
@@ -61,10 +69,12 @@ public class RegistryAuthLocator {
     }
 
     /**
+     *
      */
     protected RegistryAuthLocator() {
-        final String dockerConfigLocation = System.getenv().getOrDefault("DOCKER_CONFIG",
-            System.getProperty("user.home") + "/.docker");
+        final String dockerConfigLocation = System
+                .getenv()
+                .getOrDefault("DOCKER_CONFIG", System.getProperty("user.home") + "/.docker");
         this.configFile = new File(dockerConfigLocation + "/config.json");
         this.commandPathPrefix = "";
         this.commandExtension = "";
@@ -72,7 +82,7 @@ public class RegistryAuthLocator {
         this.CREDENTIALS_HELPERS_NOT_FOUND_MESSAGE_CACHE = new HashMap<>();
     }
 
-    public synchronized static RegistryAuthLocator instance() {
+    public static synchronized RegistryAuthLocator instance() {
         if (instance == null) {
             instance = new RegistryAuthLocator();
         }
@@ -98,7 +108,7 @@ public class RegistryAuthLocator {
      *     implementation</li>
      * </ol>
      *
-     * @param dockerImageName image name to be looked up (potentially including a registry URL part)
+     * @param dockerImageName   image name to be looked up (potentially including a registry URL part)
      * @param defaultAuthConfig an AuthConfig object that should be returned if there is no overriding authentication available for images that are looked up
      * @return an AuthConfig that is applicable to this specific image OR the defaultAuthConfig.
      */
@@ -120,9 +130,9 @@ public class RegistryAuthLocator {
 
     private Optional<AuthConfig> lookupUncachedAuthConfig(String registryName, DockerImageName dockerImageName) {
         log.debug("RegistryAuthLocator has configFile: {} ({}) and commandPathPrefix: {}",
-            configFile,
-            configFile.exists() ? "exists" : "does not exist",
-            commandPathPrefix);
+                configFile,
+                configFile.exists() ? "exists" : "does not exist",
+                commandPathPrefix);
 
         try {
             final JsonNode config = OBJECT_MAPPER.readTree(configFile);
@@ -147,27 +157,29 @@ public class RegistryAuthLocator {
                 return Optional.of(existingAuthConfig);
             }
         } catch (Exception e) {
-            log.warn("Failure when attempting to lookup auth config (dockerImageName: {}, configFile: {}. Falling back to docker-java default behaviour. Exception message: {}",
-                dockerImageName,
-                configFile,
-                e.getMessage());
+            log.info(
+                    "Failure when attempting to lookup auth config. Please ignore if you don't have images in an authenticated registry. Details: (dockerImageName: {}, configFile: {}. Falling back to docker-java default behaviour. Exception message: {}",
+                    dockerImageName,
+                    configFile,
+                    e.getMessage()
+            );
         }
         return Optional.empty();
     }
 
     private AuthConfig findExistingAuthConfig(final JsonNode config, final String reposName) throws Exception {
-
         final Map.Entry<String, JsonNode> entry = findAuthNode(config, reposName);
 
         if (entry != null && entry.getValue() != null && entry.getValue().size() > 0) {
             final AuthConfig deserializedAuth = OBJECT_MAPPER
-                .treeToValue(entry.getValue(), AuthConfig.class)
-                .withRegistryAddress(entry.getKey());
+                    .treeToValue(entry.getValue(), AuthConfig.class)
+                    .withRegistryAddress(entry.getKey());
 
-            if (isBlank(deserializedAuth.getUsername()) &&
-                isBlank(deserializedAuth.getPassword()) &&
-                !isBlank(deserializedAuth.getAuth())) {
-
+            if (
+                    StringUtils.isBlank(deserializedAuth.getUsername()) &&
+                            StringUtils.isBlank(deserializedAuth.getPassword()) &&
+                            !StringUtils.isBlank(deserializedAuth.getAuth())
+            ) {
                 final String rawAuth = new String(Base64.getDecoder().decode(deserializedAuth.getAuth()));
                 final String[] splitRawAuth = rawAuth.split(":", 2);
 
@@ -198,7 +210,7 @@ public class RegistryAuthLocator {
         final JsonNode credsStoreNode = config.get("credsStore");
         if (credsStoreNode != null && !credsStoreNode.isMissingNode() && credsStoreNode.isTextual()) {
             final String credsStore = credsStoreNode.asText();
-            if (isBlank(credsStore)) {
+            if (StringUtils.isBlank(credsStore)) {
                 log.warn("Docker auth config credsStore field will be ignored, because value is blank");
                 return null;
             }
@@ -222,8 +234,7 @@ public class RegistryAuthLocator {
     }
 
     private AuthConfig runCredentialProvider(String hostName, String helperOrStoreName) throws Exception {
-
-        if (isBlank(hostName)) {
+        if (StringUtils.isBlank(hostName)) {
             log.debug("There is no point in locating AuthConfig for blank hostName. Returning NULL to allow fallback");
             return null;
         }
@@ -231,28 +242,34 @@ public class RegistryAuthLocator {
         final String credentialProgramName = getCredentialProgramName(helperOrStoreName);
         final String data;
 
-        log.debug("Executing docker credential provider: {} to locate auth config for: {}",
-            credentialProgramName, hostName);
+        log.debug(
+                "Executing docker credential provider: {} to locate auth config for: {}",
+                credentialProgramName,
+                hostName
+        );
 
         try {
             data = runCredentialProgram(hostName, credentialProgramName);
         } catch (InvalidResultException e) {
-
             final String responseErrorMsg = extractCredentialProviderErrorMessage(e);
 
-            if (!isBlank(responseErrorMsg)) {
+            if (!StringUtils.isBlank(responseErrorMsg)) {
                 String credentialsNotFoundMsg = getGenericCredentialsNotFoundMsg(credentialProgramName);
                 if (credentialsNotFoundMsg != null && credentialsNotFoundMsg.equals(responseErrorMsg)) {
-                    log.info("Credential helper/store ({}) does not have credentials for {}",
-                        credentialProgramName,
-                        hostName);
+                    log.info(
+                            "Credential helper/store ({}) does not have credentials for {}",
+                            credentialProgramName,
+                            hostName
+                    );
 
                     return null;
                 }
 
-                log.debug("Failure running docker credential helper/store ({}) with output '{}'",
-                    credentialProgramName, responseErrorMsg);
-
+                log.debug(
+                        "Failure running docker credential helper/store ({}) with output '{}'",
+                        credentialProgramName,
+                        responseErrorMsg
+                );
             } else {
                 log.debug("Failure running docker credential helper/store ({})", credentialProgramName);
             }
@@ -272,9 +289,9 @@ public class RegistryAuthLocator {
             return new AuthConfig().withIdentityToken(password);
         } else {
             return new AuthConfig()
-                .withRegistryAddress(helperResponse.at("/ServerURL").asText())
-                .withUsername(username)
-                .withPassword(password);
+                    .withRegistryAddress(helperResponse.at("/ServerURL").asText())
+                    .withUsername(username)
+                    .withPassword(password);
         }
     }
 
@@ -289,7 +306,7 @@ public class RegistryAuthLocator {
     private String getGenericCredentialsNotFoundMsg(String credentialHelperName) {
         if (!CREDENTIALS_HELPERS_NOT_FOUND_MESSAGE_CACHE.containsKey(credentialHelperName)) {
             String credentialsNotFoundMsg = discoverCredentialsHelperNotFoundMessage(credentialHelperName);
-            if (!isBlank(credentialsNotFoundMsg)) {
+            if (!StringUtils.isBlank(credentialsNotFoundMsg)) {
                 CREDENTIALS_HELPERS_NOT_FOUND_MESSAGE_CACHE.put(credentialHelperName, credentialsNotFoundMsg);
             }
         }
@@ -310,19 +327,26 @@ public class RegistryAuthLocator {
             runCredentialProgram(notExistentFakeHostName, credentialHelperName);
 
             // should not reach here
-            log.warn("Failure running docker credential helper ({}) with fake call, expected 'credentials not found' response",
-                credentialHelperName);
-        } catch(Exception e) {
+            log.warn(
+                    "Failure running docker credential helper ({}) with fake call, expected 'credentials not found' response",
+                    credentialHelperName
+            );
+        } catch (Exception e) {
             if (e instanceof InvalidResultException) {
-                credentialsNotFoundMsg = extractCredentialProviderErrorMessage((InvalidResultException)e);
+                credentialsNotFoundMsg = extractCredentialProviderErrorMessage((InvalidResultException) e);
             }
 
-            if (isBlank(credentialsNotFoundMsg)) {
-                log.warn("Failure running docker credential helper ({}) with fake call, expected 'credentials not found' response. Exception message: {}",
-                    credentialHelperName,
-                    e.getMessage());
+            if (StringUtils.isBlank(credentialsNotFoundMsg)) {
+                log.warn(
+                        "Failure running docker credential helper ({}) with fake call, expected 'credentials not found' response. Exception message: {}",
+                        credentialHelperName,
+                        e.getMessage()
+                );
             } else {
-                log.debug("Got credentials not found error message from docker credential helper - {}", credentialsNotFoundMsg);
+                log.debug(
+                        "Got credentials not found error message from docker credential helper - {}",
+                        credentialsNotFoundMsg
+                );
             }
         }
 
@@ -337,16 +361,18 @@ public class RegistryAuthLocator {
     }
 
     private String runCredentialProgram(String hostName, String credentialHelperName)
-        throws InvalidResultException, InterruptedException, TimeoutException, IOException {
-
+            throws InvalidResultException, InterruptedException, TimeoutException, IOException {
+        String[] command = SystemUtils.IS_OS_WINDOWS
+                ? new String[]{"cmd", "/c", credentialHelperName, "get"}
+                : new String[]{credentialHelperName, "get"};
         return new ProcessExecutor()
-                        .command(credentialHelperName, "get")
-                        .redirectInput(new ByteArrayInputStream(hostName.getBytes()))
-                        .readOutput(true)
-                        .exitValueNormal()
-                        .timeout(30, TimeUnit.SECONDS)
-                        .execute()
-                        .outputUTF8()
-                        .trim();
+                .command(command)
+                .redirectInput(new ByteArrayInputStream(hostName.getBytes()))
+                .readOutput(true)
+                .exitValueNormal()
+                .timeout(30, TimeUnit.SECONDS)
+                .execute()
+                .outputUTF8()
+                .trim();
     }
 }

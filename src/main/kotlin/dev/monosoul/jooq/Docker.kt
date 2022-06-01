@@ -11,7 +11,7 @@ import com.github.dockerjava.core.DockerClientConfig
 import com.github.dockerjava.core.DockerClientImpl
 import com.github.dockerjava.core.command.ExecStartResultCallback
 import com.github.dockerjava.okhttp.OkHttpDockerCmdExecFactory
-import dev.monosoul.shaded.org.testcontainers.dockerclient.auth.AuthDelegatingDockerClientConfig
+import dev.monosoul.shadowed.org.testcontainers.dockerclient.AuthDelegatingDockerClientConfig
 import org.gradle.api.Action
 import java.io.Closeable
 import java.lang.System.err

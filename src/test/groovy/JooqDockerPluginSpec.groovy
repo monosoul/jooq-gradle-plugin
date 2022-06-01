@@ -167,65 +167,6 @@ class JooqDockerPluginSpec extends Specification {
             Files.exists(generatedClass)
     }
 
-    def "plugin is configurable"() {
-        given:
-            prepareBuildGradleFile("""
-                      plugins {
-                          id("dev.monosoul.jooq-docker")
-                      }
-                      
-                      repositories {
-                          mavenCentral()
-                      }
-                      
-                      jooq {
-                          image {
-                              repository = "mysql"
-                              tag = "8.0.15"
-                              envVars = mapOf(
-                                  "MYSQL_ROOT_PASSWORD" to "mysql",
-                                  "MYSQL_DATABASE" to "mysql")
-                              containerName = "uniqueMySqlContainerName"
-                              readinessProbe = { host: String, port: Int ->
-                                  arrayOf("sh", "-c", "until mysqladmin -h\$host -P\$port -uroot -pmysql ping; do echo wait; sleep 1; done;")
-                              }
-                          }
-                          
-                          db {
-                              username = "root"
-                              password = "mysql"
-                              name = "mysql"
-                              port = 3306
-                          }
-                          
-                          jdbc {
-                              schema = "jdbc:mysql"
-                              driverClassName = "com.mysql.cj.jdbc.Driver"
-                              jooqMetaName = "org.jooq.meta.mysql.MySQLDatabase"
-                              urlQueryParams = "?useSSL=false"
-                          }
-                      }
-                      
-                      dependencies {
-                          jdbc("mysql:mysql-connector-java:8.0.29")
-                      }
-                      """)
-            copyResource("/V01__init_mysql.sql", "src/main/resources/db/migration/V01__init_mysql.sql")
-
-        when:
-            def result = GradleRunner.create()
-                    .withProjectDir(projectDir)
-                    .withPluginClasspath()
-                    .forwardOutput()
-                    .withArguments("generateJooqClasses", "--stacktrace", "--debug")
-                    .build()
-
-        then:
-            result.task(":generateJooqClasses").outcome == SUCCESS
-            def generatedClass = Paths.get(projectDir.getPath(), "build/generated-jooq/org/jooq/generated/tables/Foo.java")
-            Files.exists(generatedClass)
-    }
-
     def "output schema to default properly passed to jOOQ generator"() {
         given:
             prepareBuildGradleFile("""

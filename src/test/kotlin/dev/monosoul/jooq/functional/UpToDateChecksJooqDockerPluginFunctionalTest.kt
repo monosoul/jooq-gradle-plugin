@@ -4,7 +4,9 @@ import org.gradle.testkit.runner.TaskOutcome.SUCCESS
 import org.gradle.testkit.runner.TaskOutcome.UP_TO_DATE
 import org.junit.jupiter.api.Test
 import strikt.api.expect
+import strikt.assertions.contains
 import strikt.assertions.isEqualTo
+import strikt.java.exists
 import strikt.java.notExists
 
 class UpToDateChecksJooqDockerPluginFunctionalTest : JooqDockerPluginFunctionalTestBase() {
@@ -216,6 +218,90 @@ class UpToDateChecksJooqDockerPluginFunctionalTest : JooqDockerPluginFunctionalT
             that(
                 projectFile("build/generated-jooq/org/jooq/generated/other/tables/Bar.java")
             ).notExists()
+        }
+    }
+
+    @Test
+    fun `should regenerate jooq classes when out of date even if output directory already has classes generated`() {
+        // given
+        val initialBuildScript = """
+            import org.jooq.meta.jaxb.ForcedType
+
+            plugins {
+                id("dev.monosoul.jooq-docker")
+            }
+
+            repositories {
+                mavenCentral()
+            }
+
+            tasks {
+                generateJooqClasses {
+                    generateUsingJavaConfig {
+                        database.withForcedTypes(ForcedType()
+                            .withUserType("com.example.UniqueClassForFirstGeneration")
+                            .withBinding("com.example.PostgresJSONGsonBinding")
+                            .withTypes("JSONB"))
+                    }
+                }
+            }
+
+            dependencies {
+                jdbc("org.postgresql:postgresql:42.3.6")
+            }
+        """.trimIndent()
+
+        val updatedBuildScript = """
+            import org.jooq.meta.jaxb.ForcedType
+
+            plugins {
+                id("dev.monosoul.jooq-docker")
+            }
+
+            repositories {
+                mavenCentral()
+            }
+
+            tasks {
+                generateJooqClasses {
+                    generateUsingJavaConfig {
+                        database.withForcedTypes(ForcedType()
+                            .withUserType("com.example.UniqueClassForSecondGeneration")
+                            .withBinding("com.example.PostgresJSONGsonBinding")
+                            .withTypes("JSONB"))
+                    }
+                }
+            }
+
+            dependencies {
+                jdbc("org.postgresql:postgresql:42.3.6")
+            }
+        """.trimIndent()
+
+        prepareBuildGradleFile { initialBuildScript }
+        copyResource(from = "/V01__init.sql", to = "src/main/resources/db/migration/V01__init.sql")
+
+        // when
+        val initialResult = runGradleWithArguments("generateJooqClasses")
+
+        // then
+        expect {
+            that(initialResult).generateJooqClassesTask.outcome isEqualTo SUCCESS
+            that(
+                projectFile("build/generated-jooq/org/jooq/generated/tables/Foo.java")
+            ).exists().get { readText() }.contains("com.example.UniqueClassForFirstGeneration")
+        }
+
+        // when
+        prepareBuildGradleFile { updatedBuildScript }
+        val resultAfterUpdate = runGradleWithArguments("generateJooqClasses")
+
+        // then
+        expect {
+            that(resultAfterUpdate).generateJooqClassesTask.outcome isEqualTo SUCCESS
+            that(
+                projectFile("build/generated-jooq/org/jooq/generated/tables/Foo.java")
+            ).exists().get { readText() }.contains("com.example.UniqueClassForSecondGeneration")
         }
     }
 }

@@ -16,7 +16,7 @@ import com.github.dockerjava.core.DockerClientConfig
 import com.github.dockerjava.core.DockerClientImpl
 import com.github.dockerjava.okhttp.OkDockerHttpClient
 import dev.monosoul.jooq.DockerCommandLogger.Companion.logger
-import dev.monosoul.shadowed.org.testcontainers.dockerclient.AuthDelegatingDockerClientConfig
+import dev.monosoul.shaded.org.testcontainers.dockerclient.AuthDelegatingDockerClientConfig
 import org.gradle.api.Action
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory

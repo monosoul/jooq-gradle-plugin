@@ -1,10 +1,10 @@
-package dev.monosoul.shadowed.org.testcontainers.dockerclient
+package dev.monosoul.shaded.org.testcontainers.dockerclient
 
 import com.github.dockerjava.api.model.AuthConfig
 import com.github.dockerjava.core.DockerClientConfig
-import dev.monosoul.shadowed.org.testcontainers.utility.AuthConfigUtil.toSafeString
-import dev.monosoul.shadowed.org.testcontainers.utility.DockerImageName
-import dev.monosoul.shadowed.org.testcontainers.utility.RegistryAuthLocator
+import dev.monosoul.shaded.org.testcontainers.utility.AuthConfigUtil.toSafeString
+import dev.monosoul.shaded.org.testcontainers.utility.DockerImageName
+import dev.monosoul.shaded.org.testcontainers.utility.RegistryAuthLocator
 import org.slf4j.LoggerFactory
 import javax.annotation.Generated
 

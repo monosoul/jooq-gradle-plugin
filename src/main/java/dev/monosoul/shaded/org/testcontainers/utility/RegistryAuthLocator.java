@@ -1,4 +1,4 @@
-package dev.monosoul.shadowed.org.testcontainers.utility;
+package dev.monosoul.shaded.org.testcontainers.utility;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -22,7 +22,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import static dev.monosoul.shadowed.org.testcontainers.utility.AuthConfigUtil.toSafeString;
+import static dev.monosoul.shaded.org.testcontainers.utility.AuthConfigUtil.toSafeString;
 import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.slf4j.LoggerFactory.getLogger;

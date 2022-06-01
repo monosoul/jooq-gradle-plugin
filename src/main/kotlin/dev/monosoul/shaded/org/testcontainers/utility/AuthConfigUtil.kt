@@ -1,4 +1,4 @@
-package dev.monosoul.shadowed.org.testcontainers.utility
+package dev.monosoul.shaded.org.testcontainers.utility
 
 import com.github.dockerjava.api.model.AuthConfig
 import com.google.common.base.MoreObjects

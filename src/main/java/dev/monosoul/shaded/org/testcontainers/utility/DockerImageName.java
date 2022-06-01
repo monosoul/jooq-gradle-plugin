@@ -1,9 +1,9 @@
-package dev.monosoul.shadowed.org.testcontainers.utility;
+package dev.monosoul.shaded.org.testcontainers.utility;
 
 import com.google.common.net.HostAndPort;
-import dev.monosoul.shadowed.org.testcontainers.utility.Versioning.AnyVersion;
-import dev.monosoul.shadowed.org.testcontainers.utility.Versioning.Sha256Versioning;
-import dev.monosoul.shadowed.org.testcontainers.utility.Versioning.TagVersioning;
+import dev.monosoul.shaded.org.testcontainers.utility.Versioning.AnyVersion;
+import dev.monosoul.shaded.org.testcontainers.utility.Versioning.Sha256Versioning;
+import dev.monosoul.shaded.org.testcontainers.utility.Versioning.TagVersioning;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

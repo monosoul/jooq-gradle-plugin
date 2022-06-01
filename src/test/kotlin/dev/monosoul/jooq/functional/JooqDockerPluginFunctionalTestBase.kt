@@ -15,9 +15,6 @@ abstract class JooqDockerPluginFunctionalTestBase {
     @TempDir
     private lateinit var projectDir: File
 
-    @TempDir
-    private lateinit var localBuildCacheDirectory: File
-
     @BeforeEach
     fun setUp() {
         copyResource("/testkit-gradle.properties", "gradle.properties")
@@ -42,18 +39,6 @@ abstract class JooqDockerPluginFunctionalTestBase {
                 sourceStream.copyTo(destinationStream)
             }
         } ?: throw IllegalStateException("Resource not found: $from")
-    }
-
-    protected fun configureLocalGradleCache() {
-        writeProjectFile("settings.gradle.kts") {
-            """
-                buildCache {
-                    local {
-                        directory = "${localBuildCacheDirectory.path}"
-                    }
-                }
-            """.trimIndent()
-        }
     }
 
     protected fun prepareBuildGradleFile(scriptName: String = "build.gradle.kts", scriptSupplier: () -> String) =

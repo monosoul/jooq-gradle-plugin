@@ -5,16 +5,12 @@ import spock.lang.TempDir
 import java.nio.file.Files
 import java.nio.file.Paths
 
-import static org.gradle.testkit.runner.TaskOutcome.FROM_CACHE
 import static org.gradle.testkit.runner.TaskOutcome.SUCCESS
 
 class JooqDockerPluginSpec extends Specification {
 
     @TempDir
     File projectDir
-
-    @TempDir
-    File localBuildCacheDirectory
 
     def setup() {
         copyResource("testkit-gradle.properties", "gradle.properties")
@@ -516,63 +512,6 @@ class JooqDockerPluginSpec extends Specification {
             Files.exists(generatedFlywayClass)
     }
 
-    def "generateJooqClasses task output is loaded from cache"() {
-        given:
-            configureLocalGradleCache();
-            prepareBuildGradleFile("""
-                      plugins {
-                          id("dev.monosoul.jooq-docker")
-                      }
-                      
-                      repositories {
-                          mavenCentral()
-                      }
-                      
-                      dependencies {
-                          jdbc("org.postgresql:postgresql:42.3.6")
-                      }
-                      """)
-            copyResource("/V01__init.sql", "src/main/resources/db/migration/V01__init.sql")
-
-        when:
-            //first run loads to cache
-            def firstRun = GradleRunner.create()
-                    .withProjectDir(projectDir)
-                    .withPluginClasspath()
-                    .forwardOutput()
-                    .withArguments("generateJooqClasses", "--build-cache", "--stacktrace", "--debug")
-                    .build()
-            //second run uses from cache
-            new File(projectDir, 'build').deleteDir()
-            def secondRun = GradleRunner.create()
-                    .withProjectDir(projectDir)
-                    .withPluginClasspath()
-                    .forwardOutput()
-                    .withArguments("generateJooqClasses", "--build-cache", "--stacktrace", "--debug")
-                    .build()
-            //third run got changes and can't use cached output
-            new File(projectDir, 'build').deleteDir()
-            copyResource("/V02__add_bar.sql", "src/main/resources/db/migration/V02__add_bar.sql")
-            def thirdRun = GradleRunner.create()
-                    .withProjectDir(projectDir)
-                    .withPluginClasspath()
-                    .forwardOutput()
-                    .withArguments("generateJooqClasses", "--build-cache", "--stacktrace", "--debug")
-                    .build()
-
-        then:
-            firstRun.task(":generateJooqClasses").outcome == SUCCESS
-            secondRun.task(":generateJooqClasses").outcome == FROM_CACHE
-            thirdRun.task(":generateJooqClasses").outcome == SUCCESS
-
-            def generatedFooClass = Paths.get(projectDir.getPath(), "build/generated-jooq/org/jooq/generated/tables/Foo.java")
-            def generatedFlywayClass = Paths.get(projectDir.getPath(), "build/generated-jooq/org/jooq/generated/tables/FlywaySchemaHistory.java")
-            def generatedBarClass = Paths.get(projectDir.getPath(), "build/generated-jooq/org/jooq/generated/tables/Bar.java")
-            Files.exists(generatedFooClass)
-            Files.exists(generatedBarClass)
-            Files.exists(generatedFlywayClass)
-    }
-
     def "customizer has default generate object defined"() {
         given:
             prepareBuildGradleFile("""
@@ -612,17 +551,6 @@ class JooqDockerPluginSpec extends Specification {
             def generatedFlywayClass = Paths.get(projectDir.getPath(), "build/generated-jooq/org/jooq/generated/tables/FlywaySchemaHistory.java")
             Files.exists(generatedFooClass)
             Files.exists(generatedFlywayClass)
-    }
-
-    def configureLocalGradleCache() {
-        def settingsGradleFile = new File(projectDir, "settings.gradle.kts")
-        settingsGradleFile.write("""
-                        buildCache {
-                            local {
-                                directory = "${localBuildCacheDirectory.path}"
-                            }
-                        }
-                        """)
     }
 
     private void prepareBuildGradleFile(String script) {

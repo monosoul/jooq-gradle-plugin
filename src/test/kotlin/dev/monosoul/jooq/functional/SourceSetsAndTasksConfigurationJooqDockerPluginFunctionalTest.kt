@@ -151,6 +151,7 @@ class SourceSetsAndTasksConfigurationJooqDockerPluginFunctionalTest : JooqDocker
             prepareBuildGradleFile { buildScript }
             copyResource(from = "/V01__init.sql", to = "src/main/resources/db/migration/V01__init.sql")
             writeProjectFile("src/main/kotlin/com/test/Main.kt") {
+                // language=kotlin
                 """
                     package com.test
 

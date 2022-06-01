@@ -61,6 +61,7 @@ class SourceSetsAndTasksConfigurationJooqDockerPluginFunctionalTest : JooqDocker
             }
         """.trimIndent()
     ).onEach {
+        setUp()
         recreateProjectDir()
     }.map { (caseName, buildScript) ->
         dynamicTest("should configure source sets and tasks for java project $caseName") {
@@ -144,6 +145,7 @@ class SourceSetsAndTasksConfigurationJooqDockerPluginFunctionalTest : JooqDocker
             }
         """.trimIndent()
     ).onEach {
+        setUp()
         recreateProjectDir()
     }.map { (caseName, buildScript) ->
         dynamicTest("should configure source sets and tasks for kotlin project $caseName") {

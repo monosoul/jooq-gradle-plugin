@@ -23,6 +23,11 @@ abstract class JooqDockerPluginFunctionalTestBase {
         copyResource("/testkit-gradle.properties", "gradle.properties")
     }
 
+    protected fun recreateProjectDir() {
+        projectDir.deleteRecursively()
+        projectDir.mkdirs()
+    }
+
     protected fun runGradleWithArguments(vararg arguments: String): BuildResult = GradleRunner.create()
         .withProjectDir(projectDir)
         .withPluginClasspath()

@@ -314,80 +314,6 @@ class JooqDockerPluginSpec extends Specification {
             Files.exists(generatedClass)
     }
 
-    def "flyway configuration overridden with flywayProperties task input"() {
-        given:
-            prepareBuildGradleFile("""
-                      plugins {
-                          id("dev.monosoul.jooq-docker")
-                      }
-                      
-                      repositories {
-                          mavenCentral()
-                      }
-                      
-                      tasks {
-                          generateJooqClasses {
-                              flywayProperties = mapOf("flyway.placeholderReplacement" to "false")
-                          }
-                      }
-                      
-                      dependencies {
-                          jdbc("org.postgresql:postgresql:42.3.6")
-                      }
-                      """)
-            copyResource("/V01__init_with_placeholders.sql", "src/main/resources/db/migration/V01__init_with_placeholders.sql")
-
-        when:
-            def result = GradleRunner.create()
-                    .withProjectDir(projectDir)
-                    .withPluginClasspath()
-                    .forwardOutput()
-                    .withArguments("generateJooqClasses", "--stacktrace", "--debug")
-                    .build()
-
-        then:
-            result.task(":generateJooqClasses").outcome == SUCCESS
-            def generatedClass = Paths.get(projectDir.getPath(), "build/generated-jooq/org/jooq/generated/tables/Foo.java")
-            Files.exists(generatedClass)
-    }
-
-    def "schema version provider is aware of flyway table name override"() {
-        given:
-            prepareBuildGradleFile("""
-                      plugins {
-                          id("dev.monosoul.jooq-docker")
-                      }
-                      
-                      repositories {
-                          mavenCentral()
-                      }
-                      
-                      tasks {
-                          generateJooqClasses {
-                              flywayProperties = mapOf("flyway.table" to "some_schema_table")
-                          }
-                      }
-                      
-                      dependencies {
-                          jdbc("org.postgresql:postgresql:42.3.6")
-                      }
-                      """)
-            copyResource("/V01__init.sql", "src/main/resources/db/migration/V01__init.sql")
-
-        when:
-            def result = GradleRunner.create()
-                    .withProjectDir(projectDir)
-                    .withPluginClasspath()
-                    .forwardOutput()
-                    .withArguments("generateJooqClasses", "--stacktrace", "--debug")
-                    .build()
-
-        then:
-            result.task(":generateJooqClasses").outcome == SUCCESS
-            def generatedFlywayClass = Paths.get(projectDir.getPath(), "build/generated-jooq/org/jooq/generated/tables/SomeSchemaTable.java")
-            Files.exists(generatedFlywayClass)
-    }
-
     def "output schema to default properly passed to jOOQ generator"() {
         given:
             prepareBuildGradleFile("""
@@ -645,47 +571,6 @@ class JooqDockerPluginSpec extends Specification {
             Files.exists(generatedFooClass)
             Files.exists(generatedBarClass)
             Files.exists(generatedFlywayClass)
-    }
-
-    def "generates flyway table in first schema by default"() {
-        given:
-            prepareBuildGradleFile("""
-                      plugins {
-                          id("dev.monosoul.jooq-docker")
-                      }
-                      
-                      repositories {
-                          mavenCentral()
-                      }
-                      
-                      tasks {
-                          generateJooqClasses {
-                              schemas = arrayOf("other", "public")
-                          }
-                      }
-                      
-                      dependencies {
-                          jdbc("org.postgresql:postgresql:42.3.6")
-                      }
-                      """)
-            copyResource("/V01__init_multiple_schemas.sql", "src/main/resources/db/migration/V01__init_multiple_schemas.sql")
-
-        when:
-            def result = GradleRunner.create()
-                    .withProjectDir(projectDir)
-                    .withPluginClasspath()
-                    .forwardOutput()
-                    .withArguments("generateJooqClasses", "--stacktrace", "--debug")
-                    .build()
-
-        then:
-            result.task(":generateJooqClasses").outcome == SUCCESS
-            def generatedPublic = Paths.get(projectDir.getPath(), "build/generated-jooq/org/jooq/generated/public_/tables/Foo.java")
-            def generatedOther = Paths.get(projectDir.getPath(), "build/generated-jooq/org/jooq/generated/other/tables/Bar.java")
-            def generatedFlywaySchemaClass = Paths.get(projectDir.getPath(), "build/generated-jooq/org/jooq/generated/other/tables/FlywaySchemaHistory.java")
-            Files.exists(generatedPublic)
-            Files.exists(generatedOther)
-            Files.exists(generatedFlywaySchemaClass)
     }
 
     def "customizer has default generate object defined"() {

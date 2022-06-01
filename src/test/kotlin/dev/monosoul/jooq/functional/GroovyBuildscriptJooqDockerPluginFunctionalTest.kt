@@ -13,7 +13,7 @@ class GroovyBuildscriptJooqDockerPluginFunctionalTest : JooqDockerPluginFunction
     fun `should work with Groovy buildscript`() {
         // given
         prepareBuildGradleFile("build.gradle") {
-            // language=Groovy
+            // language=gradle
             """
                 plugins {
                     id "dev.monosoul.jooq-docker"
@@ -62,7 +62,7 @@ class GroovyBuildscriptJooqDockerPluginFunctionalTest : JooqDockerPluginFunction
     fun `should respect the generator customizations when using deprecated method with Groovy buildscript`() {
         // given
         prepareBuildGradleFile("build.gradle") {
-            // language=Groovy
+            // language=gradle
             """
                 plugins {
                     id "dev.monosoul.jooq-docker"

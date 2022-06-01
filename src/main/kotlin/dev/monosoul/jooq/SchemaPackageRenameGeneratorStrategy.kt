@@ -19,13 +19,13 @@ class SchemaPackageRenameGeneratorStrategy : DefaultGeneratorStrategy() {
     }
 
     private fun isEligibleForRename(definition: Definition?) =
-            isSchemaOrCatalog(definition) && getMappingForDefinition(definition) != null
+        isSchemaOrCatalog(definition) && getMappingForDefinition(definition) != null
 
     private fun isSchemaOrCatalog(definition: Definition?) =
-            definition is SchemaDefinition || definition is CatalogDefinition
+        definition is SchemaDefinition || definition is CatalogDefinition
 
     private fun getMappingForDefinition(definition: Definition?) =
-            schemaToPackageMapping.get()[definition?.getSchemaName()]
+        schemaToPackageMapping.get()[definition?.getSchemaName()]
 
     private fun Definition.getSchemaName(): String {
         return inputName

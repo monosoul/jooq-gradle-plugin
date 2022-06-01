@@ -7,13 +7,15 @@ import org.jooq.impl.DSL.table
 import org.jooq.meta.SchemaDefinition
 import org.jooq.meta.SchemaVersionProvider
 
-object FlywaySchemaVersionProvider : SchemaVersionProvider {
-    private val defaultSchemaName = ThreadLocal<String>()
-    private val flywayTableName = ThreadLocal<String>()
+class FlywaySchemaVersionProvider : SchemaVersionProvider {
+    companion object {
+        private val defaultSchemaName = ThreadLocal<String>()
+        private val flywayTableName = ThreadLocal<String>()
 
-    fun setup(defaultSchemaName: String, flywayTableName: String) {
-        this.defaultSchemaName.set(defaultSchemaName)
-        this.flywayTableName.set(flywayTableName)
+        fun setup(defaultSchemaName: String, flywayTableName: String) {
+            this.defaultSchemaName.set(defaultSchemaName)
+            this.flywayTableName.set(flywayTableName)
+        }
     }
 
     override fun version(schema: SchemaDefinition): String? {

@@ -25,7 +25,7 @@ class JavaBasedConfigJooqDockerPluginFunctionalTest : JooqDockerPluginFunctional
                 tasks {
                     generateJooqClasses {
                         schemas = arrayOf("public", "other")
-                        generateUsingJavaConfig {
+                        usingJavaConfig {
                             database.withExcludes("BAR")
                         }
                     }
@@ -118,7 +118,7 @@ class JavaBasedConfigJooqDockerPluginFunctionalTest : JooqDockerPluginFunctional
 
                 tasks {
                     generateJooqClasses {
-                        generateUsingJavaConfig {
+                        usingJavaConfig {
                             generate.setDeprecated(true)
                         }
                     }

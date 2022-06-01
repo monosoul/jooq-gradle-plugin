@@ -25,7 +25,7 @@ class XmlBasedConfigJooqDockerPluginFunctionalTest : JooqDockerPluginFunctionalT
                 tasks {
                     generateJooqClasses {
                         schemas = arrayOf("public", "other")
-                        generateUsingXmlConfig()
+                        usingXmlConfig()
                     }
                 }
 
@@ -71,7 +71,7 @@ class XmlBasedConfigJooqDockerPluginFunctionalTest : JooqDockerPluginFunctionalT
                 tasks {
                     generateJooqClasses {
                         schemas = arrayOf("public", "other")
-                        generateUsingXmlConfig {
+                        usingXmlConfig {
                             database.withExcludes("BAR")
                         }
                     }

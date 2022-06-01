@@ -141,7 +141,7 @@ open class GenerateJooqClassesTask @Inject constructor(
     private fun getExtension() = project.extensions.getByName("jooq") as JooqExtension
 
     @Suppress("unused")
-    fun generateUsingXmlConfig(
+    fun usingXmlConfig(
         file: File = project.file("src/main/resources/db/jooq.xml"),
         customizer: Action<Generator> = Action<Generator> { }
     ) {
@@ -155,7 +155,7 @@ open class GenerateJooqClassesTask @Inject constructor(
     }
 
     @Suppress("unused")
-    fun generateUsingJavaConfig(customizer: Action<Generator>) {
+    fun usingJavaConfig(customizer: Action<Generator>) {
         generatorConfig.set(
             providerFactory.provider {
                 defaultGeneratorConfig().also {
@@ -166,16 +166,16 @@ open class GenerateJooqClassesTask @Inject constructor(
     }
 
     @Deprecated(
-        message = "Use generateUsingJavaConfig instead",
-        replaceWith = ReplaceWith("generateUsingJavaConfig(customizer)"),
+        message = "Use usingJavaConfig instead",
+        replaceWith = ReplaceWith("usingJavaConfig(customizer)"),
     )
-    fun customizeGenerator(customizer: Action<Generator>) = generateUsingJavaConfig(customizer)
+    fun customizeGenerator(customizer: Action<Generator>) = usingJavaConfig(customizer)
 
     @Deprecated(
-        message = "Use generateUsingJavaConfig instead",
-        replaceWith = ReplaceWith("generateUsingJavaConfig(closure)"),
+        message = "Use usingJavaConfig instead",
+        replaceWith = ReplaceWith("usingJavaConfig(closure)"),
     )
-    fun customizeGenerator(closure: Closure<Generator>) = generateUsingJavaConfig {
+    fun customizeGenerator(closure: Closure<Generator>) = usingJavaConfig {
         closure.rehydrate(this, this, this).call(this)
     }
 

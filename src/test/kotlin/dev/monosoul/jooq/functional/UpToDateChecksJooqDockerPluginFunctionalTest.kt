@@ -158,7 +158,7 @@ class UpToDateChecksJooqDockerPluginFunctionalTest : JooqDockerPluginFunctionalT
             tasks {
                 generateJooqClasses {
                     schemas = arrayOf("public", "other")
-                    generateUsingJavaConfig {
+                    usingJavaConfig {
                         database.withExcludes("BAR")
                     }
                 }
@@ -181,7 +181,7 @@ class UpToDateChecksJooqDockerPluginFunctionalTest : JooqDockerPluginFunctionalT
             tasks {
                 generateJooqClasses {
                     schemas = arrayOf("public", "other")
-                    generateUsingJavaConfig {
+                    usingJavaConfig {
                         database.withExcludes(".*")
                     }
                 }
@@ -237,7 +237,7 @@ class UpToDateChecksJooqDockerPluginFunctionalTest : JooqDockerPluginFunctionalT
 
             tasks {
                 generateJooqClasses {
-                    generateUsingJavaConfig {
+                    usingJavaConfig {
                         database.withForcedTypes(ForcedType()
                             .withUserType("com.example.UniqueClassForFirstGeneration")
                             .withBinding("com.example.PostgresJSONGsonBinding")
@@ -264,7 +264,7 @@ class UpToDateChecksJooqDockerPluginFunctionalTest : JooqDockerPluginFunctionalT
 
             tasks {
                 generateJooqClasses {
-                    generateUsingJavaConfig {
+                    usingJavaConfig {
                         database.withForcedTypes(ForcedType()
                             .withUserType("com.example.UniqueClassForSecondGeneration")
                             .withBinding("com.example.PostgresJSONGsonBinding")

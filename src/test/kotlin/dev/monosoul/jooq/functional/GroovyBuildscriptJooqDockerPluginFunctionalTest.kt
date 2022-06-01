@@ -26,7 +26,7 @@ class GroovyBuildscriptJooqDockerPluginFunctionalTest : JooqDockerPluginFunction
                 tasks {
                     generateJooqClasses {
                         flywayProperties = ["flyway.placeholderReplacement": "false"]
-                        generateUsingJavaConfig {
+                        usingJavaConfig {
                             database.withExcludes("BAR")
                         }
                     }

@@ -245,47 +245,6 @@ class JooqDockerPluginSpec extends Specification {
             Files.exists(generatedFlywayClass)
     }
 
-    def "customizer has default generate object defined"() {
-        given:
-            prepareBuildGradleFile("""
-                      plugins {
-                          id("dev.monosoul.jooq-docker")
-                      }
-                      
-                      repositories {
-                          mavenCentral()
-                      }
-                      
-                      tasks {
-                          generateJooqClasses {
-                              generateUsingJavaConfig {
-                                  generate.setDeprecated(true)
-                              }
-                          }
-                      }
-                      
-                      dependencies {
-                          jdbc("org.postgresql:postgresql:42.3.6")
-                      }
-                      """)
-            copyResource("/V01__init.sql", "src/main/resources/db/migration/V01__init.sql")
-
-        when:
-            def result = GradleRunner.create()
-                    .withProjectDir(projectDir)
-                    .withPluginClasspath()
-                    .forwardOutput()
-                    .withArguments("generateJooqClasses", "--stacktrace", "--debug")
-                    .build()
-
-        then:
-            result.task(":generateJooqClasses").outcome == SUCCESS
-            def generatedFooClass = Paths.get(projectDir.getPath(), "build/generated-jooq/org/jooq/generated/tables/Foo.java")
-            def generatedFlywayClass = Paths.get(projectDir.getPath(), "build/generated-jooq/org/jooq/generated/tables/FlywaySchemaHistory.java")
-            Files.exists(generatedFooClass)
-            Files.exists(generatedFlywayClass)
-    }
-
     private void prepareBuildGradleFile(String script) {
         def buildGradleFile = new File(projectDir, "build.gradle.kts")
         buildGradleFile.write(script)

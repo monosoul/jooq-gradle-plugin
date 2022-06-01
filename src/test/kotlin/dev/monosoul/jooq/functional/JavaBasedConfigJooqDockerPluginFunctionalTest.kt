@@ -102,4 +102,47 @@ class JavaBasedConfigJooqDockerPluginFunctionalTest : JooqDockerPluginFunctional
             ).notExists()
         }
     }
+
+    @Test
+    fun `customizer should have default generate object defined`() {
+        // given
+        prepareBuildGradleFile {
+            """
+                plugins {
+                    id("dev.monosoul.jooq-docker")
+                }
+
+                repositories {
+                    mavenCentral()
+                }
+
+                tasks {
+                    generateJooqClasses {
+                        generateUsingJavaConfig {
+                            generate.setDeprecated(true)
+                        }
+                    }
+                }
+
+                dependencies {
+                    jdbc("org.postgresql:postgresql:42.3.6")
+                }
+            """.trimIndent()
+        }
+        copyResource(from = "/V01__init.sql", to = "src/main/resources/db/migration/V01__init.sql")
+
+        // when
+        val result = runGradleWithArguments("generateJooqClasses")
+
+        // then
+        expect {
+            that(result).generateJooqClassesTask.outcome isEqualTo SUCCESS
+            that(
+                projectFile("build/generated-jooq/org/jooq/generated/tables/Foo.java")
+            ).exists()
+            that(
+                projectFile("build/generated-jooq/org/jooq/generated/tables/FlywaySchemaHistory.java")
+            ).exists()
+        }
+    }
 }

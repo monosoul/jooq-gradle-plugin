@@ -50,7 +50,11 @@ open class JooqExtension(projectName: String) : Serializable {
     class Image(private val db: Database, projectName: String) : Serializable {
         var repository = "postgres"
         var tag = "11.2-alpine"
-        var envVars: Map<String, Any> = mapOf("POSTGRES_USER" to db.username, "POSTGRES_PASSWORD" to db.password, "POSTGRES_DB" to db.name)
+        var envVars: Map<String, Any> = mapOf(
+            "POSTGRES_USER" to db.username,
+            "POSTGRES_PASSWORD" to db.password,
+            "POSTGRES_DB" to db.name
+        )
         var containerName = "jooq-docker-container-${projectName}"
         var readinessProbeHost = "127.0.0.1"
         var readinessProbe = { host: String, port: Int ->

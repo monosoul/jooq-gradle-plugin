@@ -14,8 +14,10 @@ class DatabaseHostResolver(private val dbHostOverride: String?) {
         return when (dockerHost.scheme) {
             in arrayOf("http", "https", "tcp") -> dockerHost.host
             in arrayOf("unix", "npipe") -> "localhost"
-            else -> throw IllegalStateException("could not resolve docker host for $dockerHost, " +
-                    "please override it in plugin config \"jooq.db.hostOverride\"")
+            else -> throw IllegalStateException(
+                "could not resolve docker host for $dockerHost, " +
+                        "please override it in plugin config \"jooq.db.hostOverride\""
+            )
         }
     }
 }

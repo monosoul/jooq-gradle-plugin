@@ -23,6 +23,7 @@ abstract class JooqDockerPluginFunctionalTestBase {
     protected fun recreateProjectDir() {
         projectDir.deleteRecursively()
         projectDir.mkdirs()
+        setUp()
     }
 
     protected fun runGradleWithArguments(vararg arguments: String): BuildResult = GradleRunner.create()

@@ -16,39 +16,6 @@ class JooqDockerPluginSpec extends Specification {
         copyResource("testkit-gradle.properties", "gradle.properties")
     }
 
-    def "generates jooq classes for PostgreSQL db with default config"() {
-        given:
-            prepareBuildGradleFile("""
-                      plugins {
-                          id("dev.monosoul.jooq-docker")
-                      }
-                      
-                      repositories {
-                          mavenCentral()
-                      }
-                      
-                      dependencies {
-                          jdbc("org.postgresql:postgresql:42.3.6")
-                      }
-                      """)
-            copyResource("/V01__init.sql", "src/main/resources/db/migration/V01__init.sql")
-
-        when:
-            def result = GradleRunner.create()
-                    .withProjectDir(projectDir)
-                    .withPluginClasspath()
-                    .forwardOutput()
-                    .withArguments("generateJooqClasses", "--stacktrace", "--debug")
-                    .build()
-
-        then:
-            result.task(":generateJooqClasses").outcome == SUCCESS
-            def generatedFooClass = Paths.get(projectDir.getPath(), "build/generated-jooq/org/jooq/generated/tables/Foo.java")
-            def generatedFlywayClass = Paths.get(projectDir.getPath(), "build/generated-jooq/org/jooq/generated/tables/FlywaySchemaHistory.java")
-            Files.exists(generatedFooClass)
-            Files.exists(generatedFlywayClass)
-    }
-
     def "generates jooq classes for PostgreSQL db with default config for multiple schemas"() {
         given:
             prepareBuildGradleFile("""

@@ -2,7 +2,9 @@
 
 [![Build Status](https://github.com/monosoul/jooq-gradle-plugin/actions/workflows/build-on-push.yml/badge.svg?branch=master)](https://github.com/monosoul/jooq-gradle-plugin/actions/workflows/build-on-push.yml?query=master)
 [![codecov](https://codecov.io/gh/monosoul/jooq-gradle-plugin/branch/master/graph/badge.svg?token=7SWSOTIBMX)](https://codecov.io/gh/monosoul/jooq-gradle-plugin)
-[![Gradle Plugins Release](https://img.shields.io/github/release/monosoul/jooq-gradle-plugin.svg)](https://plugins.gradle.org/plugin/dev.monosoul.jooq-docker)
+[![GitHub Release](https://img.shields.io/github/release/monosoul/jooq-gradle-plugin.svg?label=GitHub%20Release)](https://github.com/monosoul/jooq-gradle-plugin/releases)
+[![Gradle Plugins Release](https://img.shields.io/maven-metadata/v/https/plugins.gradle.org/m2/dev/monosoul/jooq-docker/dev.monosoul.jooq-docker.gradle.plugin/maven-metadata.xml.svg?label=Gradle%20Plugin%20Portal)](https://plugins.gradle.org/plugin/dev.monosoul.jooq-docker)
+![license](https://img.shields.io/github/license/monosoul/jooq-gradle-plugin.svg)
 
 Copyright 2021 [Adrian Skrobacz](https://github.com/adrianskrobaczrevolut)
 

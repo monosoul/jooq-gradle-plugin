@@ -103,7 +103,7 @@ repositories {
 jooq {
     image {
         repository = "mysql"
-        tag = "8.0.15"
+        tag = "8.0.29"
         envVars = mapOf(
             "MYSQL_ROOT_PASSWORD" to "mysql",
             "MYSQL_DATABASE" to "mysql"
@@ -126,7 +126,7 @@ jooq {
 
 dependencies {
     implementation("org.jooq:jooq:3.16.5")
-    jdbc("mysql:mysql-connector-java:8.0.15")
+    jdbc("mysql:mysql-connector-java:8.0.29")
 }
 ```
 

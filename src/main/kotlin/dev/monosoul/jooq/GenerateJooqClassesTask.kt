@@ -178,11 +178,6 @@ open class GenerateJooqClassesTask @Inject constructor(
         val jdbc = getJdbc()
         val jdbcAwareClassLoader = buildJdbcArtifactsAwareClassLoader()
 
-        logger.info(
-            """
-                Image name: ${image.getImageName()} | Env vars: ${image.envVars.mapValues { (_, value) -> value.toString() }} | Test query string: ${image.readinessProbe}
-            """.trimIndent()
-        )
         val dbContainer = GenericDatabaseContainer(
             imageName = image.getImageName(),
             env = image.envVars.mapValues { (_, value) -> value.toString() },

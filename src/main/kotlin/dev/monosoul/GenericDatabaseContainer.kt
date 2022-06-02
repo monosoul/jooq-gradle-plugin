@@ -16,7 +16,8 @@ class GenericDatabaseContainer(
     private val database: Database,
     private val jdbc: Jdbc,
     private val jdbcAwareClassLoader: ClassLoader,
-    private val testQueryString: String
+    private val testQueryString: String,
+    command: String? = null
 ) : JdbcDatabaseContainer<GenericDatabaseContainer>(DockerImageName.parse(imageName)) {
 
     private val DRIVER_LOAD_MUTEX = Any()
@@ -36,6 +37,7 @@ class GenericDatabaseContainer(
         withEnv(env)
         withExposedPorts(database.port)
         setWaitStrategy(HostPortWaitStrategy())
+        command?.run(::withCommand)
         driverField = JdbcDatabaseContainer::class.java.getDeclaredField("driver").also {
             it.isAccessible = true
         }

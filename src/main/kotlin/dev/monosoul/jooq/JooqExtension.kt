@@ -44,6 +44,7 @@ open class JooqExtension : Serializable {
             "POSTGRES_DB" to db.name
         )
         var readinessProbe = "SELECT 1"
+        var command: String? = null
 
         internal fun getImageName(): String {
             return "$repository:$tag"

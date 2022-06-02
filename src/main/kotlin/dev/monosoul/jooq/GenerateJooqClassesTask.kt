@@ -190,6 +190,7 @@ open class GenerateJooqClassesTask @Inject constructor(
             database = db,
             jdbc = jdbc,
             jdbcAwareClassLoader = jdbcAwareClassLoader,
+            command = image.command,
         ).also { it.start() }
         val jdbcUrl = dbContainer.jdbcUrl
         try {

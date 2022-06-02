@@ -29,6 +29,7 @@ class GenerateForMySqlJooqDockerPluginFunctionalTest : JooqDockerPluginFunctiona
                             "MYSQL_ROOT_PASSWORD" to "mysql",
                             "MYSQL_DATABASE" to "mysql"
                         )
+                        command = "--default-authentication-plugin=mysql_native_password"
                     }
 
                     db {

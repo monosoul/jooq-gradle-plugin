@@ -1,5 +1,6 @@
 package dev.monosoul.jooq
 
+import dev.monosoul.GenericDatabaseContainer
 import groovy.lang.Closure
 import org.flywaydb.core.Flyway
 import org.flywaydb.core.api.Location.FILESYSTEM_PREFIX
@@ -119,15 +120,6 @@ open class GenerateJooqClassesTask @Inject constructor(
     @Input
     fun getImageEnvVars() = getImage().envVars
 
-    @Input
-    fun getContainerName() = getImage().containerName
-
-    @Input
-    fun getReadinessProbeHost() = getImage().readinessProbeHost
-
-    @Input
-    fun getReadinessCommand() = getImage().getReadinessCommand()
-
     init {
         project.plugins.withType(JavaPlugin::class.java) {
             project.extensions.getByType<JavaPluginExtension>().sourceSets.named(MAIN_SOURCE_SET_NAME) {
@@ -183,27 +175,35 @@ open class GenerateJooqClassesTask @Inject constructor(
     fun generateClasses() {
         val image = getImage()
         val db = getDb()
+        val jdbc = getJdbc()
         val jdbcAwareClassLoader = buildJdbcArtifactsAwareClassLoader()
-        val docker = Docker(
-            image.getImageName(),
-            image.envVars,
-            db.port to db.exposedPort,
-            image.getReadinessCommand(),
-            DatabaseHostResolver(db.hostOverride),
-            image.containerName
+
+        logger.info(
+            """
+                Image name: ${image.getImageName()} | Env vars: ${image.envVars.mapValues { (_, value) -> value.toString() }} | Test query string: ${image.readinessProbe}
+            """.trimIndent()
         )
-        docker.use {
-            it.runInContainer {
-                migrateDb(jdbcAwareClassLoader, this)
-                generateJooqClasses(jdbcAwareClassLoader, this)
-            }
+        val dbContainer = GenericDatabaseContainer(
+            imageName = image.getImageName(),
+            env = image.envVars.mapValues { (_, value) -> value.toString() },
+            testQueryString = image.readinessProbe,
+            database = db,
+            jdbc = jdbc,
+            jdbcAwareClassLoader = jdbcAwareClassLoader,
+        ).also { it.start() }
+        val jdbcUrl = dbContainer.jdbcUrl
+        try {
+            migrateDb(jdbcAwareClassLoader, jdbcUrl)
+            generateJooqClasses(jdbcAwareClassLoader, jdbcUrl)
+        } finally {
+            dbContainer.stop()
         }
     }
 
-    private fun migrateDb(jdbcAwareClassLoader: ClassLoader, dbHost: String) {
+    private fun migrateDb(jdbcAwareClassLoader: ClassLoader, jdbcUrl: String) {
         val db = getDb()
         Flyway.configure(jdbcAwareClassLoader)
-            .dataSource(db.getUrl(dbHost), db.username, db.password)
+            .dataSource(jdbcUrl, db.username, db.password)
             .schemas(*schemas)
             .locations(*inputDirectory.map { "$FILESYSTEM_PREFIX${it.absolutePath}" }.toTypedArray())
             .defaultSchema(defaultFlywaySchema())
@@ -217,7 +217,7 @@ open class GenerateJooqClassesTask @Inject constructor(
 
     private fun flywayTableName() = flywayProperties[TABLE] ?: "flyway_schema_history"
 
-    private fun generateJooqClasses(jdbcAwareClassLoader: ClassLoader, dbHost: String) {
+    private fun generateJooqClasses(jdbcAwareClassLoader: ClassLoader, jdbcUrl: String) {
         project.delete(outputDirectory)
         val db = getDb()
         val jdbc = getJdbc()
@@ -231,7 +231,7 @@ open class GenerateJooqClassesTask @Inject constructor(
             withJdbc(
                 Jdbc()
                     .withDriver(jdbc.driverClassName)
-                    .withUrl(db.getUrl(dbHost))
+                    .withUrl(jdbcUrl)
                     .withUser(db.username)
                     .withPassword(db.password)
             )

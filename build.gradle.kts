@@ -75,18 +75,6 @@ tasks {
     }
 }
 
-afterEvaluate {
-    tasks.jacocoTestReport {
-        classDirectories.setFrom(classDirectories.files.map {
-            fileTree(it) {
-                exclude("dev/monosoul/shaded/org/testcontainers/**/*")
-            }
-        })
-    }
-}
-
-val testContainersVersion = "1.17.2"
-
 dependencies {
     implementation("org.jooq:jooq-codegen:3.16.6")
     implementation("org.glassfish.jaxb:jaxb-runtime:3.0.2")
@@ -97,7 +85,7 @@ dependencies {
     implementation("org.zeroturnaround:zt-exec:1.12")
     implementation("org.apache.commons:commons-lang3:3.12.0")
     compileOnly("javax.annotation:javax.annotation-api:1.3.2")
-    implementation("org.testcontainers:postgresql:$testContainersVersion")
+    implementation("org.testcontainers:jdbc:1.17.2")
 
     testImplementation(enforcedPlatform("org.junit:junit-bom:5.8.2"))
     testImplementation("org.junit.jupiter:junit-jupiter")

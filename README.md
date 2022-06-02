@@ -108,10 +108,6 @@ jooq {
             "MYSQL_ROOT_PASSWORD" to "mysql",
             "MYSQL_DATABASE" to "mysql"
         )
-        containerName = "uniqueMySqlContainerName"
-        readinessProbe = { host: String, port: Int ->
-            arrayOf("sh", "-c", "until mysqladmin -h$host -P$port -uroot -pmysql ping; do echo wait; sleep 1; done;")
-        }
     }
 
     db {

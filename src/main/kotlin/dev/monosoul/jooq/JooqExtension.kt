@@ -2,12 +2,11 @@ package dev.monosoul.jooq
 
 import org.gradle.api.Action
 import java.io.Serializable
-import java.net.ServerSocket
 
-open class JooqExtension(projectName: String) : Serializable {
+open class JooqExtension : Serializable {
     val jdbc = Jdbc()
-    val db = Database(jdbc)
-    val image = Image(db, projectName)
+    val db = Database()
+    val image = Image(db)
 
     fun db(configure: Action<Database>) {
         configure.execute(db)
@@ -28,26 +27,15 @@ open class JooqExtension(projectName: String) : Serializable {
         var urlQueryParams = ""
     }
 
-    class Database(private val jdbc: Jdbc) : Serializable {
+    class Database : Serializable {
         var username = "postgres"
         var password = "postgres"
         var name = "postgres"
         var hostOverride: String? = null
         var port = 5432
-        var exposedPort = lookupFreePort()
-
-        internal fun getUrl(host: String): String {
-            return "${jdbc.schema}://$host:$exposedPort/$name${jdbc.urlQueryParams}"
-        }
-
-        private fun lookupFreePort(): Int {
-            ServerSocket(0).use {
-                return it.localPort
-            }
-        }
     }
 
-    class Image(private val db: Database, projectName: String) : Serializable {
+    class Image(private val db: Database) : Serializable {
         var repository = "postgres"
         var tag = "11.2-alpine"
         var envVars: Map<String, Any> = mapOf(
@@ -55,15 +43,7 @@ open class JooqExtension(projectName: String) : Serializable {
             "POSTGRES_PASSWORD" to db.password,
             "POSTGRES_DB" to db.name
         )
-        var containerName = "jooq-docker-container-${projectName}"
-        var readinessProbeHost = "127.0.0.1"
-        var readinessProbe = { host: String, port: Int ->
-            arrayOf("sh", "-c", "until pg_isready -h $host -p $port; do echo waiting for db; sleep 1; done;")
-        }
-
-        internal fun getReadinessCommand(): Array<String> {
-            return readinessProbe(readinessProbeHost, db.port)
-        }
+        var readinessProbe = "SELECT 1"
 
         internal fun getImageName(): String {
             return "$repository:$tag"

@@ -30,7 +30,6 @@ open class JooqExtension : Serializable {
         var username = "postgres"
         var password = "postgres"
         var name = "postgres"
-        var hostOverride: String? = null
         var port = 5432
     }
 

@@ -181,7 +181,7 @@ open class GenerateJooqClassesTask @Inject constructor(
         val dbContainer = GenericDatabaseContainer(
             imageName = image.getImageName(),
             env = image.envVars.mapValues { (_, value) -> value.toString() },
-            testQueryString = image.readinessProbe,
+            testQueryString = image.testQuery,
             database = db,
             jdbc = jdbc,
             jdbcAwareClassLoader = jdbcAwareClassLoader,

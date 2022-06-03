@@ -43,7 +43,7 @@ open class JooqExtension : Serializable {
             "POSTGRES_PASSWORD" to db.password,
             "POSTGRES_DB" to db.name
         )
-        var readinessProbe = "SELECT 1"
+        var testQuery = "SELECT 1"
         var command: String? = null
 
         internal fun getImageName(): String {

@@ -136,7 +136,6 @@ open class GenerateJooqClassesTask @Inject constructor(
     }
 
     private fun migrateDb(jdbcAwareClassLoader: ClassLoader, credentials: DatabaseCredentials) {
-        val db = getPluginSettings()
         Flyway.configure(jdbcAwareClassLoader)
             .dataSource(credentials.jdbcUrl, credentials.username, credentials.password)
             .schemas(*schemas)

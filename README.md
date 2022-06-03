@@ -120,7 +120,6 @@ jooq {
     jdbc {
         schema = "jdbc:mysql"
         driverClassName = "com.mysql.cj.jdbc.Driver"
-        jooqMetaName = "org.jooq.meta.mysql.MySQLDatabase"
     }
 }
 

@@ -93,9 +93,6 @@ open class GenerateJooqClassesTask @Inject constructor(
     fun getJdbcDriverClassName() = getJdbc().driverClassName
 
     @Input
-    fun getJooqMetaName() = getJdbc().jooqMetaName
-
-    @Input
     fun getJdbcUrlQueryParams() = getJdbc().urlQueryParams
 
     @Input
@@ -238,7 +235,6 @@ open class GenerateJooqClassesTask @Inject constructor(
         .withName(JavaGenerator::class.qualifiedName)
         .withDatabase(
             Database()
-                .withName(getJdbc().jooqMetaName)
                 .withSchemata(schemas.map(this::toSchemaMappingType))
                 .withIncludes(".*")
                 .withExcludes("")

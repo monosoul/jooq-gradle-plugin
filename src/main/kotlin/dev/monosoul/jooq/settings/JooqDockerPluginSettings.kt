@@ -8,7 +8,7 @@ import java.net.URLClassLoader
 sealed class JooqDockerPluginSettings : Serializable {
     abstract val jdbc: Jdbc
     abstract val database: Database
-    internal abstract fun withDatabaseCredentials(classloaderProvider: Provider<URLClassLoader>, block: (URLClassLoader, JdbcDriverClassName, JdbcUrl, Username, Password) -> Unit)
+    internal abstract fun runWithDatabaseCredentials(classloaderProvider: Provider<URLClassLoader>, block: (URLClassLoader, JdbcDriverClassName, JdbcUrl, Username, Password) -> Unit)
 
     fun jdbc(block: Jdbc.() -> Unit) = jdbc.apply(block)
 
@@ -17,7 +17,7 @@ sealed class JooqDockerPluginSettings : Serializable {
         override val database: Database.Internal,
         val image: Image,
     ) : JooqDockerPluginSettings() {
-        override fun withDatabaseCredentials(classloaderProvider: Provider<URLClassLoader>, block: (URLClassLoader, JdbcDriverClassName, JdbcUrl, Username, Password) -> Unit) {
+        override fun runWithDatabaseCredentials(classloaderProvider: Provider<URLClassLoader>, block: (URLClassLoader, JdbcDriverClassName, JdbcUrl, Username, Password) -> Unit) {
             val jdbcAwareClassloader = classloaderProvider.get()
             val dbContainer = GenericDatabaseContainer(
                 imageName = image.getImageName(),
@@ -58,7 +58,7 @@ sealed class JooqDockerPluginSettings : Serializable {
         private fun getJdbcUrl() =
             "${jdbc.schema}://${database.host}:${database.port}/${database.name}${jdbc.urlQueryParams}"
 
-        override fun withDatabaseCredentials(classloaderProvider: Provider<URLClassLoader>, block: (URLClassLoader, JdbcDriverClassName, JdbcUrl, Username, Password) -> Unit) {
+        override fun runWithDatabaseCredentials(classloaderProvider: Provider<URLClassLoader>, block: (URLClassLoader, JdbcDriverClassName, JdbcUrl, Username, Password) -> Unit) {
             block(classloaderProvider.get(), JdbcDriverClassName(jdbc.driverClassName), JdbcUrl(getJdbcUrl()), Username(database.username), Password(database.password))
         }
 

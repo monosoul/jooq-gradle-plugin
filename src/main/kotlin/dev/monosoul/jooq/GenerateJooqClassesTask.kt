@@ -131,7 +131,7 @@ open class GenerateJooqClassesTask @Inject constructor(
 
     @TaskAction
     fun generateClasses() {
-        getPluginSettings().withDatabaseCredentials(project.jdbcAwareClassloaderProvider()) { jdbcAwareClassLoader, jdbcDriverClassName, jdbcUrl, username, password ->
+        getPluginSettings().runWithDatabaseCredentials(project.jdbcAwareClassloaderProvider()) { jdbcAwareClassLoader, jdbcDriverClassName, jdbcUrl, username, password ->
             migrateDb(jdbcAwareClassLoader, jdbcUrl, username, password)
             generateJooqClasses(jdbcAwareClassLoader, jdbcDriverClassName, jdbcUrl, username, password)
         }

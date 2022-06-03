@@ -1,8 +1,6 @@
-package dev.monosoul.jooq
+package dev.monosoul.jooq.settings
 
-import dev.monosoul.GenericDatabaseContainer
-import dev.monosoul.jooq.JooqExtension.Image
-import dev.monosoul.jooq.JooqExtension.Jdbc
+import dev.monosoul.jooq.container.GenericDatabaseContainer
 import org.gradle.api.provider.Provider
 import java.io.Serializable
 import java.net.URLClassLoader
@@ -18,7 +16,7 @@ sealed class JooqDockerPluginSettings : Serializable {
         override val jdbc: Jdbc,
         override val database: Database.Internal,
         val image: Image,
-    ) : JooqDockerPluginSettings(), Serializable {
+    ) : JooqDockerPluginSettings() {
         override fun withDatabaseCredentials(classloaderProvider: Provider<URLClassLoader>, block: (URLClassLoader, JdbcDriverClassName, JdbcUrl, Username, Password) -> Unit) {
             val jdbcAwareClassloader = classloaderProvider.get()
             val dbContainer = GenericDatabaseContainer(
@@ -56,7 +54,7 @@ sealed class JooqDockerPluginSettings : Serializable {
     class WithoutContainer private constructor(
         override val jdbc: Jdbc,
         override val database: Database.External,
-    ) : JooqDockerPluginSettings(), Serializable {
+    ) : JooqDockerPluginSettings() {
         private fun getJdbcUrl() =
             "${jdbc.schema}://${database.host}:${database.port}/${database.name}${jdbc.urlQueryParams}"
 
@@ -73,31 +71,4 @@ sealed class JooqDockerPluginSettings : Serializable {
             ).apply(block)
         }
     }
-
-    sealed class Database : Serializable {
-        abstract var username: String
-        abstract var password: String
-        abstract var name: String
-        abstract var port: Int
-
-        class Internal(
-            override var username: String = "postgres",
-            override var password: String = "postgres",
-            override var name: String = "postgres",
-            override var port: Int = 5432,
-        ) : Database(), Serializable
-
-        class External(
-            override var username: String = "postgres",
-            override var password: String = "postgres",
-            override var name: String = "postgres",
-            var host: String = "localhost",
-            override var port: Int = 5432,
-        ) : Database(), Serializable
-    }
-
-    internal data class JdbcDriverClassName(val value: String) : Serializable
-    internal data class JdbcUrl(val value: String) : Serializable
-    internal data class Username(val value: String) : Serializable
-    internal data class Password(val value: String) : Serializable
 }

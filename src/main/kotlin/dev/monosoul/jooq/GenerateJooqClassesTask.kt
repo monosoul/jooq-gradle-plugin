@@ -1,9 +1,9 @@
 package dev.monosoul.jooq
 
-import dev.monosoul.jooq.JooqDockerPluginSettings.JdbcDriverClassName
-import dev.monosoul.jooq.JooqDockerPluginSettings.JdbcUrl
-import dev.monosoul.jooq.JooqDockerPluginSettings.Password
-import dev.monosoul.jooq.JooqDockerPluginSettings.Username
+import dev.monosoul.jooq.settings.JdbcDriverClassName
+import dev.monosoul.jooq.settings.JdbcUrl
+import dev.monosoul.jooq.settings.Password
+import dev.monosoul.jooq.settings.Username
 import groovy.lang.Closure
 import org.flywaydb.core.Flyway
 import org.flywaydb.core.api.Location.FILESYSTEM_PREFIX

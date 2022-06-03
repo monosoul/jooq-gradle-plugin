@@ -1,7 +1,7 @@
-package dev.monosoul
+package dev.monosoul.jooq.container
 
-import dev.monosoul.jooq.JooqDockerPluginSettings.Database
-import dev.monosoul.jooq.JooqExtension.Jdbc
+import dev.monosoul.jooq.settings.Database
+import dev.monosoul.jooq.settings.Jdbc
 import org.slf4j.LoggerFactory
 import org.testcontainers.containers.JdbcDatabaseContainer
 import org.testcontainers.containers.output.Slf4jLogConsumer

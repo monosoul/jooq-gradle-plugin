@@ -78,13 +78,9 @@ tasks {
 dependencies {
     implementation("org.jooq:jooq-codegen:3.16.6")
     implementation("org.glassfish.jaxb:jaxb-runtime:3.0.2")
-    implementation("com.github.docker-java:docker-java-transport-okhttp:3.2.13")
     implementation("org.flywaydb:flyway-core:8.5.12")
     implementation("org.flywaydb:flyway-mysql:8.5.12")
     implementation("org.flywaydb:flyway-sqlserver:8.5.12")
-    implementation("org.zeroturnaround:zt-exec:1.12")
-    implementation("org.apache.commons:commons-lang3:3.12.0")
-    compileOnly("javax.annotation:javax.annotation-api:1.3.2")
     val testcontainersVersion = "1.17.2"
     implementation("org.testcontainers:jdbc:$testcontainersVersion")
 

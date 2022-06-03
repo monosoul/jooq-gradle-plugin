@@ -22,25 +22,25 @@ class GenerateForMySqlJooqDockerPluginFunctionalTest : JooqDockerPluginFunctiona
                 }
 
                 jooq {
-                    image {
-                        repository = "mysql"
-                        tag = "8.0.29"
-                        envVars = mapOf(
-                            "MYSQL_ROOT_PASSWORD" to "mysql",
-                            "MYSQL_DATABASE" to "mysql"
-                        )
-                    }
-
-                    db {
-                        username = "root"
-                        password = "mysql"
-                        name = "mysql"
-                        port = 3306
-                    }
-
-                    jdbc {
-                        schema = "jdbc:mysql"
-                        driverClassName = "com.mysql.cj.jdbc.Driver"
+                    withContainer {
+                        image {
+                            repository = "mysql"
+                            tag = "8.0.29"
+                            envVars = mapOf(
+                                "MYSQL_ROOT_PASSWORD" to "mysql",
+                                "MYSQL_DATABASE" to "mysql"
+                            )
+                        }
+                        db {
+                            username = "root"
+                            password = "mysql"
+                            name = "mysql"
+                            port = 3306
+                        }
+                        jdbc {
+                            schema = "jdbc:mysql"
+                            driverClassName = "com.mysql.cj.jdbc.Driver"
+                        }
                     }
                 }
 

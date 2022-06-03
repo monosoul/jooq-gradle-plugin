@@ -90,8 +90,10 @@ class UpToDateChecksJooqDockerPluginFunctionalTest : JooqDockerPluginFunctionalT
             }
 
             jooq {
-                image {
-                    tag = "11.2-alpine"
+                withContainer {
+                    image {
+                        tag = "11.2-alpine"
+                    }
                 }
             }
 
@@ -110,8 +112,10 @@ class UpToDateChecksJooqDockerPluginFunctionalTest : JooqDockerPluginFunctionalT
             }
 
             jooq {
-                image {
-                    tag = "11.3-alpine"
+                withContainer {
+                    image {
+                        tag = "11.3-alpine"
+                    }
                 }
             }
 

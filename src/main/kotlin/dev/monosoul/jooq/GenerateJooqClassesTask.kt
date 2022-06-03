@@ -1,6 +1,9 @@
 package dev.monosoul.jooq
 
-import dev.monosoul.GenericDatabaseContainer
+import dev.monosoul.jooq.JooqDockerPluginSettings.JdbcDriverClassName
+import dev.monosoul.jooq.JooqDockerPluginSettings.JdbcUrl
+import dev.monosoul.jooq.JooqDockerPluginSettings.Password
+import dev.monosoul.jooq.JooqDockerPluginSettings.Username
 import groovy.lang.Closure
 import org.flywaydb.core.Flyway
 import org.flywaydb.core.api.Location.FILESYSTEM_PREFIX
@@ -15,7 +18,6 @@ import org.gradle.api.provider.ProviderFactory
 import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
-import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
@@ -35,9 +37,6 @@ import org.jooq.meta.jaxb.SchemaMappingType
 import org.jooq.meta.jaxb.Strategy
 import org.jooq.meta.jaxb.Target
 import java.io.File
-import java.io.IOException
-import java.net.URL
-import java.net.URLClassLoader
 import javax.inject.Inject
 
 @CacheableTask
@@ -76,41 +75,8 @@ open class GenerateJooqClassesTask @Inject constructor(
     val outputDirectory =
         objectFactory.directoryProperty().convention(project.layout.buildDirectory.dir("generated-jooq"))
 
-    @Internal
-    fun getDb() = getExtension().db
-
-    @Internal
-    fun getJdbc() = getExtension().jdbc
-
-    @Internal
-    fun getImage() = getExtension().image
-
     @Input
-    fun getJdbcSchema() = getJdbc().schema
-
-    @Input
-    fun getJdbcDriverClassName() = getJdbc().driverClassName
-
-    @Input
-    fun getJdbcUrlQueryParams() = getJdbc().urlQueryParams
-
-    @Input
-    fun getDbUsername() = getDb().username
-
-    @Input
-    fun getDbPassword() = getDb().password
-
-    @Input
-    fun getDbPort() = getDb().port
-
-    @Input
-    fun getImageRepository() = getImage().repository
-
-    @Input
-    fun getImageTag() = getImage().tag
-
-    @Input
-    fun getImageEnvVars() = getImage().envVars
+    fun getPluginSettings() = getExtension().pluginSettings
 
     init {
         project.plugins.withType(JavaPlugin::class.java) {
@@ -165,33 +131,16 @@ open class GenerateJooqClassesTask @Inject constructor(
 
     @TaskAction
     fun generateClasses() {
-        val image = getImage()
-        val db = getDb()
-        val jdbc = getJdbc()
-        val jdbcAwareClassLoader = buildJdbcArtifactsAwareClassLoader()
-
-        val dbContainer = GenericDatabaseContainer(
-            imageName = image.getImageName(),
-            env = image.envVars.mapValues { (_, value) -> value.toString() },
-            testQueryString = image.testQuery,
-            database = db,
-            jdbc = jdbc,
-            jdbcAwareClassLoader = jdbcAwareClassLoader,
-            command = image.command,
-        ).also { it.start() }
-        val jdbcUrl = dbContainer.jdbcUrl
-        try {
-            migrateDb(jdbcAwareClassLoader, jdbcUrl)
-            generateJooqClasses(jdbcAwareClassLoader, jdbcUrl)
-        } finally {
-            dbContainer.stop()
+        getPluginSettings().withDatabaseCredentials(project.jdbcAwareClassloaderProvider()) { jdbcAwareClassLoader, jdbcDriverClassName, jdbcUrl, username, password ->
+            migrateDb(jdbcAwareClassLoader, jdbcUrl, username, password)
+            generateJooqClasses(jdbcAwareClassLoader, jdbcDriverClassName, jdbcUrl, username, password)
         }
     }
 
-    private fun migrateDb(jdbcAwareClassLoader: ClassLoader, jdbcUrl: String) {
-        val db = getDb()
+    private fun migrateDb(jdbcAwareClassLoader: ClassLoader, jdbcUrl: JdbcUrl, username: Username, password: Password) {
+        val db = getPluginSettings()
         Flyway.configure(jdbcAwareClassLoader)
-            .dataSource(jdbcUrl, db.username, db.password)
+            .dataSource(jdbcUrl.value, username.value, password.value)
             .schemas(*schemas)
             .locations(*inputDirectory.map { "$FILESYSTEM_PREFIX${it.absolutePath}" }.toTypedArray())
             .defaultSchema(defaultFlywaySchema())
@@ -205,10 +154,14 @@ open class GenerateJooqClassesTask @Inject constructor(
 
     private fun flywayTableName() = flywayProperties[TABLE] ?: "flyway_schema_history"
 
-    private fun generateJooqClasses(jdbcAwareClassLoader: ClassLoader, jdbcUrl: String) {
+    private fun generateJooqClasses(
+        jdbcAwareClassLoader: ClassLoader,
+        driverClassName: JdbcDriverClassName,
+        jdbcUrl: JdbcUrl,
+        username: Username,
+        password: Password
+    ) {
         project.delete(outputDirectory)
-        val db = getDb()
-        val jdbc = getJdbc()
         FlywaySchemaVersionProvider.setup(defaultFlywaySchema(), flywayTableName())
         SchemaPackageRenameGeneratorStrategy.schemaToPackageMapping.set(schemaToPackageMapping.toMap())
         val tool = GenerationTool()
@@ -218,10 +171,10 @@ open class GenerateJooqClassesTask @Inject constructor(
         }.apply {
             withJdbc(
                 Jdbc()
-                    .withDriver(jdbc.driverClassName)
-                    .withUrl(jdbcUrl)
-                    .withUser(db.username)
-                    .withPassword(db.password)
+                    .withDriver(driverClassName.value)
+                    .withUrl(jdbcUrl.value)
+                    .withUser(username.value)
+                    .withPassword(password.value)
             )
         }.run(tool::run)
     }
@@ -272,16 +225,5 @@ open class GenerateJooqClassesTask @Inject constructor(
         return listOf(currentExcludes, flywayTableName())
             .filterNot(String?::isNullOrEmpty)
             .joinToString("|")
-    }
-
-    private fun buildJdbcArtifactsAwareClassLoader(): ClassLoader {
-        return URLClassLoader(resolveJdbcArtifacts(), project.buildscript.classLoader)
-    }
-
-    @Throws(IOException::class)
-    private fun resolveJdbcArtifacts(): Array<URL> {
-        return project.configurations.getByName("jdbc").resolvedConfiguration.resolvedArtifacts.map {
-            it.file.toURI().toURL()
-        }.toTypedArray()
     }
 }

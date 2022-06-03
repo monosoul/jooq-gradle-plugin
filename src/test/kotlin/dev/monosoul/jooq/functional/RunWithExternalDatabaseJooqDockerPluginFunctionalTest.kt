@@ -1,15 +1,31 @@
 package dev.monosoul.jooq.functional
 
 import org.gradle.testkit.runner.TaskOutcome.SUCCESS
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.testcontainers.containers.PostgreSQLContainer
+import org.testcontainers.utility.DockerImageName
 import strikt.api.expect
 import strikt.assertions.isEqualTo
 import strikt.java.exists
 
-class RunContainerWithCommandJooqDockerPluginFunctionalTest : JooqDockerPluginFunctionalTestBase() {
+class RunWithExternalDatabaseJooqDockerPluginFunctionalTest : JooqDockerPluginFunctionalTestBase() {
+
+    private val postgresContainer = PostgresContainer()
+
+    @BeforeEach
+    fun startPostgres() {
+        postgresContainer.start()
+    }
+
+    @AfterEach
+    fun stopPostgres() {
+        postgresContainer.stop()
+    }
 
     @Test
-    fun `should support running DB containers with command`() {
+    fun `should support using external DB for classes generation`() {
         // given
         prepareBuildGradleFile {
             """
@@ -22,13 +38,13 @@ class RunContainerWithCommandJooqDockerPluginFunctionalTest : JooqDockerPluginFu
                 }
                 
                 jooq {
-                    withContainer {
-                        image {
-                            command = "postgres -p 6666"
-                        }
-
+                    withoutContainer {
                         db {
-                            port = 6666
+                            username = "${postgresContainer.username}"
+                            password = "${postgresContainer.password}"
+                            name = "${postgresContainer.databaseName}"
+                            host = "${postgresContainer.host}"
+                            port = ${postgresContainer.firstMappedPort}
                         }
                     }
                 }
@@ -54,4 +70,8 @@ class RunContainerWithCommandJooqDockerPluginFunctionalTest : JooqDockerPluginFu
             ).exists()
         }
     }
+
+    private class PostgresContainer(
+        image: String = "postgres:11.2-alpine"
+    ) : PostgreSQLContainer<PostgresContainer>(DockerImageName.parse(image))
 }

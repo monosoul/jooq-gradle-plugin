@@ -1,6 +1,6 @@
 package dev.monosoul
 
-import dev.monosoul.jooq.JooqExtension.Database
+import dev.monosoul.jooq.JooqDockerPluginSettings.Database
 import dev.monosoul.jooq.JooqExtension.Jdbc
 import org.slf4j.LoggerFactory
 import org.testcontainers.containers.JdbcDatabaseContainer
@@ -17,7 +17,7 @@ import kotlin.reflect.KProperty
 class GenericDatabaseContainer(
     imageName: String,
     env: Map<String, String>,
-    private val database: Database,
+    private val database: Database.Internal,
     private val jdbc: Jdbc,
     private val jdbcAwareClassLoader: ClassLoader,
     private val testQueryString: String,

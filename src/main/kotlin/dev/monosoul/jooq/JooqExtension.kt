@@ -1,23 +1,24 @@
 package dev.monosoul.jooq
 
+import dev.monosoul.jooq.JooqDockerPluginSettings.Database
+import dev.monosoul.jooq.JooqDockerPluginSettings.WithContainer
+import dev.monosoul.jooq.JooqDockerPluginSettings.WithoutContainer
 import org.gradle.api.Action
 import java.io.Serializable
 
 open class JooqExtension : Serializable {
-    val jdbc = Jdbc()
-    val db = Database()
-    val image = Image(db)
+    internal var pluginSettings: JooqDockerPluginSettings = WithContainer.new()
 
-    fun db(configure: Action<Database>) {
-        configure.execute(db)
+    fun withContainer(configure: Action<WithContainer>) {
+        pluginSettings = WithContainer.new {
+            configure.execute(this)
+        }
     }
 
-    fun image(configure: Action<Image>) {
-        configure.execute(image)
-    }
-
-    fun jdbc(configure: Action<Jdbc>) {
-        configure.execute(jdbc)
+    fun withoutContainer(configure: Action<WithoutContainer>) {
+        pluginSettings = WithoutContainer.new {
+            configure.execute(this)
+        }
     }
 
     class Jdbc : Serializable {
@@ -26,14 +27,7 @@ open class JooqExtension : Serializable {
         var urlQueryParams = ""
     }
 
-    class Database : Serializable {
-        var username = "postgres"
-        var password = "postgres"
-        var name = "postgres"
-        var port = 5432
-    }
-
-    class Image(private val db: Database) : Serializable {
+    class Image(db: Database.Internal) : Serializable {
         var repository = "postgres"
         var tag = "11.2-alpine"
         var envVars: Map<String, Any> = mapOf(

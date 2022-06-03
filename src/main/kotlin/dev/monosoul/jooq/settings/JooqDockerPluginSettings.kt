@@ -10,7 +10,7 @@ sealed class JooqDockerPluginSettings : Serializable {
     abstract val database: Database
     internal abstract fun runWithDatabaseCredentials(
         classloaderProvider: Provider<URLClassLoader>,
-        block: (URLClassLoader, JdbcDriverClassName, JdbcUrl, Username, Password) -> Unit
+        block: (URLClassLoader, DatabaseCredentials) -> Unit
     )
 
     fun jdbc(block: Jdbc.() -> Unit) = jdbc.apply(block)
@@ -22,7 +22,7 @@ sealed class JooqDockerPluginSettings : Serializable {
     ) : JooqDockerPluginSettings() {
         override fun runWithDatabaseCredentials(
             classloaderProvider: Provider<URLClassLoader>,
-            block: (URLClassLoader, JdbcDriverClassName, JdbcUrl, Username, Password) -> Unit
+            block: (URLClassLoader, DatabaseCredentials) -> Unit
         ) {
             val jdbcAwareClassloader = classloaderProvider.get()
             val dbContainer = GenericDatabaseContainer(
@@ -38,10 +38,12 @@ sealed class JooqDockerPluginSettings : Serializable {
             try {
                 block(
                     jdbcAwareClassloader,
-                    JdbcDriverClassName(jdbc.driverClassName),
-                    JdbcUrl(dbContainer.jdbcUrl),
-                    Username(dbContainer.username),
-                    Password(dbContainer.password)
+                    DatabaseCredentials(
+                        jdbcDriverClassName = jdbc.driverClassName,
+                        jdbcUrl = dbContainer.jdbcUrl,
+                        username = dbContainer.username,
+                        password = dbContainer.password,
+                    )
                 )
             } finally {
                 dbContainer.stop()
@@ -72,14 +74,16 @@ sealed class JooqDockerPluginSettings : Serializable {
 
         override fun runWithDatabaseCredentials(
             classloaderProvider: Provider<URLClassLoader>,
-            block: (URLClassLoader, JdbcDriverClassName, JdbcUrl, Username, Password) -> Unit
+            block: (URLClassLoader, DatabaseCredentials) -> Unit
         ) {
             block(
                 classloaderProvider.get(),
-                JdbcDriverClassName(jdbc.driverClassName),
-                JdbcUrl(getJdbcUrl()),
-                Username(database.username),
-                Password(database.password)
+                DatabaseCredentials(
+                    jdbcDriverClassName = jdbc.driverClassName,
+                    jdbcUrl = getJdbcUrl(),
+                    username = database.username,
+                    password = database.password
+                )
             )
         }
 

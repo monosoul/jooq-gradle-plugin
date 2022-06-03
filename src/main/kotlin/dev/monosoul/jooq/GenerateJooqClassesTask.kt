@@ -1,9 +1,6 @@
 package dev.monosoul.jooq
 
-import dev.monosoul.jooq.settings.JdbcDriverClassName
-import dev.monosoul.jooq.settings.JdbcUrl
-import dev.monosoul.jooq.settings.Password
-import dev.monosoul.jooq.settings.Username
+import dev.monosoul.jooq.settings.DatabaseCredentials
 import groovy.lang.Closure
 import org.flywaydb.core.Flyway
 import org.flywaydb.core.api.Location.FILESYSTEM_PREFIX
@@ -131,16 +128,17 @@ open class GenerateJooqClassesTask @Inject constructor(
 
     @TaskAction
     fun generateClasses() {
-        getPluginSettings().runWithDatabaseCredentials(project.jdbcAwareClassloaderProvider()) { jdbcAwareClassLoader, jdbcDriverClassName, jdbcUrl, username, password ->
-            migrateDb(jdbcAwareClassLoader, jdbcUrl, username, password)
-            generateJooqClasses(jdbcAwareClassLoader, jdbcDriverClassName, jdbcUrl, username, password)
-        }
+        getPluginSettings()
+            .runWithDatabaseCredentials(project.jdbcAwareClassloaderProvider()) { jdbcAwareClassLoader, credentials ->
+                migrateDb(jdbcAwareClassLoader, credentials)
+                generateJooqClasses(jdbcAwareClassLoader, credentials)
+            }
     }
 
-    private fun migrateDb(jdbcAwareClassLoader: ClassLoader, jdbcUrl: JdbcUrl, username: Username, password: Password) {
+    private fun migrateDb(jdbcAwareClassLoader: ClassLoader, credentials: DatabaseCredentials) {
         val db = getPluginSettings()
         Flyway.configure(jdbcAwareClassLoader)
-            .dataSource(jdbcUrl.value, username.value, password.value)
+            .dataSource(credentials.jdbcUrl, credentials.username, credentials.password)
             .schemas(*schemas)
             .locations(*inputDirectory.map { "$FILESYSTEM_PREFIX${it.absolutePath}" }.toTypedArray())
             .defaultSchema(defaultFlywaySchema())
@@ -154,13 +152,7 @@ open class GenerateJooqClassesTask @Inject constructor(
 
     private fun flywayTableName() = flywayProperties[TABLE] ?: "flyway_schema_history"
 
-    private fun generateJooqClasses(
-        jdbcAwareClassLoader: ClassLoader,
-        driverClassName: JdbcDriverClassName,
-        jdbcUrl: JdbcUrl,
-        username: Username,
-        password: Password
-    ) {
+    private fun generateJooqClasses(jdbcAwareClassLoader: ClassLoader, credentials: DatabaseCredentials) {
         project.delete(outputDirectory)
         FlywaySchemaVersionProvider.setup(defaultFlywaySchema(), flywayTableName())
         SchemaPackageRenameGeneratorStrategy.schemaToPackageMapping.set(schemaToPackageMapping.toMap())
@@ -171,10 +163,10 @@ open class GenerateJooqClassesTask @Inject constructor(
         }.apply {
             withJdbc(
                 Jdbc()
-                    .withDriver(driverClassName.value)
-                    .withUrl(jdbcUrl.value)
-                    .withUser(username.value)
-                    .withPassword(password.value)
+                    .withDriver(credentials.jdbcDriverClassName)
+                    .withUrl(credentials.jdbcUrl)
+                    .withUser(credentials.username)
+                    .withPassword(credentials.password)
             )
         }.run(tool::run)
     }

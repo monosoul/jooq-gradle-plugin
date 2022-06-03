@@ -82,8 +82,6 @@ class GenericDatabaseContainer(
     private class ReflectionDelegate<T>(private val field: Field) : ReadWriteProperty<Any, T> {
         @Suppress("UNCHECKED_CAST")
         override fun getValue(thisRef: Any, property: KProperty<*>): T = field.get(thisRef) as T
-        override fun setValue(thisRef: Any, property: KProperty<*>, value: T) {
-            field.set(thisRef, value)
-        }
+        override fun setValue(thisRef: Any, property: KProperty<*>, value: T) = field.set(thisRef, value)
     }
 }

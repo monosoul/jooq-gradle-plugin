@@ -2,8 +2,8 @@ package dev.monosoul.jooq.settings
 
 import java.io.Serializable
 
-class Jdbc : Serializable {
-    var schema = "jdbc:postgresql"
-    var driverClassName = "org.postgresql.Driver"
-    var urlQueryParams = ""
-}
+class Jdbc(
+    var schema: String = "jdbc:postgresql",
+    var driverClassName: String = "org.postgresql.Driver",
+    var urlQueryParams: String = "",
+) : Serializable

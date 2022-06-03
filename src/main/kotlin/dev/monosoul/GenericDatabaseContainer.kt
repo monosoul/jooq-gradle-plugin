@@ -9,6 +9,10 @@ import org.testcontainers.containers.wait.strategy.HostPortWaitStrategy
 import org.testcontainers.utility.DockerImageName
 import java.lang.reflect.Field
 import java.sql.Driver
+import java.util.concurrent.locks.ReentrantLock
+import kotlin.concurrent.withLock
+import kotlin.properties.ReadWriteProperty
+import kotlin.reflect.KProperty
 
 class GenericDatabaseContainer(
     imageName: String,
@@ -20,13 +24,12 @@ class GenericDatabaseContainer(
     command: String? = null
 ) : JdbcDatabaseContainer<GenericDatabaseContainer>(DockerImageName.parse(imageName)) {
 
-    private val DRIVER_LOAD_MUTEX = Any()
-    private val driverField: Field
-    private var driver: Driver?
-        get() = driverField.get(this) as Driver?
-        set(value) {
-            driverField.set(this, value)
+    private val driverLoadLock = ReentrantLock()
+    private var driver: Driver? by ReflectionDelegate(
+        JdbcDatabaseContainer::class.java.getDeclaredField("driver").also {
+            it.isAccessible = true
         }
+    )
 
     init {
         withLogConsumer(
@@ -38,16 +41,12 @@ class GenericDatabaseContainer(
         withExposedPorts(database.port)
         setWaitStrategy(HostPortWaitStrategy())
         command?.run(::withCommand)
-        driverField = JdbcDatabaseContainer::class.java.getDeclaredField("driver").also {
-            it.isAccessible = true
-        }
     }
 
     override fun getDriverClassName() = jdbc.driverClassName
 
-    override fun getJdbcUrl() = "${jdbc.schema}://$host:${getMappedPort(database.port)}/$databaseName${jdbc.urlQueryParams}".also {
-        logger().info("JdbcUrl: $it")
-    }
+    override fun getJdbcUrl() =
+        "${jdbc.schema}://$host:${getMappedPort(database.port)}/$databaseName${jdbc.urlQueryParams}"
 
     override fun getUsername() = database.username
 
@@ -59,10 +58,10 @@ class GenericDatabaseContainer(
 
     override fun getJdbcDriverInstance(): Driver {
         if (driver == null) {
-            synchronized(DRIVER_LOAD_MUTEX) {
+            driverLoadLock.withLock {
                 if (driver == null) {
                     return try {
-                        jdbcAwareClassLoader.loadClass(this.driverClassName).newInstance() as Driver
+                        jdbcAwareClassLoader.loadClass(driverClassName).newInstance() as Driver
                     } catch (e: Exception) {
                         when (e) {
                             is InstantiationException, is IllegalAccessException, is ClassNotFoundException -> {
@@ -71,12 +70,20 @@ class GenericDatabaseContainer(
                             else -> throw e
                         }
                     }.also {
-                        driverField.set(this, it)
+                        driver = it
                     }
                 }
             }
         }
 
         return driver!!
+    }
+
+    private class ReflectionDelegate<T>(private val field: Field) : ReadWriteProperty<Any, T> {
+        @Suppress("UNCHECKED_CAST")
+        override fun getValue(thisRef: Any, property: KProperty<*>): T = field.get(thisRef) as T
+        override fun setValue(thisRef: Any, property: KProperty<*>, value: T) {
+            field.set(thisRef, value)
+        }
     }
 }

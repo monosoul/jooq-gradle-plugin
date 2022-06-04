@@ -19,11 +19,15 @@ sealed class JooqDockerPluginSettings : Serializable {
     fun jdbc(customizer: Action<Jdbc>) = customizer.execute(jdbc)
     fun jdbc(closure: Closure<Jdbc>) = jdbc(closure::callWith)
 
-    class WithContainer private constructor(
-        override val jdbc: Jdbc,
-        override val database: Database.Internal,
-        val image: Image,
-    ) : JooqDockerPluginSettings() {
+    class WithContainer(customizer: Action<WithContainer> = Action<WithContainer> { }) : JooqDockerPluginSettings() {
+        override val jdbc = Jdbc()
+        override val database = Database.Internal()
+        val image = Image(database)
+
+        init {
+            customizer.execute(this)
+        }
+
         override fun runWithDatabaseCredentials(
             classloaderProvider: Provider<URLClassLoader>,
             block: (URLClassLoader, DatabaseCredentials) -> Unit
@@ -58,23 +62,18 @@ sealed class JooqDockerPluginSettings : Serializable {
         fun db(closure: Closure<Database.Internal>) = db(closure::callWith)
         fun image(customizer: Action<Image>) = customizer.execute(image)
         fun image(closure: Closure<Image>) = image(closure::callWith)
-
-        companion object {
-            fun new(customizer: Action<WithContainer> = Action<WithContainer> { }): WithContainer {
-                val database = Database.Internal()
-                return WithContainer(
-                    jdbc = Jdbc(),
-                    database = database,
-                    image = Image(database),
-                ).apply(customizer::execute)
-            }
-        }
     }
 
-    class WithoutContainer private constructor(
-        override val jdbc: Jdbc,
-        override val database: Database.External,
+    class WithoutContainer(
+        customizer: Action<WithoutContainer> = Action<WithoutContainer> { }
     ) : JooqDockerPluginSettings() {
+        override val jdbc = Jdbc()
+        override val database = Database.External()
+
+        init {
+            customizer.execute(this)
+        }
+
         private fun getJdbcUrl() =
             "${jdbc.schema}://${database.host}:${database.port}/${database.name}${jdbc.urlQueryParams}"
 
@@ -95,12 +94,5 @@ sealed class JooqDockerPluginSettings : Serializable {
 
         fun db(customizer: Action<Database.External>) = customizer.execute(database)
         fun db(closure: Closure<Database.External>) = db(closure::callWith)
-
-        companion object {
-            fun new(customizer: Action<WithoutContainer> = Action<WithoutContainer> { }) = WithoutContainer(
-                jdbc = Jdbc(),
-                database = Database.External(),
-            ).apply(customizer::execute)
-        }
     }
 }

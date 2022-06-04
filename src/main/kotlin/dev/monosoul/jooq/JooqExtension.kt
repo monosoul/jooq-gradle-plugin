@@ -8,11 +8,11 @@ import org.gradle.api.Action
 import java.io.Serializable
 
 open class JooqExtension : Serializable {
-    internal var pluginSettings: JooqDockerPluginSettings = WithContainer.new()
+    internal var pluginSettings: JooqDockerPluginSettings = WithContainer()
 
     @Suppress("unused")
     fun withContainer(configure: Action<WithContainer>) {
-        pluginSettings = WithContainer.new(configure)
+        pluginSettings = WithContainer(configure)
     }
 
     @Suppress("unused")
@@ -20,7 +20,7 @@ open class JooqExtension : Serializable {
 
     @Suppress("unused")
     fun withoutContainer(configure: Action<WithoutContainer>) {
-        pluginSettings = WithoutContainer.new(configure)
+        pluginSettings = WithoutContainer(configure)
     }
 
     @Suppress("unused")

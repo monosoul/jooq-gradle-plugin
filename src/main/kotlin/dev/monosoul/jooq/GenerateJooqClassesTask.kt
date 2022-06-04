@@ -85,7 +85,7 @@ open class GenerateJooqClassesTask @Inject constructor(
         }
     }
 
-    private fun getExtension() = project.extensions.getByName("jooq") as JooqExtension
+    private fun getExtension() = project.extensions.getByName(JooqDockerPlugin.EXTENSION_NAME) as JooqExtension
 
     @Suppress("unused")
     fun usingXmlConfig(

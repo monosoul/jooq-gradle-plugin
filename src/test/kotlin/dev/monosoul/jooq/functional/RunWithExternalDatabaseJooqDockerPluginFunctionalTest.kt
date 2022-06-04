@@ -1,11 +1,10 @@
 package dev.monosoul.jooq.functional
 
+import dev.monosoul.jooq.container.PostgresContainer
 import org.gradle.testkit.runner.TaskOutcome.SUCCESS
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.testcontainers.containers.PostgreSQLContainer
-import org.testcontainers.utility.DockerImageName
 import strikt.api.expect
 import strikt.assertions.isEqualTo
 import strikt.java.exists
@@ -70,8 +69,4 @@ class RunWithExternalDatabaseJooqDockerPluginFunctionalTest : JooqDockerPluginFu
             ).exists()
         }
     }
-
-    private class PostgresContainer(
-        image: String = "postgres:11.2-alpine"
-    ) : PostgreSQLContainer<PostgresContainer>(DockerImageName.parse(image))
 }

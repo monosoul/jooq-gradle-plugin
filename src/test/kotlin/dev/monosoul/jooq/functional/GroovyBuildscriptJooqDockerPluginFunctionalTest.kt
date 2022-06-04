@@ -22,6 +22,23 @@ class GroovyBuildscriptJooqDockerPluginFunctionalTest : JooqDockerPluginFunction
                 repositories {
                     mavenCentral()
                 }
+                
+                jooq {
+                    db {
+                        username = "customusername"
+                        password = "custompassword"
+                    }
+                    jdbc {
+                        schema = "jdbc:postgresql"
+                    }
+                    image {
+                        envVars = [
+                                "POSTGRES_USER": "customusername",
+                                "POSTGRES_PASSWORD": "custompassword",
+                                "POSTGRES_DB": "postgres"
+                        ]
+                    }
+                }
 
                 tasks {
                     generateJooqClasses {
@@ -42,6 +59,53 @@ class GroovyBuildscriptJooqDockerPluginFunctionalTest : JooqDockerPluginFunction
             to = "src/main/resources/db/migration/V01__init_with_placeholders.sql"
         )
         copyResource(from = "/V02__add_bar.sql", to = "src/main/resources/db/migration/V02__add_bar.sql")
+
+        // when
+        val result = runGradleWithArguments("generateJooqClasses")
+
+        // then
+        expect {
+            that(result).generateJooqClassesTask.outcome isEqualTo SUCCESS
+            that(
+                projectFile("build/generated-jooq/org/jooq/generated/tables/Foo.java")
+            ).exists()
+            that(
+                projectFile("build/generated-jooq/org/jooq/generated/tables/Bar.java")
+            ).notExists()
+        }
+    }
+
+    @Test
+    fun `should work with Groovy buildscript when using XML generator definition`() {
+        // given
+        prepareBuildGradleFile("build.gradle") {
+            // language=gradle
+            """
+                plugins {
+                    id "dev.monosoul.jooq-docker"
+                }
+                repositories {
+                    mavenCentral()
+                }
+                tasks {
+                    generateJooqClasses {
+                        flywayProperties = ["flyway.placeholderReplacement": "false"]
+                        usingXmlConfig(project.file("src/main/resources/db/jooq.xml")) {
+                            database.withExcludes("BAR")
+                        }
+                    }
+                }
+                dependencies {
+                    jdbc "org.postgresql:postgresql:42.3.6"
+                }
+            """.trimIndent()
+        }
+        copyResource(
+            from = "/V01__init_with_placeholders.sql",
+            to = "src/main/resources/db/migration/V01__init_with_placeholders.sql"
+        )
+        copyResource(from = "/V02__add_bar.sql", to = "src/main/resources/db/migration/V02__add_bar.sql")
+        copyResource(from = "/jooq-generator.xml", to = "src/main/resources/db/jooq.xml")
 
         // when
         val result = runGradleWithArguments("generateJooqClasses")

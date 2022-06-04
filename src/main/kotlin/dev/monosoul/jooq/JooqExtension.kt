@@ -1,5 +1,6 @@
 package dev.monosoul.jooq
 
+import groovy.lang.Closure
 import org.gradle.api.Action
 import java.io.Serializable
 import java.net.ServerSocket
@@ -9,17 +10,29 @@ open class JooqExtension(projectName: String) : Serializable {
     val db = Database(jdbc)
     val image = Image(db, projectName)
 
+    @Suppress("unused")
     fun db(configure: Action<Database>) {
         configure.execute(db)
     }
 
+    @Suppress("unused")
+    fun db(closure: Closure<Database>) = db(closure::callWith)
+
+    @Suppress("unused")
     fun image(configure: Action<Image>) {
         configure.execute(image)
     }
 
+    @Suppress("unused")
+    fun image(closure: Closure<Image>) = image(closure::callWith)
+
+    @Suppress("unused")
     fun jdbc(configure: Action<Jdbc>) {
         configure.execute(jdbc)
     }
+
+    @Suppress("unused")
+    fun jdbc(closure: Closure<Jdbc>) = jdbc(closure::callWith)
 
     class Jdbc : Serializable {
         var schema = "jdbc:postgresql"

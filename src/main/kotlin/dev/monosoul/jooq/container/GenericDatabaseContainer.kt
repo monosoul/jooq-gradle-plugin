@@ -61,6 +61,7 @@ class GenericDatabaseContainer(
             driverLoadLock.withLock {
                 if (driver == null) {
                     return try {
+                        @Suppress("DEPRECATION")
                         jdbcAwareClassLoader.loadClass(driverClassName).newInstance() as Driver
                     } catch (e: Exception) {
                         when (e) {

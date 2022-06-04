@@ -4,12 +4,12 @@ import java.io.Serializable
 
 class Image(
     var name: String = "postgres:11.2-alpine",
-    var envVars: MutableMap<String, String> = mutableMapOf(),
+    var envVars: Map<String, String> = mapOf(),
     var testQuery: String = "SELECT 1",
     var command: String? = null,
 ) : Serializable {
     constructor(database: Database.Internal) : this(
-        envVars = mutableMapOf(
+        envVars = mapOf(
             "POSTGRES_USER" to database.username,
             "POSTGRES_PASSWORD" to database.password,
             "POSTGRES_DB" to database.name

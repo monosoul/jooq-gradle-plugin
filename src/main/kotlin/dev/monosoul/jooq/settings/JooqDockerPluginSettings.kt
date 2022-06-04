@@ -9,18 +9,13 @@ import java.io.Serializable
 import java.net.URLClassLoader
 
 sealed class JooqDockerPluginSettings : Serializable {
-    abstract val jdbc: Jdbc
     abstract val database: Database
     internal abstract fun runWithDatabaseCredentials(
         classloaderProvider: Provider<URLClassLoader>,
         block: (URLClassLoader, DatabaseCredentials) -> Unit
     )
 
-    fun jdbc(customizer: Action<Jdbc>) = customizer.execute(jdbc)
-    fun jdbc(closure: Closure<Jdbc>) = jdbc(closure::callWith)
-
     class WithContainer(customizer: Action<WithContainer> = Action<WithContainer> { }) : JooqDockerPluginSettings() {
-        override val jdbc = Jdbc()
         override val database = Database.Internal()
         val image = Image(database)
 
@@ -38,7 +33,6 @@ sealed class JooqDockerPluginSettings : Serializable {
                 env = image.envVars.mapValues { (_, value) -> value.toString() },
                 testQueryString = image.testQuery,
                 database = database,
-                jdbc = jdbc,
                 jdbcAwareClassLoader = jdbcAwareClassloader,
                 command = image.command,
             ).also { it.start() }
@@ -47,7 +41,7 @@ sealed class JooqDockerPluginSettings : Serializable {
                 block(
                     jdbcAwareClassloader,
                     DatabaseCredentials(
-                        jdbcDriverClassName = jdbc.driverClassName,
+                        jdbcDriverClassName = dbContainer.driverClassName,
                         jdbcUrl = dbContainer.jdbcUrl,
                         username = dbContainer.username,
                         password = dbContainer.password,
@@ -67,15 +61,11 @@ sealed class JooqDockerPluginSettings : Serializable {
     class WithoutContainer(
         customizer: Action<WithoutContainer> = Action<WithoutContainer> { }
     ) : JooqDockerPluginSettings() {
-        override val jdbc = Jdbc()
         override val database = Database.External()
 
         init {
             customizer.execute(this)
         }
-
-        private fun getJdbcUrl() =
-            "${jdbc.schema}://${database.host}:${database.port}/${database.name}${jdbc.urlQueryParams}"
 
         override fun runWithDatabaseCredentials(
             classloaderProvider: Provider<URLClassLoader>,
@@ -84,8 +74,8 @@ sealed class JooqDockerPluginSettings : Serializable {
             block(
                 classloaderProvider.get(),
                 DatabaseCredentials(
-                    jdbcDriverClassName = jdbc.driverClassName,
-                    jdbcUrl = getJdbcUrl(),
+                    jdbcDriverClassName = database.jdbc.driverClassName,
+                    jdbcUrl = database.getJdbcUrl(),
                     username = database.username,
                     password = database.password
                 )

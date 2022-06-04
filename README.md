@@ -116,11 +116,11 @@ jooq {
             password = "mysql"
             name = "mysql"
             port = 3306
-        }
 
-        jdbc {
-            schema = "jdbc:mysql"
-            driverClassName = "com.mysql.cj.jdbc.Driver"
+            jdbc {
+                schema = "jdbc:mysql"
+                driverClassName = "com.mysql.cj.jdbc.Driver"
+            }
         }
     }
 }

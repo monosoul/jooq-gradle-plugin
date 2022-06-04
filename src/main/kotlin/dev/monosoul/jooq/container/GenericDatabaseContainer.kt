@@ -1,7 +1,6 @@
 package dev.monosoul.jooq.container
 
 import dev.monosoul.jooq.settings.Database
-import dev.monosoul.jooq.settings.Jdbc
 import org.slf4j.LoggerFactory
 import org.testcontainers.containers.JdbcDatabaseContainer
 import org.testcontainers.containers.output.Slf4jLogConsumer
@@ -18,7 +17,6 @@ class GenericDatabaseContainer(
     imageName: String,
     env: Map<String, String>,
     private val database: Database.Internal,
-    private val jdbc: Jdbc,
     private val jdbcAwareClassLoader: ClassLoader,
     private val testQueryString: String,
     command: String? = null
@@ -43,10 +41,9 @@ class GenericDatabaseContainer(
         command?.run(::withCommand)
     }
 
-    override fun getDriverClassName() = jdbc.driverClassName
+    override fun getDriverClassName() = database.jdbc.driverClassName
 
-    override fun getJdbcUrl() =
-        "${jdbc.schema}://$host:${getMappedPort(database.port)}/$databaseName${jdbc.urlQueryParams}"
+    override fun getJdbcUrl() = database.getJdbcUrl(host, getMappedPort(database.port))
 
     override fun getUsername() = database.username
 

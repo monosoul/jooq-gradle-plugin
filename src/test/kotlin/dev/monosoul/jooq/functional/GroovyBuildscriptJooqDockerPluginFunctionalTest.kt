@@ -29,9 +29,10 @@ class GroovyBuildscriptJooqDockerPluginFunctionalTest : JooqDockerPluginFunction
                         db {
                             username = "customusername"
                             password = "custompassword"
-                        }
-                        jdbc {
-                            schema = "jdbc:postgresql"
+                            
+                            jdbc {
+                                schema = "jdbc:postgresql"
+                            }
                         }
                         image {
                             envVars = [
@@ -101,9 +102,10 @@ class GroovyBuildscriptJooqDockerPluginFunctionalTest : JooqDockerPluginFunction
                             name = "${postgresContainer.databaseName}"
                             host = "${postgresContainer.host}"
                             port = ${postgresContainer.firstMappedPort}
-                        }
-                        jdbc {
-                            schema = "jdbc:postgresql"
+                            
+                            jdbc {
+                                schema = "jdbc:postgresql"
+                            }
                         }
                     }
                 }

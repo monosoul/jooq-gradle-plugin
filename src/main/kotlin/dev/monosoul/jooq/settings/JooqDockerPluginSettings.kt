@@ -1,6 +1,9 @@
 package dev.monosoul.jooq.settings
 
+import dev.monosoul.jooq.callWith
 import dev.monosoul.jooq.container.GenericDatabaseContainer
+import groovy.lang.Closure
+import org.gradle.api.Action
 import org.gradle.api.provider.Provider
 import java.io.Serializable
 import java.net.URLClassLoader
@@ -13,7 +16,8 @@ sealed class JooqDockerPluginSettings : Serializable {
         block: (URLClassLoader, DatabaseCredentials) -> Unit
     )
 
-    fun jdbc(block: Jdbc.() -> Unit) = jdbc.apply(block)
+    fun jdbc(customizer: Action<Jdbc>) = customizer.execute(jdbc)
+    fun jdbc(closure: Closure<Jdbc>) = jdbc(closure::callWith)
 
     class WithContainer private constructor(
         override val jdbc: Jdbc,
@@ -50,17 +54,19 @@ sealed class JooqDockerPluginSettings : Serializable {
             }
         }
 
-        fun db(block: Database.Internal.() -> Unit) = database.apply(block)
-        fun image(block: Image.() -> Unit) = image.apply(block)
+        fun db(customizer: Action<Database.Internal>) = customizer.execute(database)
+        fun db(closure: Closure<Database.Internal>) = db(closure::callWith)
+        fun image(customizer: Action<Image>) = customizer.execute(image)
+        fun image(closure: Closure<Image>) = image(closure::callWith)
 
         companion object {
-            fun new(block: WithContainer.() -> Unit = {}): WithContainer {
+            fun new(customizer: Action<WithContainer> = Action<WithContainer> { }): WithContainer {
                 val database = Database.Internal()
                 return WithContainer(
                     jdbc = Jdbc(),
                     database = database,
                     image = Image(database),
-                ).apply(block)
+                ).apply(customizer::execute)
             }
         }
     }
@@ -87,13 +93,14 @@ sealed class JooqDockerPluginSettings : Serializable {
             )
         }
 
-        fun db(block: Database.External.() -> Unit) = database.apply(block)
+        fun db(customizer: Action<Database.External>) = customizer.execute(database)
+        fun db(closure: Closure<Database.External>) = db(closure::callWith)
 
         companion object {
-            fun new(block: WithoutContainer.() -> Unit = {}) = WithoutContainer(
+            fun new(customizer: Action<WithoutContainer> = Action<WithoutContainer> { }) = WithoutContainer(
                 jdbc = Jdbc(),
                 database = Database.External(),
-            ).apply(block)
+            ).apply(customizer::execute)
         }
     }
 }

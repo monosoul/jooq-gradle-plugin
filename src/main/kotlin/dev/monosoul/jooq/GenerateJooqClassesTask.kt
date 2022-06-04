@@ -102,6 +102,9 @@ open class GenerateJooqClassesTask @Inject constructor(
     }
 
     @Suppress("unused")
+    fun usingXmlConfig(file: File, closure: Closure<Generator>) = usingXmlConfig(file, closure::callWith)
+
+    @Suppress("unused")
     fun usingJavaConfig(customizer: Action<Generator>) {
         generatorConfig.set(
             providerFactory.provider {
@@ -111,6 +114,9 @@ open class GenerateJooqClassesTask @Inject constructor(
             }
         )
     }
+
+    @Suppress("unused")
+    fun usingJavaConfig(closure: Closure<Generator>) = usingJavaConfig(closure::callWith)
 
     @Deprecated(
         message = "Use usingJavaConfig instead",

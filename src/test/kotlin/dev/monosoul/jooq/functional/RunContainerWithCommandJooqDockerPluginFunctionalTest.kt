@@ -6,10 +6,10 @@ import strikt.api.expect
 import strikt.assertions.isEqualTo
 import strikt.java.exists
 
-class GenerateForMySqlJooqDockerPluginFunctionalTest : JooqDockerPluginFunctionalTestBase() {
+class RunContainerWithCommandJooqDockerPluginFunctionalTest : JooqDockerPluginFunctionalTestBase() {
 
     @Test
-    fun `should be able to generate jOOQ classes for MySQL`() {
+    fun `should support running DB containers with command`() {
         // given
         prepareBuildGradleFile {
             """
@@ -20,36 +20,25 @@ class GenerateForMySqlJooqDockerPluginFunctionalTest : JooqDockerPluginFunctiona
                 repositories {
                     mavenCentral()
                 }
-
+                
                 jooq {
                     withContainer {
                         image {
-                            name = "mysql:8.0.29"
-                            envVars = mapOf(
-                                "MYSQL_ROOT_PASSWORD" to "mysql",
-                                "MYSQL_DATABASE" to "mysql"
-                            )
+                            command = "postgres -p 6666"
                         }
+
                         db {
-                            username = "root"
-                            password = "mysql"
-                            name = "mysql"
-                            port = 3306
-                            
-                            jdbc {
-                                schema = "jdbc:mysql"
-                                driverClassName = "com.mysql.cj.jdbc.Driver"
-                            }
+                            port = 6666
                         }
                     }
                 }
 
                 dependencies {
-                    jdbc("mysql:mysql-connector-java:8.0.29")
+                    jdbc("org.postgresql:postgresql:42.3.6")
                 }
             """.trimIndent()
         }
-        copyResource(from = "/V01__init_mysql.sql", to = "src/main/resources/db/migration/V01__init_mysql.sql")
+        copyResource(from = "/V01__init.sql", to = "src/main/resources/db/migration/V01__init.sql")
 
         // when
         val result = runGradleWithArguments("generateJooqClasses")
@@ -59,6 +48,9 @@ class GenerateForMySqlJooqDockerPluginFunctionalTest : JooqDockerPluginFunctiona
             that(result).generateJooqClassesTask.outcome isEqualTo SUCCESS
             that(
                 projectFile("build/generated-jooq/org/jooq/generated/tables/Foo.java")
+            ).exists()
+            that(
+                projectFile("build/generated-jooq/org/jooq/generated/tables/FlywaySchemaHistory.java")
             ).exists()
         }
     }

@@ -1,5 +1,6 @@
 package dev.monosoul.jooq
 
+import dev.monosoul.jooq.settings.DatabaseCredentials
 import groovy.lang.Closure
 import org.flywaydb.core.Flyway
 import org.flywaydb.core.api.Location.FILESYSTEM_PREFIX
@@ -14,8 +15,6 @@ import org.gradle.api.provider.ProviderFactory
 import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
-import org.gradle.api.tasks.Internal
-import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
@@ -35,9 +34,6 @@ import org.jooq.meta.jaxb.SchemaMappingType
 import org.jooq.meta.jaxb.Strategy
 import org.jooq.meta.jaxb.Target
 import java.io.File
-import java.io.IOException
-import java.net.URL
-import java.net.URLClassLoader
 import javax.inject.Inject
 
 @CacheableTask
@@ -76,57 +72,8 @@ open class GenerateJooqClassesTask @Inject constructor(
     val outputDirectory =
         objectFactory.directoryProperty().convention(project.layout.buildDirectory.dir("generated-jooq"))
 
-    @Internal
-    fun getDb() = getExtension().db
-
-    @Internal
-    fun getJdbc() = getExtension().jdbc
-
-    @Internal
-    fun getImage() = getExtension().image
-
     @Input
-    fun getJdbcSchema() = getJdbc().schema
-
-    @Input
-    fun getJdbcDriverClassName() = getJdbc().driverClassName
-
-    @Input
-    fun getJooqMetaName() = getJdbc().jooqMetaName
-
-    @Input
-    fun getJdbcUrlQueryParams() = getJdbc().urlQueryParams
-
-    @Input
-    fun getDbUsername() = getDb().username
-
-    @Input
-    fun getDbPassword() = getDb().password
-
-    @Input
-    fun getDbPort() = getDb().port
-
-    @Input
-    @Optional
-    fun getDbHostOverride() = getDb().hostOverride
-
-    @Input
-    fun getImageRepository() = getImage().repository
-
-    @Input
-    fun getImageTag() = getImage().tag
-
-    @Input
-    fun getImageEnvVars() = getImage().envVars
-
-    @Input
-    fun getContainerName() = getImage().containerName
-
-    @Input
-    fun getReadinessProbeHost() = getImage().readinessProbeHost
-
-    @Input
-    fun getReadinessCommand() = getImage().getReadinessCommand()
+    fun getPluginSettings() = getExtension().pluginSettings
 
     init {
         project.plugins.withType(JavaPlugin::class.java) {
@@ -138,7 +85,7 @@ open class GenerateJooqClassesTask @Inject constructor(
         }
     }
 
-    private fun getExtension() = project.extensions.getByName("jooq") as JooqExtension
+    private fun getExtension() = project.extensions.getByName(JooqDockerPlugin.EXTENSION_NAME) as JooqExtension
 
     @Suppress("unused")
     fun usingXmlConfig(
@@ -155,6 +102,9 @@ open class GenerateJooqClassesTask @Inject constructor(
     }
 
     @Suppress("unused")
+    fun usingXmlConfig(file: File, closure: Closure<Generator>) = usingXmlConfig(file, closure::callWith)
+
+    @Suppress("unused")
     fun usingJavaConfig(customizer: Action<Generator>) {
         generatorConfig.set(
             providerFactory.provider {
@@ -164,6 +114,9 @@ open class GenerateJooqClassesTask @Inject constructor(
             }
         )
     }
+
+    @Suppress("unused")
+    fun usingJavaConfig(closure: Closure<Generator>) = usingJavaConfig(closure::callWith)
 
     @Deprecated(
         message = "Use usingJavaConfig instead",
@@ -175,35 +128,20 @@ open class GenerateJooqClassesTask @Inject constructor(
         message = "Use usingJavaConfig instead",
         replaceWith = ReplaceWith("usingJavaConfig(closure)"),
     )
-    fun customizeGenerator(closure: Closure<Generator>) = usingJavaConfig {
-        closure.rehydrate(this, this, this).call(this)
-    }
+    fun customizeGenerator(closure: Closure<Generator>) = usingJavaConfig(closure::callWith)
 
     @TaskAction
     fun generateClasses() {
-        val image = getImage()
-        val db = getDb()
-        val jdbcAwareClassLoader = buildJdbcArtifactsAwareClassLoader()
-        val docker = Docker(
-            image.getImageName(),
-            image.envVars,
-            db.port to db.exposedPort,
-            image.getReadinessCommand(),
-            DatabaseHostResolver(db.hostOverride),
-            image.containerName
-        )
-        docker.use {
-            it.runInContainer {
-                migrateDb(jdbcAwareClassLoader, this)
-                generateJooqClasses(jdbcAwareClassLoader, this)
+        getPluginSettings()
+            .runWithDatabaseCredentials(project.jdbcAwareClassloaderProvider()) { jdbcAwareClassLoader, credentials ->
+                migrateDb(jdbcAwareClassLoader, credentials)
+                generateJooqClasses(jdbcAwareClassLoader, credentials)
             }
-        }
     }
 
-    private fun migrateDb(jdbcAwareClassLoader: ClassLoader, dbHost: String) {
-        val db = getDb()
+    private fun migrateDb(jdbcAwareClassLoader: ClassLoader, credentials: DatabaseCredentials) {
         Flyway.configure(jdbcAwareClassLoader)
-            .dataSource(db.getUrl(dbHost), db.username, db.password)
+            .dataSource(credentials.jdbcUrl, credentials.username, credentials.password)
             .schemas(*schemas)
             .locations(*inputDirectory.map { "$FILESYSTEM_PREFIX${it.absolutePath}" }.toTypedArray())
             .defaultSchema(defaultFlywaySchema())
@@ -217,10 +155,8 @@ open class GenerateJooqClassesTask @Inject constructor(
 
     private fun flywayTableName() = flywayProperties[TABLE] ?: "flyway_schema_history"
 
-    private fun generateJooqClasses(jdbcAwareClassLoader: ClassLoader, dbHost: String) {
+    private fun generateJooqClasses(jdbcAwareClassLoader: ClassLoader, credentials: DatabaseCredentials) {
         project.delete(outputDirectory)
-        val db = getDb()
-        val jdbc = getJdbc()
         FlywaySchemaVersionProvider.setup(defaultFlywaySchema(), flywayTableName())
         SchemaPackageRenameGeneratorStrategy.schemaToPackageMapping.set(schemaToPackageMapping.toMap())
         val tool = GenerationTool()
@@ -230,10 +166,10 @@ open class GenerateJooqClassesTask @Inject constructor(
         }.apply {
             withJdbc(
                 Jdbc()
-                    .withDriver(jdbc.driverClassName)
-                    .withUrl(db.getUrl(dbHost))
-                    .withUser(db.username)
-                    .withPassword(db.password)
+                    .withDriver(credentials.jdbcDriverClassName)
+                    .withUrl(credentials.jdbcUrl)
+                    .withUser(credentials.username)
+                    .withPassword(credentials.password)
             )
         }.run(tool::run)
     }
@@ -242,7 +178,6 @@ open class GenerateJooqClassesTask @Inject constructor(
         .withName(JavaGenerator::class.qualifiedName)
         .withDatabase(
             Database()
-                .withName(getJdbc().jooqMetaName)
                 .withSchemata(schemas.map(this::toSchemaMappingType))
                 .withIncludes(".*")
                 .withExcludes("")
@@ -285,16 +220,5 @@ open class GenerateJooqClassesTask @Inject constructor(
         return listOf(currentExcludes, flywayTableName())
             .filterNot(String?::isNullOrEmpty)
             .joinToString("|")
-    }
-
-    private fun buildJdbcArtifactsAwareClassLoader(): ClassLoader {
-        return URLClassLoader(resolveJdbcArtifacts(), project.buildscript.classLoader)
-    }
-
-    @Throws(IOException::class)
-    private fun resolveJdbcArtifacts(): Array<URL> {
-        return project.configurations.getByName("jdbc").resolvedConfiguration.resolvedArtifacts.map {
-            it.file.toURI().toURL()
-        }.toTypedArray()
     }
 }

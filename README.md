@@ -101,37 +101,32 @@ repositories {
 }
 
 jooq {
-    image {
-        repository = "mysql"
-        tag = "8.0.15"
-        envVars = mapOf(
-            "MYSQL_ROOT_PASSWORD" to "mysql",
-            "MYSQL_DATABASE" to "mysql"
-        )
-        containerName = "uniqueMySqlContainerName"
-        readinessProbe = { host: String, port: Int ->
-            arrayOf("sh", "-c", "until mysqladmin -h$host -P$port -uroot -pmysql ping; do echo wait; sleep 1; done;")
+    withContainer {
+        image {
+            name = "mysql:8.0.29"
+            envVars = mapOf(
+                "MYSQL_ROOT_PASSWORD" to "mysql",
+                "MYSQL_DATABASE" to "mysql"
+            )
         }
-    }
 
-    db {
-        username = "root"
-        password = "mysql"
-        name = "mysql"
-        port = 3306
-    }
+        db {
+            username = "root"
+            password = "mysql"
+            name = "mysql"
+            port = 3306
 
-    jdbc {
-        schema = "jdbc:mysql"
-        driverClassName = "com.mysql.cj.jdbc.Driver"
-        jooqMetaName = "org.jooq.meta.mysql.MySQLDatabase"
-        urlQueryParams = "?useSSL=false"
+            jdbc {
+                schema = "jdbc:mysql"
+                driverClassName = "com.mysql.cj.jdbc.Driver"
+            }
+        }
     }
 }
 
 dependencies {
     implementation("org.jooq:jooq:3.16.5")
-    jdbc("mysql:mysql-connector-java:8.0.15")
+    jdbc("mysql:mysql-connector-java:8.0.29")
 }
 ```
 
@@ -187,7 +182,9 @@ dependencies {
     jdbc("org.postgresql:postgresql:42.3.6")
 }
 ```
+
 where `src/main/resources/db/jooq.xml` looks as following:
+
 ```xml
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <configuration xmlns="http://www.jooq.org/xsd/jooq-codegen-3.16.5.xsd">
@@ -264,37 +261,41 @@ dependencies {
 
 ### Remote docker setup
 
-The library plugin uses to communicate with docker daemon will pick up your environment variables like `DOCKER_HOST`
-and use them for connection ([all config options here](https://github.com/docker-java/docker-java#configuration)).
-Plugin then, based on this config, will try to figure out the host on which database is exposed,
-if it fail you can override it the following way:
+The plugin uses [testcontainers library](https://www.testcontainers.org) to spin up the DB
+container. If you want to use the plugin with remote docker instance, refer to the
+[testcontainers documentation](https://www.testcontainers.org/features/configuration/#customizing-docker-host-detection)
+.
+
+### Remote database setup
+
+The plugin supports remote database setup, where an external DB can be used to generate jOOQ classes instead of
+spinning up a container with the DB. This setup can also be convenient when a container with the DB is created
+externally (for example with Docker compose).
+
+To use the plugin with a remote DB:
 
 ```kotlin
 plugins {
     id("dev.monosoul.jooq-docker")
 }
 
-
-jooq {
-    db {
-        hostOverride = "localhost"
-    }
-}
-```
-
-For the readiness probe plugin will always use localhost `127.0.0.1` as it's a command run within the database
-container.
-If for whatever reason you need to override this you can do that by specifying it as follows:
-
-```kotlin
- plugins {
-    id("dev.monosoul.jooq-docker")
+repositories {
+    mavenCentral()
 }
 
-
 jooq {
-    image {
-        readinessProbeHost = "someHost"
+    withoutContainer {
+        db {
+            username = "postgres"
+            password = "postgres"
+            name = "postgres"
+            host = "remotehost"
+            port = 5432
+        }
     }
+}
+
+dependencies {
+    jdbc("org.postgresql:postgresql:42.3.6")
 }
 ```

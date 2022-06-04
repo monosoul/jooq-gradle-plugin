@@ -103,8 +103,7 @@ repositories {
 jooq {
     withContainer {
         image {
-            repository = "mysql"
-            tag = "8.0.29"
+            name = "mysql:8.0.29"
             envVars = mapOf(
                 "MYSQL_ROOT_PASSWORD" to "mysql",
                 "MYSQL_DATABASE" to "mysql"

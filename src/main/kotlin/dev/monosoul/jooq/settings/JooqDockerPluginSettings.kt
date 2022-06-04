@@ -29,7 +29,7 @@ sealed class JooqDockerPluginSettings : Serializable {
         ) {
             val jdbcAwareClassloader = classloaderProvider.get()
             val dbContainer = GenericDatabaseContainer(
-                imageName = image.getImageName(),
+                imageName = image.name,
                 env = image.envVars,
                 testQueryString = image.testQuery,
                 database = database,

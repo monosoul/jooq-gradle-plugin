@@ -1,6 +1,7 @@
 package dev.monosoul.jooq.container
 
 import dev.monosoul.jooq.settings.Database
+import dev.monosoul.jooq.settings.Image
 import org.slf4j.LoggerFactory
 import org.testcontainers.containers.JdbcDatabaseContainer
 import org.testcontainers.containers.output.Slf4jLogConsumer
@@ -14,13 +15,10 @@ import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
 
 class GenericDatabaseContainer(
-    imageName: String,
-    env: Map<String, String>,
+    private val image: Image,
     private val database: Database.Internal,
     private val jdbcAwareClassLoader: ClassLoader,
-    private val testQueryString: String,
-    command: String? = null
-) : JdbcDatabaseContainer<GenericDatabaseContainer>(DockerImageName.parse(imageName)) {
+) : JdbcDatabaseContainer<GenericDatabaseContainer>(DockerImageName.parse(image.name)) {
 
     private val driverLoadLock = ReentrantLock()
     private var driver: Driver? by ReflectionDelegate(
@@ -35,10 +33,10 @@ class GenericDatabaseContainer(
                 LoggerFactory.getLogger("JooqGenerationDb[$dockerImageName]")
             )
         )
-        withEnv(env)
+        withEnv(image.envVars)
         withExposedPorts(database.port)
         setWaitStrategy(HostPortWaitStrategy())
-        command?.run(::withCommand)
+        image.command?.run(::withCommand)
     }
 
     override fun getDriverClassName() = database.jdbc.driverClassName
@@ -49,7 +47,7 @@ class GenericDatabaseContainer(
 
     override fun getPassword() = database.password
 
-    override fun getTestQueryString() = testQueryString
+    override fun getTestQueryString() = image.testQuery
 
     override fun getDatabaseName() = database.name
 

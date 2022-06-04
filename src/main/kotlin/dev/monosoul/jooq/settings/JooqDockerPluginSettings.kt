@@ -15,11 +15,14 @@ sealed class JooqDockerPluginSettings : Serializable {
         block: (URLClassLoader, DatabaseCredentials) -> Unit
     )
 
-    class WithContainer(customizer: Action<WithContainer> = Action<WithContainer> { }) : JooqDockerPluginSettings() {
-        override val database = Database.Internal()
-        val image = Image(database)
+    internal abstract fun copy(): JooqDockerPluginSettings
 
-        init {
+    class WithContainer private constructor(
+        override val database: Database.Internal,
+        val image: Image,
+    ) : JooqDockerPluginSettings() {
+        private constructor(database: Database.Internal) : this(database, Image(database))
+        constructor(customizer: Action<WithContainer> = Action<WithContainer> { }) : this(Database.Internal()) {
             customizer.execute(this)
         }
 
@@ -49,18 +52,18 @@ sealed class JooqDockerPluginSettings : Serializable {
             }
         }
 
+        override fun copy(): WithContainer = WithContainer(database.copy(), image.copy())
+
         fun db(customizer: Action<Database.Internal>) = customizer.execute(database)
         fun db(closure: Closure<Database.Internal>) = db(closure::callWith)
         fun image(customizer: Action<Image>) = customizer.execute(image)
         fun image(closure: Closure<Image>) = image(closure::callWith)
     }
 
-    class WithoutContainer(
-        customizer: Action<WithoutContainer> = Action<WithoutContainer> { }
+    class WithoutContainer private constructor(
+        override val database: Database.External
     ) : JooqDockerPluginSettings() {
-        override val database = Database.External()
-
-        init {
+        constructor(customizer: Action<WithoutContainer> = Action<WithoutContainer> { }) : this(Database.External()) {
             customizer.execute(this)
         }
 
@@ -78,6 +81,8 @@ sealed class JooqDockerPluginSettings : Serializable {
                 )
             )
         }
+
+        override fun copy(): WithoutContainer = WithoutContainer(database.copy())
 
         fun db(customizer: Action<Database.External>) = customizer.execute(database)
         fun db(closure: Closure<Database.External>) = db(closure::callWith)

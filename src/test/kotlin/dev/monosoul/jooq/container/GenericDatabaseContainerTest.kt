@@ -108,9 +108,10 @@ class GenericDatabaseContainerTest {
             }
         }
         driverGetLatch.countDown()
+        futures.forEach { it.get() }
+        threadPool.shutdown()
 
         // then
-        futures.forEach { it.get() }
         verify(exactly = 1) {
             jdbcAwareClassLoader.loadClass(database.jdbc.driverClassName)
         }

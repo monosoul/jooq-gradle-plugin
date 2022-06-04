@@ -1,6 +1,9 @@
 package dev.monosoul.jooq
 
 import dev.monosoul.jooq.settings.DatabaseCredentials
+import dev.monosoul.jooq.settings.JooqDockerPluginSettings
+import dev.monosoul.jooq.settings.JooqDockerPluginSettings.WithContainer
+import dev.monosoul.jooq.settings.JooqDockerPluginSettings.WithoutContainer
 import groovy.lang.Closure
 import org.flywaydb.core.Flyway
 import org.flywaydb.core.api.Location.FILESYSTEM_PREFIX
@@ -40,7 +43,7 @@ import javax.inject.Inject
 open class GenerateJooqClassesTask @Inject constructor(
     private val objectFactory: ObjectFactory,
     private val providerFactory: ProviderFactory,
-) : DefaultTask() {
+) : DefaultTask(), SettingsAware {
     @Input
     var schemas = arrayOf("public")
 
@@ -72,8 +75,12 @@ open class GenerateJooqClassesTask @Inject constructor(
     val outputDirectory =
         objectFactory.directoryProperty().convention(project.layout.buildDirectory.dir("generated-jooq"))
 
+    private var localPluginSettings: JooqDockerPluginSettings? = null
+
     @Input
-    fun getPluginSettings() = getExtension().pluginSettings
+    fun getPluginSettings() = localPluginSettings ?: globalPluginSettings()
+
+    private fun globalPluginSettings() = project.extensions.getByType<JooqExtension>().pluginSettings
 
     init {
         project.plugins.withType(JavaPlugin::class.java) {
@@ -85,7 +92,15 @@ open class GenerateJooqClassesTask @Inject constructor(
         }
     }
 
-    private fun getExtension() = project.extensions.getByName(JooqDockerPlugin.EXTENSION_NAME) as JooqExtension
+    override fun withContainer(configure: Action<WithContainer>) {
+        localPluginSettings = globalPluginSettings().let { it as? WithContainer }?.copy()?.apply(configure::execute)
+            ?: WithContainer(configure)
+    }
+
+    override fun withoutContainer(configure: Action<WithoutContainer>) {
+        localPluginSettings = globalPluginSettings().let { it as? WithoutContainer }?.copy()?.apply(configure::execute)
+            ?: WithoutContainer(configure)
+    }
 
     @Suppress("unused")
     fun usingXmlConfig(

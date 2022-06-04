@@ -3,27 +3,20 @@ package dev.monosoul.jooq
 import dev.monosoul.jooq.settings.JooqDockerPluginSettings
 import dev.monosoul.jooq.settings.JooqDockerPluginSettings.WithContainer
 import dev.monosoul.jooq.settings.JooqDockerPluginSettings.WithoutContainer
-import groovy.lang.Closure
 import org.gradle.api.Action
 import java.io.Serializable
 
-open class JooqExtension : Serializable {
+open class JooqExtension : Serializable, SettingsAware {
     internal var pluginSettings: JooqDockerPluginSettings = WithContainer()
 
     @Suppress("unused")
-    fun withContainer(configure: Action<WithContainer>) {
+    override fun withContainer(configure: Action<WithContainer>) {
         pluginSettings = WithContainer(configure)
     }
 
     @Suppress("unused")
-    fun withContainer(closure: Closure<WithContainer>) = withContainer(closure::callWith)
-
-    @Suppress("unused")
-    fun withoutContainer(configure: Action<WithoutContainer>) {
+    override fun withoutContainer(configure: Action<WithoutContainer>) {
         pluginSettings = WithoutContainer(configure)
     }
-
-    @Suppress("unused")
-    fun withoutContainer(closure: Closure<WithoutContainer>) = withoutContainer(closure::callWith)
 }
 

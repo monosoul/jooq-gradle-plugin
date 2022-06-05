@@ -16,11 +16,12 @@ internal object PropertiesReader {
     val DATABASE_PREFIX = "${functionName(DbAware<Database>::db)}."
     val JDBC_PREFIX = "${functionName(Database::jdbc)}."
 
-    fun Project.settingsFromProperties() = if (properties.keys.any { it.startsWith(WITHOUT_CONTAINER) }) {
-        settingsWithoutContainerFromProperties()
-    } else {
-        settingsWithContainerFromProperties()
-    }
+    fun Project.settingsFromProperties(): JooqDockerPluginSettings =
+        if (properties.keys.any { it.startsWith(WITHOUT_CONTAINER) }) {
+            settingsWithoutContainerFromProperties()
+        } else {
+            settingsWithContainerFromProperties()
+        }
 
     fun Project.settingsWithContainerFromProperties() = internalDatabaseFromProperties(
         jdbcFromProperties(WITH_CONTAINER)

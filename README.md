@@ -378,7 +378,7 @@ block and **local** (or task-specific) configuration declared for each task sepa
 
 The plugin supports configuration with properties.
 
-Here's an example of how to use `gradle.properties` file to configure the plugin to run generate jOOQ classes for MySQL:
+Here's an example of how to use `gradle.properties` file to configure the plugin to generate jOOQ classes for MySQL:
 
 `gradle.properties`:
 

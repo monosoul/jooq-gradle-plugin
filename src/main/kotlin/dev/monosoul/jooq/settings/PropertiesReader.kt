@@ -16,60 +16,52 @@ internal object PropertiesReader {
     val DATABASE_PREFIX = "${functionName(DbAware<Database>::db)}."
     val JDBC_PREFIX = "${functionName(Database::jdbc)}."
 
-    fun Project.settingsFromProperties(): JooqDockerPluginSettings =
-        if (properties.keys.any { it.startsWith(WITHOUT_CONTAINER) }) {
-            settingsWithoutContainerFromProperties()
-        } else {
-            settingsWithContainerFromProperties()
-        }
-
-    fun Project.settingsWithContainerFromProperties() = internalDatabaseFromProperties(
-        jdbcFromProperties(WITH_CONTAINER)
-    ).let {
-        WithContainer(it, imageFromProperties(it))
+    fun WithContainer.applyPropertiesFrom(project: Project) = apply {
+        image.applyPropertiesFrom(project)
+        database.applyPropertiesFrom(project)
     }
 
-    fun Project.settingsWithoutContainerFromProperties() = WithoutContainer(
-        externalDatabaseFromProperties(
-            jdbcFromProperties(WITHOUT_CONTAINER)
-        )
-    )
-
-    fun Project.jdbcFromProperties(namespace: String) = Jdbc().also { jdbc ->
-        val prefix = "$namespace$DATABASE_PREFIX$JDBC_PREFIX"
-        findAndSetProperty(prefix, jdbc::schema)
-        findAndSetProperty(prefix, jdbc::driverClassName)
-        findAndSetProperty(prefix, jdbc::urlQueryParams)
+    fun WithoutContainer.applyPropertiesFrom(project: Project) = apply {
+        database.applyPropertiesFrom(project)
     }
 
-    fun Project.externalDatabaseFromProperties(jdbc: Jdbc) = Database.External(jdbc = jdbc).also { db ->
+    fun Jdbc.applyPropertiesFrom(project: Project, namespace: String) {
+        val prefix = "$namespace$JDBC_PREFIX"
+        project.findAndSetProperty(prefix, ::schema)
+        project.findAndSetProperty(prefix, ::driverClassName)
+        project.findAndSetProperty(prefix, ::urlQueryParams)
+    }
+
+    fun Database.External.applyPropertiesFrom(project: Project) {
         val prefix = "$WITHOUT_CONTAINER$DATABASE_PREFIX"
-        findAndSetProperty(prefix, db::host)
-        findAndSetProperty(prefix, db::port) { it.toInt() }
-        findAndSetProperty(prefix, db::name)
-        findAndSetProperty(prefix, db::username)
-        findAndSetProperty(prefix, db::password)
+        project.findAndSetProperty(prefix, ::host)
+        project.findAndSetProperty(prefix, ::port) { it.toInt() }
+        project.findAndSetProperty(prefix, ::name)
+        project.findAndSetProperty(prefix, ::username)
+        project.findAndSetProperty(prefix, ::password)
+        jdbc.applyPropertiesFrom(project, prefix)
     }
 
-    fun Project.internalDatabaseFromProperties(jdbc: Jdbc) = Database.Internal(jdbc = jdbc).also { db ->
+    fun Database.Internal.applyPropertiesFrom(project: Project) {
         val prefix = "$WITH_CONTAINER$DATABASE_PREFIX"
-        findAndSetProperty(prefix, db::port) { it.toInt() }
-        findAndSetProperty(prefix, db::name)
-        findAndSetProperty(prefix, db::username)
-        findAndSetProperty(prefix, db::password)
+        project.findAndSetProperty(prefix, ::port) { it.toInt() }
+        project.findAndSetProperty(prefix, ::name)
+        project.findAndSetProperty(prefix, ::username)
+        project.findAndSetProperty(prefix, ::password)
+        jdbc.applyPropertiesFrom(project, prefix)
     }
 
-    fun Project.imageFromProperties(database: Database.Internal) = Image(database).also { image ->
+    fun Image.applyPropertiesFrom(project: Project) {
         val prefix = "$WITH_CONTAINER$IMAGE_PREFIX"
-        findAndSetProperty(prefix, image::name)
-        findAndSetProperty(prefix, image::command)
-        findAndSetProperty(prefix, image::testQuery)
+        project.findAndSetProperty(prefix, ::name)
+        project.findAndSetProperty(prefix, ::command)
+        project.findAndSetProperty(prefix, ::testQuery)
 
-        val envVarsPrefix = "$prefix${image::envVars.name}."
-        properties.filterKeys { it.startsWith(envVarsPrefix) }.map { (key, value) ->
+        val envVarsPrefix = "$prefix${::envVars.name}."
+        project.properties.filterKeys { it.startsWith(envVarsPrefix) }.map { (key, value) ->
             key.removePrefix(envVarsPrefix) to value.toString()
         }.toMap().takeIf { it.isNotEmpty() }?.also {
-            image.envVars = it
+            envVars = it
         }
     }
 

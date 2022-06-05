@@ -90,4 +90,71 @@ class MultipleDatabasesJooqDockerPluginFunctionalTest : JooqDockerPluginFunction
             ).exists()
         }
     }
+
+    @Test
+    fun `local task configuration should inherit global configuration`() {
+        // given
+        prepareBuildGradleFile {
+            """
+                plugins {
+                    id("dev.monosoul.jooq-docker")
+                }
+
+                repositories {
+                    mavenCentral()
+                }
+
+                jooq {
+                    withContainer {
+                        image {
+                            name = "mysql:8.0.29"
+                            envVars = mapOf(
+                                "MYSQL_ROOT_PASSWORD" to "mysql",
+                                "MYSQL_DATABASE" to "mysql",
+                            )
+                        }
+                        db {
+                            username = "root"
+                            password = "mysql"
+                            name = "mysql"
+                            port = 6666
+                            
+                            jdbc {
+                                schema = "jdbc:mysql"
+                                driverClassName = "com.mysql.cj.jdbc.Driver"
+                            }
+                        }
+                    }
+                }
+                
+                tasks {
+                    generateJooqClasses {
+                        withContainer {
+                            image {
+                                envVars = envVars + mapOf(
+                                    "MYSQL_TCP_PORT" to "6666"
+                                )
+                            }
+                        }
+                    }
+                }
+
+                dependencies {
+                    jdbc("mysql:mysql-connector-java:8.0.29")
+                }
+            """.trimIndent()
+        }
+        copyResource(from = "/V01__init_mysql.sql", to = "src/main/resources/db/migration/V01__init_mysql.sql")
+
+        // when
+        val result = runGradleWithArguments("generateJooqClasses")
+
+        // then
+        expect {
+            that(result).generateJooqClassesTask.outcome isEqualTo SUCCESS
+            that(
+                projectFile("build/generated-jooq/org/jooq/generated/tables/Foo.java")
+            ).exists()
+        }
+    }
 }

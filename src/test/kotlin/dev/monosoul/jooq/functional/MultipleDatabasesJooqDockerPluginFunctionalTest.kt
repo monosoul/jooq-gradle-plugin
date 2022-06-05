@@ -1,5 +1,6 @@
 package dev.monosoul.jooq.functional
 
+import dev.monosoul.jooq.container.PostgresContainer
 import org.gradle.testkit.runner.TaskOutcome.SUCCESS
 import org.junit.jupiter.api.Test
 import strikt.api.expect
@@ -71,7 +72,7 @@ class MultipleDatabasesJooqDockerPluginFunctionalTest : JooqDockerPluginFunction
         copyResource(from = "/V01__init_mysql.sql", to = "src/main/resources/mysql/migration/V01__init.sql")
 
         // when
-        val result = runGradleWithArguments("tasks", "classes")
+        val result = runGradleWithArguments("classes")
 
         // then
         expect {
@@ -154,6 +155,76 @@ class MultipleDatabasesJooqDockerPluginFunctionalTest : JooqDockerPluginFunction
             that(result).generateJooqClassesTask.outcome isEqualTo SUCCESS
             that(
                 projectFile("build/generated-jooq/org/jooq/generated/tables/Foo.java")
+            ).exists()
+        }
+    }
+
+    @Test
+    fun `should be able generate jooq classes for internal and external databases`() {
+        // given
+        val postgresContainer = PostgresContainer().also { it.start() }
+        prepareBuildGradleFile {
+            """
+                import dev.monosoul.jooq.GenerateJooqClassesTask
+                
+                plugins {
+                    kotlin("jvm") version "1.6.21"
+                    id("dev.monosoul.jooq-docker")
+                }
+
+                repositories {
+                    mavenCentral()
+                }
+                
+                tasks {
+                    generateJooqClasses {
+                        basePackageName = "org.jooq.generated.local"
+                        outputDirectory.set(project.layout.buildDirectory.dir("local"))
+                    }
+                    
+                    register<GenerateJooqClassesTask>("generateJooqClassesForExternal") {
+                        basePackageName = "org.jooq.generated.remote"
+                        outputDirectory.set(project.layout.buildDirectory.dir("remote"))
+                    
+                        withoutContainer {
+                            db {
+                                username = "${postgresContainer.username}"
+                                password = "${postgresContainer.password}"
+                                name = "${postgresContainer.databaseName}"
+                                host = "${postgresContainer.host}"
+                                port = ${postgresContainer.firstMappedPort}
+                            }
+                        }
+                    }
+                }
+
+                dependencies {
+                    implementation(kotlin("stdlib"))
+                    jdbc("org.postgresql:postgresql:42.3.6")
+                    implementation("org.jooq:jooq:3.16.6")
+                }
+            """.trimIndent()
+        }
+        copyResource(from = "/V01__init.sql", to = "src/main/resources/db/migration/V01__init.sql")
+
+        // when
+        val result = runGradleWithArguments("classes")
+        postgresContainer.stop()
+
+        // then
+        expect {
+            that(result).generateJooqClassesTask.outcome isEqualTo SUCCESS
+            that(
+                projectFile("build/local/org/jooq/generated/local/tables/Foo.java")
+            ).exists()
+            that(
+                projectFile("build/local/org/jooq/generated/local/tables/FlywaySchemaHistory.java")
+            ).exists()
+            that(
+                projectFile("build/remote/org/jooq/generated/remote/tables/Foo.java")
+            ).exists()
+            that(
+                projectFile("build/remote/org/jooq/generated/remote/tables/FlywaySchemaHistory.java")
             ).exists()
         }
     }

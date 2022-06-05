@@ -31,7 +31,7 @@ class MultipleDatabasesJooqDockerPluginFunctionalTest : JooqDockerPluginFunction
                         outputDirectory.set(project.layout.buildDirectory.dir("postgres"))
                     }
                     
-                    create<GenerateJooqClassesTask>("generateJooqClassesForMySql") {
+                    register<GenerateJooqClassesTask>("generateJooqClassesForMySql") {
                         basePackageName = "org.jooq.generated.mysql"
                         inputDirectory.setFrom("src/main/resources/mysql/migration")
                         outputDirectory.set(project.layout.buildDirectory.dir("mysql"))
@@ -71,7 +71,7 @@ class MultipleDatabasesJooqDockerPluginFunctionalTest : JooqDockerPluginFunction
         copyResource(from = "/V01__init_mysql.sql", to = "src/main/resources/mysql/migration/V01__init.sql")
 
         // when
-        val result = runGradleWithArguments("classes")
+        val result = runGradleWithArguments("tasks", "classes")
 
         // then
         expect {

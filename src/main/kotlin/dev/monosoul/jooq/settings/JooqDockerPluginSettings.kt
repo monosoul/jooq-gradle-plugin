@@ -20,7 +20,7 @@ sealed class JooqDockerPluginSettings : Serializable {
     class WithContainer internal constructor(
         override val database: Database.Internal,
         val image: Image,
-    ) : JooqDockerPluginSettings() {
+    ) : JooqDockerPluginSettings(), DbAware<Database.Internal> {
         private constructor(database: Database.Internal) : this(database, Image(database))
         constructor(customizer: Action<WithContainer> = Action<WithContainer> { }) : this(Database.Internal()) {
             customizer.execute(this)
@@ -57,15 +57,14 @@ sealed class JooqDockerPluginSettings : Serializable {
             image = image.copy()
         )
 
-        fun db(customizer: Action<Database.Internal>) = customizer.execute(database)
-        fun db(closure: Closure<Database.Internal>) = db(closure::callWith)
+        override fun db(customizer: Action<Database.Internal>) = customizer.execute(database)
         fun image(customizer: Action<Image>) = customizer.execute(image)
         fun image(closure: Closure<Image>) = image(closure::callWith)
     }
 
     class WithoutContainer internal constructor(
         override val database: Database.External
-    ) : JooqDockerPluginSettings() {
+    ) : JooqDockerPluginSettings(), DbAware<Database.External> {
         constructor(customizer: Action<WithoutContainer> = Action<WithoutContainer> { }) : this(Database.External()) {
             customizer.execute(this)
         }
@@ -89,7 +88,6 @@ sealed class JooqDockerPluginSettings : Serializable {
             database = database.run { copy(jdbc = jdbc.copy()) }
         )
 
-        fun db(customizer: Action<Database.External>) = customizer.execute(database)
-        fun db(closure: Closure<Database.External>) = db(closure::callWith)
+        override fun db(customizer: Action<Database.External>) = customizer.execute(database)
     }
 }

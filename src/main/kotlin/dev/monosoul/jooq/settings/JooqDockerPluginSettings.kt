@@ -52,7 +52,10 @@ sealed class JooqDockerPluginSettings : Serializable {
             }
         }
 
-        override fun copy(): WithContainer = WithContainer(database.copy(), image.copy())
+        override fun copy(): WithContainer = WithContainer(
+            database = database.run { copy(jdbc = jdbc.copy()) },
+            image = image.copy()
+        )
 
         fun db(customizer: Action<Database.Internal>) = customizer.execute(database)
         fun db(closure: Closure<Database.Internal>) = db(closure::callWith)
@@ -82,7 +85,9 @@ sealed class JooqDockerPluginSettings : Serializable {
             )
         }
 
-        override fun copy(): WithoutContainer = WithoutContainer(database.copy())
+        override fun copy(): WithoutContainer = WithoutContainer(
+            database = database.run { copy(jdbc = jdbc.copy()) }
+        )
 
         fun db(customizer: Action<Database.External>) = customizer.execute(database)
         fun db(closure: Closure<Database.External>) = db(closure::callWith)

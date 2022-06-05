@@ -9,12 +9,12 @@ import kotlin.reflect.KFunction2
 import kotlin.reflect.KMutableProperty0
 
 internal object PropertiesReader {
-    const val PREFIX = "dev.monosoul.jooq."
-    val WITH_CONTAINER = "${PREFIX}${functionName(SettingsAware::withContainer)}."
-    val WITHOUT_CONTAINER = "${PREFIX}${functionName(SettingsAware::withoutContainer)}."
-    val IMAGE_PREFIX = "${functionName(WithContainer::image)}."
-    val DATABASE_PREFIX = "${functionName(DbAware<Database>::db)}."
-    val JDBC_PREFIX = "${functionName(Database::jdbc)}."
+    private const val PREFIX = "dev.monosoul.jooq."
+    private val WITH_CONTAINER = "${PREFIX}${functionName(SettingsAware::withContainer)}."
+    private val WITHOUT_CONTAINER = "${PREFIX}${functionName(SettingsAware::withoutContainer)}."
+    private val IMAGE_PREFIX = "${functionName(WithContainer::image)}."
+    private val DATABASE_PREFIX = "${functionName(DbAware<Database>::db)}."
+    private val JDBC_PREFIX = "${functionName(Database::jdbc)}."
 
     fun WithContainer.applyPropertiesFrom(project: Project): JooqDockerPluginSettings =
         if (project.properties.keys.any { it.startsWith(WITHOUT_CONTAINER) }) {
@@ -34,14 +34,14 @@ internal object PropertiesReader {
         database.applyPropertiesFrom(project)
     }
 
-    fun Jdbc.applyPropertiesFrom(project: Project, namespace: String) {
+    private fun Jdbc.applyPropertiesFrom(project: Project, namespace: String) {
         val prefix = "$namespace$JDBC_PREFIX"
         project.findAndSetProperty(prefix, ::schema)
         project.findAndSetProperty(prefix, ::driverClassName)
         project.findAndSetProperty(prefix, ::urlQueryParams)
     }
 
-    fun Database.External.applyPropertiesFrom(project: Project) {
+    private fun Database.External.applyPropertiesFrom(project: Project) {
         val prefix = "$WITHOUT_CONTAINER$DATABASE_PREFIX"
         project.findAndSetProperty(prefix, ::host)
         project.findAndSetProperty(prefix, ::port) { it.toInt() }
@@ -51,7 +51,7 @@ internal object PropertiesReader {
         jdbc.applyPropertiesFrom(project, prefix)
     }
 
-    fun Database.Internal.applyPropertiesFrom(project: Project) {
+    private fun Database.Internal.applyPropertiesFrom(project: Project) {
         val prefix = "$WITH_CONTAINER$DATABASE_PREFIX"
         project.findAndSetProperty(prefix, ::port) { it.toInt() }
         project.findAndSetProperty(prefix, ::name)
@@ -60,7 +60,7 @@ internal object PropertiesReader {
         jdbc.applyPropertiesFrom(project, prefix)
     }
 
-    fun Image.applyPropertiesFrom(project: Project) {
+    private fun Image.applyPropertiesFrom(project: Project) {
         val prefix = "$WITH_CONTAINER$IMAGE_PREFIX"
         project.findAndSetProperty(prefix, ::name)
         project.findAndSetProperty(prefix, ::command)

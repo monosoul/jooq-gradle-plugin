@@ -17,7 +17,7 @@ sealed class JooqDockerPluginSettings : Serializable {
 
     internal abstract fun copy(): JooqDockerPluginSettings
 
-    class WithContainer private constructor(
+    class WithContainer internal constructor(
         override val database: Database.Internal,
         val image: Image,
     ) : JooqDockerPluginSettings() {
@@ -63,7 +63,7 @@ sealed class JooqDockerPluginSettings : Serializable {
         fun image(closure: Closure<Image>) = image(closure::callWith)
     }
 
-    class WithoutContainer private constructor(
+    class WithoutContainer internal constructor(
         override val database: Database.External
     ) : JooqDockerPluginSettings() {
         constructor(customizer: Action<WithoutContainer> = Action<WithoutContainer> { }) : this(Database.External()) {

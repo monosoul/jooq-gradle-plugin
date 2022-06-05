@@ -77,7 +77,6 @@ tasks {
 
 dependencies {
     implementation("org.jooq:jooq-codegen:3.16.6")
-    implementation("org.glassfish.jaxb:jaxb-runtime:3.0.2")
     val flywayVersion = "8.5.12"
     implementation("org.flywaydb:flyway-core:$flywayVersion")
     implementation("org.flywaydb:flyway-mysql:$flywayVersion")

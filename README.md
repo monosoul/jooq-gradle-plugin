@@ -361,10 +361,68 @@ dependencies {
     implementation("org.jooq:jooq:3.16.6")
 }
 ```
+
 where:
- - For PostgreSQL:
-   - migrations are located in `src/main/resources/postgres/migration`
-   - generated classes are located in `build/postgres` under `org.jooq.generated.postgres` package
- - For MySQL:
-   - migrations are located in `src/main/resources/mysql/migration`
-   - generated classes are located in `build/mysql` under `org.jooq.generated.mysql` package
+
+- For PostgreSQL:
+    - migrations are located in `src/main/resources/postgres/migration`
+    - generated classes are located in `build/postgres` under `org.jooq.generated.postgres` package
+- For MySQL:
+    - migrations are located in `src/main/resources/mysql/migration`
+    - generated classes are located in `build/mysql` under `org.jooq.generated.mysql` package
+
+Basically, the plugin has 2 sets of configurations: **global** (or project-wide) configuration declared within `jooq {}`
+block and **local** (or task-specific) configuration declared for each task separately.
+
+Local (or task-specific) configuration initial values are inherited from the global (or project-wide) configuration.
+So if you modify the global configuration first, and then modify the local configuration, the local configuration's 
+initial values will be equal to the global configuration's values.
+
+Modifying the local configuration *will not affect* the global configuration.
+
+### Configuration with properties
+
+The plugin supports configuration with properties.
+
+Here's an example of how to use `gradle.properties` file to configure the plugin to generate jOOQ classes for MySQL:
+
+`gradle.properties`:
+
+```properties
+dev.monosoul.jooq.withContainer.db.username=root
+dev.monosoul.jooq.withContainer.db.password=mysql
+dev.monosoul.jooq.withContainer.db.name=mysql
+dev.monosoul.jooq.withContainer.db.port=3306
+dev.monosoul.jooq.withContainer.db.jdbc.schema=jdbc:mysql
+dev.monosoul.jooq.withContainer.db.jdbc.driverClassName=com.mysql.cj.jdbc.Driver
+dev.monosoul.jooq.withContainer.image.name=mysql:8.0.29
+dev.monosoul.jooq.withContainer.image.envVars.MYSQL_ROOT_PASSWORD=mysql
+dev.monosoul.jooq.withContainer.image.envVars.MYSQL_DATABASE=mysql
+```
+
+`build.gradle.kts`:
+
+```kotlin
+plugins {
+    kotlin("jvm") version "1.6.21"
+    id("dev.monosoul.jooq-docker")
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    jdbc("mysql:mysql-connector-java:8.0.29")
+    implementation("org.jooq:jooq:3.16.6")
+}
+```
+
+And here's an example how to customize the plugin configuration from command line:
+```shell
+./gradlew build -Pdev.monosoul.jooq.withContainer.db.username=root -Pdev.monosoul.jooq.withContainer.db.password=password
+```
+
+#### ❗ NOTE: `withoutContainer` properties have higher priority than `withContainer` properties.
+
+#### ❗ NOTE: properties only affect global (or project-wide) configuration.

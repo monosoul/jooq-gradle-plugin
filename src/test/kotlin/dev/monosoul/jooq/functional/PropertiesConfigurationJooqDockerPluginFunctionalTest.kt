@@ -10,6 +10,52 @@ import strikt.java.exists
 class PropertiesConfigurationJooqDockerPluginFunctionalTest : JooqDockerPluginFunctionalTestBase() {
 
     @Test
+    fun `should support partial default configuration override via properties`() {
+        // given
+        prepareBuildGradleFile {
+            """
+                plugins {
+                    id("dev.monosoul.jooq-docker")
+                }
+                
+                jooq {
+                    withContainer {
+                        image {
+                            command = "postgres -p 6666"
+                        }
+                    }
+                }
+
+                repositories {
+                    mavenCentral()
+                }
+
+                dependencies {
+                    jdbc("org.postgresql:postgresql:42.3.6")
+                }
+            """.trimIndent()
+        }
+        copyResource(from = "/V01__init.sql", to = "src/main/resources/db/migration/V01__init.sql")
+
+        // when
+        val result = runGradleWithArguments(
+            "-Pdev.monosoul.jooq.withContainer.db.port=6666",
+            "generateJooqClasses",
+        )
+
+        // then
+        expect {
+            that(result).generateJooqClassesTask.outcome isEqualTo SUCCESS
+            that(
+                projectFile("build/generated-jooq/org/jooq/generated/tables/Foo.java")
+            ).exists()
+            that(
+                projectFile("build/generated-jooq/org/jooq/generated/tables/FlywaySchemaHistory.java")
+            ).exists()
+        }
+    }
+
+    @Test
     fun `should be possible to configure the plugin with properties to run with container`() {
         // given
         writeProjectFile("gradle.properties") {

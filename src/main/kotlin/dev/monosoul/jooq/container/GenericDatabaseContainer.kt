@@ -36,7 +36,7 @@ class GenericDatabaseContainer(
         withEnv(image.envVars)
         withExposedPorts(database.port)
         setWaitStrategy(HostPortWaitStrategy())
-        image.command?.run(::withCommand)
+        image.command.takeUnless { it.isNullOrBlank() }?.run(::withCommand)
     }
 
     override fun getDriverClassName() = database.jdbc.driverClassName

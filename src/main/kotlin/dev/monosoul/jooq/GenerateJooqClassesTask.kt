@@ -1,6 +1,9 @@
 package dev.monosoul.jooq
 
 import dev.monosoul.jooq.settings.DatabaseCredentials
+import dev.monosoul.jooq.settings.JooqDockerPluginSettings
+import dev.monosoul.jooq.settings.JooqDockerPluginSettings.WithContainer
+import dev.monosoul.jooq.settings.JooqDockerPluginSettings.WithoutContainer
 import groovy.lang.Closure
 import org.flywaydb.core.Flyway
 import org.flywaydb.core.api.Location.FILESYSTEM_PREFIX
@@ -9,8 +12,6 @@ import org.flywaydb.core.internal.configuration.ConfigUtils.TABLE
 import org.gradle.api.Action
 import org.gradle.api.DefaultTask
 import org.gradle.api.model.ObjectFactory
-import org.gradle.api.plugins.JavaPlugin
-import org.gradle.api.plugins.JavaPluginExtension
 import org.gradle.api.provider.ProviderFactory
 import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
@@ -18,7 +19,6 @@ import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
-import org.gradle.api.tasks.SourceSet.MAIN_SOURCE_SET_NAME
 import org.gradle.api.tasks.TaskAction
 import org.gradle.kotlin.dsl.getByType
 import org.gradle.kotlin.dsl.property
@@ -40,7 +40,7 @@ import javax.inject.Inject
 open class GenerateJooqClassesTask @Inject constructor(
     private val objectFactory: ObjectFactory,
     private val providerFactory: ProviderFactory,
-) : DefaultTask() {
+) : DefaultTask(), SettingsAware {
     @Input
     var schemas = arrayOf("public")
 
@@ -72,20 +72,26 @@ open class GenerateJooqClassesTask @Inject constructor(
     val outputDirectory =
         objectFactory.directoryProperty().convention(project.layout.buildDirectory.dir("generated-jooq"))
 
+    private var localPluginSettings: JooqDockerPluginSettings? = null
+
     @Input
-    fun getPluginSettings() = getExtension().pluginSettings
+    fun getPluginSettings() = localPluginSettings ?: globalPluginSettings()
+
+    private fun globalPluginSettings() = project.extensions.getByType<JooqExtension>().pluginSettings
 
     init {
-        project.plugins.withType(JavaPlugin::class.java) {
-            project.extensions.getByType<JavaPluginExtension>().sourceSets.named(MAIN_SOURCE_SET_NAME) {
-                java {
-                    srcDir(outputDirectory)
-                }
-            }
-        }
+        group = "jooq"
     }
 
-    private fun getExtension() = project.extensions.getByName(JooqDockerPlugin.EXTENSION_NAME) as JooqExtension
+    override fun withContainer(configure: Action<WithContainer>) {
+        localPluginSettings = globalPluginSettings().let { it as? WithContainer }?.copy()?.apply(configure::execute)
+            ?: WithContainer(configure)
+    }
+
+    override fun withoutContainer(configure: Action<WithoutContainer>) {
+        localPluginSettings = globalPluginSettings().let { it as? WithoutContainer }?.copy()?.apply(configure::execute)
+            ?: WithoutContainer(configure)
+    }
 
     @Suppress("unused")
     fun usingXmlConfig(

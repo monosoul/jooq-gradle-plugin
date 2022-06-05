@@ -15,7 +15,7 @@ sealed class Database : Serializable {
     fun jdbc(customizer: Action<Jdbc>) = customizer.execute(jdbc)
     fun jdbc(closure: Closure<Jdbc>) = jdbc(closure::callWith)
 
-    class Internal(
+    data class Internal(
         override var username: String = "postgres",
         override var password: String = "postgres",
         override var name: String = "postgres",
@@ -25,7 +25,7 @@ sealed class Database : Serializable {
         internal fun getJdbcUrl(host: String, port: Int) = "${jdbc.schema}://$host:$port/$name${jdbc.urlQueryParams}"
     }
 
-    class External(
+    data class External(
         override var username: String = "postgres",
         override var password: String = "postgres",
         override var name: String = "postgres",

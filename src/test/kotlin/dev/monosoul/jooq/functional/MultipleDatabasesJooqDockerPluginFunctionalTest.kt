@@ -64,7 +64,6 @@ class MultipleDatabasesJooqDockerPluginFunctionalTest : JooqDockerPluginFunction
                     jdbc("org.postgresql:postgresql:42.3.6")
                     jdbc("mysql:mysql-connector-java:8.0.29")
                     implementation("org.jooq:jooq:3.16.6")
-                    implementation("javax.annotation:javax.annotation-api:1.3.2")
                 }
             """.trimIndent()
         }

@@ -374,6 +374,12 @@ where:
 Basically, the plugin has 2 sets of configurations: **global** (or project-wide) configuration declared within `jooq {}`
 block and **local** (or task-specific) configuration declared for each task separately.
 
+Local (or task-specific) configuration initial values are inherited from the global (or project-wide) configuration.
+So if you modify the global configuration first, and then modify the local configuration, the local configuration's 
+initial values will be equal to the global configuration's values.
+
+Modifying the local configuration *will not affect* the global configuration.
+
 ### Configuration with properties
 
 The plugin supports configuration with properties.
@@ -416,3 +422,7 @@ And here's an example how to customize the plugin configuration from command lin
 ```shell
 ./gradlew build -Pdev.monosoul.jooq.withContainer.db.username=root -Pdev.monosoul.jooq.withContainer.db.password=password
 ```
+
+#### ❗ NOTE: `withoutContainer` properties have higher priority than `withContainer` properties.
+
+#### ❗ NOTE: properties only affect global (or project-wide) configuration.

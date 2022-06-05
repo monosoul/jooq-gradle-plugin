@@ -1,17 +1,20 @@
 package dev.monosoul.jooq.settings
 
+import dev.monosoul.jooq.SettingsAware
 import dev.monosoul.jooq.settings.JooqDockerPluginSettings.WithContainer
 import dev.monosoul.jooq.settings.JooqDockerPluginSettings.WithoutContainer
+import org.gradle.api.Action
 import org.gradle.api.Project
+import kotlin.reflect.KFunction2
 import kotlin.reflect.KMutableProperty0
 
 internal object PropertiesReader {
     const val PREFIX = "dev.monosoul.jooq."
-    const val WITH_CONTAINER = "${PREFIX}withContainer."
-    const val WITHOUT_CONTAINER = "${PREFIX}withoutContainer."
-    const val IMAGE_PREFIX = "image."
-    const val DATABASE_PREFIX = "database."
-    const val JDBC_PREFIX = "jdbc."
+    val WITH_CONTAINER = "${PREFIX}${functionName(SettingsAware::withContainer)}."
+    val WITHOUT_CONTAINER = "${PREFIX}${functionName(SettingsAware::withoutContainer)}."
+    val IMAGE_PREFIX = "${functionName(WithContainer::image)}."
+    val DATABASE_PREFIX = "${functionName(DbAware<Database>::db)}."
+    val JDBC_PREFIX = "${functionName(Database::jdbc)}."
 
     fun Project.settingsFromProperties() = if (properties.keys.any { it.startsWith(WITHOUT_CONTAINER) }) {
         settingsWithoutContainerFromProperties()
@@ -32,7 +35,7 @@ internal object PropertiesReader {
     )
 
     fun Project.jdbcFromProperties(namespace: String) = Jdbc().also { jdbc ->
-        val prefix = "$namespace$JDBC_PREFIX"
+        val prefix = "$namespace$DATABASE_PREFIX$JDBC_PREFIX"
         findAndSetProperty(prefix, jdbc::schema)
         findAndSetProperty(prefix, jdbc::driverClassName)
         findAndSetProperty(prefix, jdbc::urlQueryParams)
@@ -79,4 +82,6 @@ internal object PropertiesReader {
             property.set(mapper(it))
         }
     }
+
+    private fun <T, O> functionName(ref: KFunction2<O, Action<T>, Unit>) = ref.name
 }

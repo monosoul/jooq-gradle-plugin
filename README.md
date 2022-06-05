@@ -299,3 +299,72 @@ dependencies {
     jdbc("org.postgresql:postgresql:42.3.6")
 }
 ```
+
+### Multi-database setup
+
+The plugin supports multi-database setup, where jOOQ classes could be generated out of different RDBMS.
+This could be achieved by registering a separate class generation task for every RDBMS.
+
+Here's an example how to generate jOOQ classes for PostgreSQL and MySQL in a single project:
+
+```kotlin
+import dev.monosoul.jooq.GenerateJooqClassesTask
+
+plugins {
+    kotlin("jvm") version "1.6.21"
+    id("dev.monosoul.jooq-docker")
+}
+
+repositories {
+    mavenCentral()
+}
+
+tasks {
+    generateJooqClasses {
+        basePackageName = "org.jooq.generated.postgres"
+        inputDirectory.setFrom("src/main/resources/postgres/migration")
+        outputDirectory.set(project.layout.buildDirectory.dir("postgres"))
+    }
+
+    register<GenerateJooqClassesTask>("generateJooqClassesForMySql") {
+        basePackageName = "org.jooq.generated.mysql"
+        inputDirectory.setFrom("src/main/resources/mysql/migration")
+        outputDirectory.set(project.layout.buildDirectory.dir("mysql"))
+
+        withContainer {
+            image {
+                name = "mysql:8.0.29"
+                envVars = mapOf(
+                    "MYSQL_ROOT_PASSWORD" to "mysql",
+                    "MYSQL_DATABASE" to "mysql"
+                )
+            }
+            db {
+                username = "root"
+                password = "mysql"
+                name = "mysql"
+                port = 3306
+
+                jdbc {
+                    schema = "jdbc:mysql"
+                    driverClassName = "com.mysql.cj.jdbc.Driver"
+                }
+            }
+        }
+    }
+}
+
+dependencies {
+    implementation(kotlin("stdlib"))
+    jdbc("org.postgresql:postgresql:42.3.6")
+    jdbc("mysql:mysql-connector-java:8.0.29")
+    implementation("org.jooq:jooq:3.16.6")
+}
+```
+where:
+ - For PostgreSQL:
+   - migrations are located in `src/main/resources/postgres/migration`
+   - generated classes are located in `build/postgres` under `org.jooq.generated.postgres` package
+ - For MySQL:
+   - migrations are located in `src/main/resources/mysql/migration`
+   - generated classes are located in `build/mysql` under `org.jooq.generated.mysql` package

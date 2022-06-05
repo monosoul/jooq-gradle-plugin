@@ -83,6 +83,7 @@ open class GenerateJooqClassesTask @Inject constructor(
     private fun globalPluginSettings() = project.extensions.getByType<JooqExtension>().pluginSettings
 
     init {
+        group = "jooq"
         project.plugins.withType(JavaPlugin::class.java) {
             project.extensions.getByType<JavaPluginExtension>().sourceSets.named(MAIN_SOURCE_SET_NAME) {
                 java {

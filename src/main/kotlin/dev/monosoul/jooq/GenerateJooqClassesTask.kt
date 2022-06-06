@@ -79,7 +79,7 @@ open class GenerateJooqClassesTask @Inject constructor(
      * Exclude Flyway migration history table from generated code.
      */
     @Input
-    var excludeFlywayTable = false
+    val excludeFlywayTable = objectFactory.property<Boolean>().convention(false)
 
     /**
      * Code generator configuration.
@@ -257,7 +257,7 @@ open class GenerateJooqClassesTask @Inject constructor(
     }
 
     private fun excludeFlywaySchemaIfNeeded(generator: Generator) {
-        if (excludeFlywayTable)
+        if (excludeFlywayTable.get())
             generator.database.withExcludes(addFlywaySchemaHistoryToExcludes(generator.database.excludes))
     }
 

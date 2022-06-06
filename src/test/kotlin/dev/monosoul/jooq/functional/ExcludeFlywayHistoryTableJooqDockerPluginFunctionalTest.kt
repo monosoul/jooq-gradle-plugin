@@ -24,7 +24,7 @@ class ExcludeFlywayHistoryTableJooqDockerPluginFunctionalTest : JooqDockerPlugin
 
                 tasks {
                     generateJooqClasses {
-                        excludeFlywayTable = true
+                        excludeFlywayTable.set(true)
                     }
                 }
 
@@ -65,7 +65,7 @@ class ExcludeFlywayHistoryTableJooqDockerPluginFunctionalTest : JooqDockerPlugin
 
                 tasks {
                     generateJooqClasses {
-                        excludeFlywayTable = true
+                        excludeFlywayTable.set(true)
                         flywayProperties.put("flyway.table", "some_schema_table")
                     }
                 }
@@ -107,7 +107,7 @@ class ExcludeFlywayHistoryTableJooqDockerPluginFunctionalTest : JooqDockerPlugin
 
                 tasks {
                     generateJooqClasses {
-                        excludeFlywayTable = true
+                        excludeFlywayTable.set(true)
                         schemas.set(listOf("public", "other"))
                         usingJavaConfig {
                             database.withExcludes("BAR")

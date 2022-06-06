@@ -1,6 +1,5 @@
 package dev.monosoul.jooq.settings
 
-import dev.monosoul.jooq.SettingsAware
 import dev.monosoul.jooq.settings.JooqDockerPluginSettings.WithContainer
 import dev.monosoul.jooq.settings.JooqDockerPluginSettings.WithoutContainer
 import org.gradle.api.Action

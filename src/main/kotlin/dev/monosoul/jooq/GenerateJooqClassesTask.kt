@@ -4,6 +4,7 @@ import dev.monosoul.jooq.settings.DatabaseCredentials
 import dev.monosoul.jooq.settings.JooqDockerPluginSettings
 import dev.monosoul.jooq.settings.JooqDockerPluginSettings.WithContainer
 import dev.monosoul.jooq.settings.JooqDockerPluginSettings.WithoutContainer
+import dev.monosoul.jooq.settings.SettingsAware
 import groovy.lang.Closure
 import org.flywaydb.core.Flyway
 import org.flywaydb.core.api.Location.FILESYSTEM_PREFIX

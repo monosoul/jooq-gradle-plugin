@@ -4,6 +4,7 @@ import dev.monosoul.jooq.settings.JooqDockerPluginSettings
 import dev.monosoul.jooq.settings.JooqDockerPluginSettings.WithContainer
 import dev.monosoul.jooq.settings.JooqDockerPluginSettings.WithoutContainer
 import dev.monosoul.jooq.settings.PropertiesReader.applyPropertiesFrom
+import dev.monosoul.jooq.settings.SettingsAware
 import org.gradle.api.Action
 import org.gradle.api.Project
 import java.io.Serializable

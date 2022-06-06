@@ -153,7 +153,7 @@ class ConfigurabilityJooqDockerPluginFunctionalTest : JooqDockerPluginFunctional
 
                 tasks {
                     generateJooqClasses {
-                        outputSchemaToDefault = setOf("public")
+                        outputSchemaToDefault.add("public")
                     }
                 }
 

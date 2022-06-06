@@ -25,6 +25,7 @@ import org.gradle.kotlin.dsl.getByType
 import org.gradle.kotlin.dsl.listProperty
 import org.gradle.kotlin.dsl.mapProperty
 import org.gradle.kotlin.dsl.property
+import org.gradle.kotlin.dsl.setProperty
 import org.jooq.codegen.GenerationTool
 import org.jooq.codegen.JavaGenerator
 import org.jooq.meta.jaxb.Configuration
@@ -66,7 +67,7 @@ open class GenerateJooqClassesTask @Inject constructor(
      * List of schemas to not generate schema information for (generate classes as for default schema).
      */
     @Input
-    var outputSchemaToDefault = emptySet<String>()
+    val outputSchemaToDefault = objectFactory.setProperty<String>().convention(emptySet())
 
     /**
      * Map of schema name to specific package name.
@@ -252,7 +253,7 @@ open class GenerateJooqClassesTask @Inject constructor(
     private fun toSchemaMappingType(schemaName: String): SchemaMappingType {
         return SchemaMappingType()
             .withInputSchema(schemaName)
-            .withOutputSchemaToDefault(outputSchemaToDefault.contains(schemaName))
+            .withOutputSchemaToDefault(outputSchemaToDefault.get().contains(schemaName))
     }
 
     private fun excludeFlywaySchemaIfNeeded(generator: Generator) {

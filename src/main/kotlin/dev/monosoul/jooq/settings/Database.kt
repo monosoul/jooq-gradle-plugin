@@ -8,7 +8,7 @@ sealed class Database : Serializable, JdbcAware {
     abstract var password: String
     abstract var name: String
     abstract var port: Int
-    abstract val jdbc: Jdbc
+    internal abstract val jdbc: Jdbc
 
     override fun jdbc(customizer: Action<Jdbc>) = customizer.execute(jdbc)
 

@@ -7,7 +7,7 @@ import java.io.Serializable
 import java.net.URLClassLoader
 
 sealed class JooqDockerPluginSettings : Serializable {
-    abstract val database: Database
+    internal abstract val database: Database
     internal abstract fun runWithDatabaseCredentials(
         classloaderProvider: Provider<URLClassLoader>,
         block: (URLClassLoader, DatabaseCredentials) -> Unit
@@ -17,7 +17,7 @@ sealed class JooqDockerPluginSettings : Serializable {
 
     class WithContainer private constructor(
         override val database: Database.Internal,
-        val image: Image,
+        internal val image: Image,
     ) : JooqDockerPluginSettings(), DbAware<Database.Internal>, ImageAware {
         private constructor(database: Database.Internal) : this(database, Image(database))
         constructor(customizer: Action<WithContainer> = Action<WithContainer> { }) : this(Database.Internal()) {

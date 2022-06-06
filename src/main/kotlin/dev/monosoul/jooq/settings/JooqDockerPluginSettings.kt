@@ -1,8 +1,6 @@
 package dev.monosoul.jooq.settings
 
-import dev.monosoul.jooq.callWith
 import dev.monosoul.jooq.container.GenericDatabaseContainer
-import groovy.lang.Closure
 import org.gradle.api.Action
 import org.gradle.api.provider.Provider
 import java.io.Serializable
@@ -20,7 +18,7 @@ sealed class JooqDockerPluginSettings : Serializable {
     class WithContainer private constructor(
         override val database: Database.Internal,
         val image: Image,
-    ) : JooqDockerPluginSettings(), DbAware<Database.Internal> {
+    ) : JooqDockerPluginSettings(), DbAware<Database.Internal>, ImageAware {
         private constructor(database: Database.Internal) : this(database, Image(database))
         constructor(customizer: Action<WithContainer> = Action<WithContainer> { }) : this(Database.Internal()) {
             customizer.execute(this)
@@ -58,8 +56,7 @@ sealed class JooqDockerPluginSettings : Serializable {
         )
 
         override fun db(customizer: Action<Database.Internal>) = customizer.execute(database)
-        fun image(customizer: Action<Image>) = customizer.execute(image)
-        fun image(closure: Closure<Image>) = image(closure::callWith)
+        override fun image(customizer: Action<Image>) = customizer.execute(image)
     }
 
     class WithoutContainer private constructor(

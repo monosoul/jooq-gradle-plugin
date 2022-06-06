@@ -41,39 +41,73 @@ open class GenerateJooqClassesTask @Inject constructor(
     private val objectFactory: ObjectFactory,
     private val providerFactory: ProviderFactory,
 ) : DefaultTask(), SettingsAware {
+    /**
+     * List of schemas to take into account when running migrations and generating code.
+     */
     @Input
     var schemas = arrayOf("public")
 
+    /**
+     * Base package for generated classes.
+     */
     @Input
     var basePackageName = "org.jooq.generated"
 
+    /**
+     * Flyway configuration.
+     */
     @Input
     var flywayProperties = emptyMap<String, String>()
 
+    /**
+     * List of schemas to not generate schema information for (generate classes as for default schema).
+     */
     @Input
     var outputSchemaToDefault = emptySet<String>()
 
+    /**
+     * Map of schema name to specific package name.
+     */
     @Input
     var schemaToPackageMapping = emptyMap<String, String>()
 
+    /**
+     * Exclude Flyway migration history table from generated code.
+     */
     @Input
     var excludeFlywayTable = false
 
+    /**
+     * Code generator configuration.
+     *
+     * Avoid changing manually, use [usingJavaConfig] or [usingXmlConfig] instead.
+     */
     @Input
     val generatorConfig = objectFactory.property<Configuration>().convention(
         providerFactory.provider(::defaultGeneratorConfig)
     )
 
+    /**
+     * Location of Flyway migrations to use for code generation.
+     */
     @InputFiles
     @PathSensitive(PathSensitivity.RELATIVE)
     val inputDirectory = objectFactory.fileCollection().from("src/main/resources/db/migration")
 
+    /**
+     * Location of generated classes.
+     */
     @OutputDirectory
     val outputDirectory =
         objectFactory.directoryProperty().convention(project.layout.buildDirectory.dir("generated-jooq"))
 
     private var localPluginSettings: JooqDockerPluginSettings? = null
 
+    /**
+     * Local (task-specific) plugin configuration.
+     *
+     * Avoid changing manually, use [withContainer] or [withoutContainer] instead.
+     */
     @Input
     fun getPluginSettings() = localPluginSettings ?: globalPluginSettings()
 
@@ -93,6 +127,9 @@ open class GenerateJooqClassesTask @Inject constructor(
             ?: WithoutContainer(configure)
     }
 
+    /**
+     * Configure the jOOQ code generator with an XML configuration file.
+     */
     @Suppress("unused")
     fun usingXmlConfig(
         file: File = project.file("src/main/resources/db/jooq.xml"),
@@ -107,9 +144,15 @@ open class GenerateJooqClassesTask @Inject constructor(
         )
     }
 
+    /**
+     * Configure the jOOQ code generator with an XML configuration file.
+     */
     @Suppress("unused")
     fun usingXmlConfig(file: File, closure: Closure<Generator>) = usingXmlConfig(file, closure::callWith)
 
+    /**
+     * Configure the jOOQ code generator programmatically with [Generator].
+     */
     @Suppress("unused")
     fun usingJavaConfig(customizer: Action<Generator>) {
         generatorConfig.set(
@@ -121,6 +164,9 @@ open class GenerateJooqClassesTask @Inject constructor(
         )
     }
 
+    /**
+     * Configure the jOOQ code generator programmatically with [Generator].
+     */
     @Suppress("unused")
     fun usingJavaConfig(closure: Closure<Generator>) = usingJavaConfig(closure::callWith)
 

@@ -1,19 +1,16 @@
 package dev.monosoul.jooq.settings
 
-import dev.monosoul.jooq.callWith
-import groovy.lang.Closure
 import org.gradle.api.Action
 import java.io.Serializable
 
-sealed class Database : Serializable {
+sealed class Database : Serializable, JdbcAware {
     abstract var username: String
     abstract var password: String
     abstract var name: String
     abstract var port: Int
     abstract val jdbc: Jdbc
 
-    fun jdbc(customizer: Action<Jdbc>) = customizer.execute(jdbc)
-    fun jdbc(closure: Closure<Jdbc>) = jdbc(closure::callWith)
+    override fun jdbc(customizer: Action<Jdbc>) = customizer.execute(jdbc)
 
     data class Internal(
         override var username: String = "postgres",

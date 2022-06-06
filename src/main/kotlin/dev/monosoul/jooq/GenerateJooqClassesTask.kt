@@ -53,7 +53,7 @@ open class GenerateJooqClassesTask @Inject constructor(
      * Base package for generated classes.
      */
     @Input
-    var basePackageName = "org.jooq.generated"
+    val basePackageName = objectFactory.property<String>().convention("org.jooq.generated")
 
     /**
      * Flyway configuration.
@@ -242,7 +242,7 @@ open class GenerateJooqClassesTask @Inject constructor(
     }
 
     private fun codeGenTarget() = Target()
-        .withPackageName(basePackageName)
+        .withPackageName(basePackageName.get())
         .withDirectory(outputDirectory.asFile.get().toString())
         .withEncoding("UTF-8")
         .withClean(true)

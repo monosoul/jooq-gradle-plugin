@@ -115,7 +115,7 @@ class ConfigurabilityJooqDockerPluginFunctionalTest : JooqDockerPluginFunctional
 
                 tasks {
                     generateJooqClasses {
-                        basePackageName = "com.example"
+                        basePackageName.set("com.example")
                     }
                 }
 

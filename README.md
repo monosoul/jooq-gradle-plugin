@@ -70,7 +70,7 @@ repositories {
 tasks {
     generateJooqClasses {
         schemas.set(listOf("public", "other_schema"))
-        basePackageName = "org.jooq.generated"
+        basePackageName.set("org.jooq.generated")
         inputDirectory.setFrom(project.files("src/main/resources/db/migration"))
         outputDirectory.set(project.layout.buildDirectory.dir("generated-jooq"))
         flywayProperties = mapOf("flyway.placeholderReplacement" to "false")
@@ -321,13 +321,13 @@ repositories {
 
 tasks {
     generateJooqClasses {
-        basePackageName = "org.jooq.generated.postgres"
+        basePackageName.set("org.jooq.generated.postgres")
         inputDirectory.setFrom("src/main/resources/postgres/migration")
         outputDirectory.set(project.layout.buildDirectory.dir("postgres"))
     }
 
     register<GenerateJooqClassesTask>("generateJooqClassesForMySql") {
-        basePackageName = "org.jooq.generated.mysql"
+        basePackageName.set("org.jooq.generated.mysql")
         inputDirectory.setFrom("src/main/resources/mysql/migration")
         outputDirectory.set(project.layout.buildDirectory.dir("mysql"))
 

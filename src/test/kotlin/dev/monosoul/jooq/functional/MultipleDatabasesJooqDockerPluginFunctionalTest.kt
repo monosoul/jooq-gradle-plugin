@@ -27,13 +27,13 @@ class MultipleDatabasesJooqDockerPluginFunctionalTest : JooqDockerPluginFunction
                 
                 tasks {
                     generateJooqClasses {
-                        basePackageName = "org.jooq.generated.postgres"
+                        basePackageName.set("org.jooq.generated.postgres")
                         inputDirectory.setFrom("src/main/resources/postgres/migration")
                         outputDirectory.set(project.layout.buildDirectory.dir("postgres"))
                     }
                     
                     register<GenerateJooqClassesTask>("generateJooqClassesForMySql") {
-                        basePackageName = "org.jooq.generated.mysql"
+                        basePackageName.set("org.jooq.generated.mysql")
                         inputDirectory.setFrom("src/main/resources/mysql/migration")
                         outputDirectory.set(project.layout.buildDirectory.dir("mysql"))
                     
@@ -234,12 +234,12 @@ class MultipleDatabasesJooqDockerPluginFunctionalTest : JooqDockerPluginFunction
                 
                 tasks {
                     generateJooqClasses {
-                        basePackageName = "org.jooq.generated.local"
+                        basePackageName.set("org.jooq.generated.local")
                         outputDirectory.set(project.layout.buildDirectory.dir("local"))
                     }
                     
                     register<GenerateJooqClassesTask>("generateJooqClassesForExternal") {
-                        basePackageName = "org.jooq.generated.remote"
+                        basePackageName.set("org.jooq.generated.remote")
                         outputDirectory.set(project.layout.buildDirectory.dir("remote"))
                     
                         withoutContainer {

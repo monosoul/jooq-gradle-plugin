@@ -219,13 +219,13 @@ class GroovyBuildscriptJooqDockerPluginFunctionalTest : JooqDockerPluginFunction
                 
                 tasks {
                     generateJooqClasses {
-                        basePackageName = "org.jooq.generated.local"
+                        basePackageName.set("org.jooq.generated.local")
                         outputDirectory.set(project.layout.buildDirectory.dir("local"))
                     }
                 }
                 
                 tasks.register('generateJooqClassesForExternal', GenerateJooqClassesTask) {
-                    basePackageName = "org.jooq.generated.remote"
+                    basePackageName.set("org.jooq.generated.remote")
                     outputDirectory.set(project.layout.buildDirectory.dir("remote"))
                     
                     withoutContainer {

@@ -5,6 +5,7 @@ import dev.monosoul.jooq.settings.JooqDockerPluginSettings
 import dev.monosoul.jooq.settings.JooqDockerPluginSettings.WithContainer
 import dev.monosoul.jooq.settings.JooqDockerPluginSettings.WithoutContainer
 import dev.monosoul.jooq.settings.SettingsAware
+import dev.monosoul.jooq.util.JooqCodegenRunner
 import dev.monosoul.jooq.util.MigrationRunner
 import groovy.lang.Closure
 import org.gradle.api.Action
@@ -23,8 +24,6 @@ import org.gradle.kotlin.dsl.listProperty
 import org.gradle.kotlin.dsl.mapProperty
 import org.gradle.kotlin.dsl.property
 import org.gradle.kotlin.dsl.setProperty
-import org.jooq.codegen.GenerationTool
-import org.jooq.codegen.JavaGenerator
 import org.jooq.meta.jaxb.Configuration
 import org.jooq.meta.jaxb.Database
 import org.jooq.meta.jaxb.Generate
@@ -118,6 +117,8 @@ open class GenerateJooqClassesTask @Inject constructor(
         MigrationRunner(schemas, inputDirectory, flywayProperties)
     }
 
+    private val codegenRunner = JooqCodegenRunner()
+
     init {
         group = "jooq"
     }
@@ -142,7 +143,7 @@ open class GenerateJooqClassesTask @Inject constructor(
     ) {
         generatorConfig.set(
             providerFactory.provider {
-                file.inputStream().use(GenerationTool::load).applyCommonConfiguration().also {
+                file.inputStream().use(JooqCodegenRunner::load).applyCommonConfiguration().also {
                     it.generator.apply(customizer::execute)
                 }
             }
@@ -188,23 +189,24 @@ open class GenerateJooqClassesTask @Inject constructor(
         project.delete(outputDirectory)
         FlywaySchemaVersionProvider.setup(migrationRunner.defaultFlywaySchema(), migrationRunner.flywayTableName())
         SchemaPackageRenameGeneratorStrategy.schemaToPackageMapping.set(schemaToPackageMapping.get())
-        val tool = GenerationTool()
-        tool.setClassLoader(jdbcAwareClassLoader)
-        generatorConfig.get().also {
-            excludeFlywaySchemaIfNeeded(it.generator)
-        }.apply {
-            withJdbc(
-                Jdbc()
-                    .withDriver(credentials.jdbcDriverClassName)
-                    .withUrl(credentials.jdbcUrl)
-                    .withUser(credentials.username)
-                    .withPassword(credentials.password)
-            )
-        }.run(tool::run)
+        codegenRunner.generateJooqClasses(
+            jdbcAwareClassLoader = jdbcAwareClassLoader,
+            configuration = generatorConfig.get().also {
+                excludeFlywaySchemaIfNeeded(it.generator)
+            }.apply {
+                withJdbc(
+                    Jdbc()
+                        .withDriver(credentials.jdbcDriverClassName)
+                        .withUrl(credentials.jdbcUrl)
+                        .withUser(credentials.username)
+                        .withPassword(credentials.password)
+                )
+            }
+        )
     }
 
     private fun defaultGeneratorConfig() = Generator()
-        .withName(JavaGenerator::class.qualifiedName)
+        .withName(JooqCodegenRunner.javaGeneratorName)
         .withDatabase(
             Database()
                 .withSchemata(schemas.get().map(this::toSchemaMappingType))

@@ -1,0 +1,2 @@
+jooqVersion=@jooq.version@
+flywayVersion=@flyway.version@

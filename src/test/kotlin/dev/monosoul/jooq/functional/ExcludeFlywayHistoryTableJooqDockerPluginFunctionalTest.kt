@@ -108,7 +108,7 @@ class ExcludeFlywayHistoryTableJooqDockerPluginFunctionalTest : JooqDockerPlugin
                 tasks {
                     generateJooqClasses {
                         excludeFlywayTable = true
-                        schemas = arrayOf("public", "other")
+                        schemas.set(listOf("public", "other"))
                         usingJavaConfig {
                             database.withExcludes("BAR")
                         }

@@ -22,6 +22,7 @@ import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
 import org.gradle.kotlin.dsl.getByType
+import org.gradle.kotlin.dsl.listProperty
 import org.gradle.kotlin.dsl.property
 import org.jooq.codegen.GenerationTool
 import org.jooq.codegen.JavaGenerator
@@ -39,14 +40,14 @@ import javax.inject.Inject
 
 @CacheableTask
 open class GenerateJooqClassesTask @Inject constructor(
-    private val objectFactory: ObjectFactory,
+    objectFactory: ObjectFactory,
     private val providerFactory: ProviderFactory,
 ) : DefaultTask(), SettingsAware {
     /**
      * List of schemas to take into account when running migrations and generating code.
      */
     @Input
-    var schemas = arrayOf("public")
+    val schemas = objectFactory.listProperty<String>().convention(listOf("public"))
 
     /**
      * Base package for generated classes.
@@ -183,7 +184,7 @@ open class GenerateJooqClassesTask @Inject constructor(
     private fun migrateDb(jdbcAwareClassLoader: ClassLoader, credentials: DatabaseCredentials) {
         Flyway.configure(jdbcAwareClassLoader)
             .dataSource(credentials.jdbcUrl, credentials.username, credentials.password)
-            .schemas(*schemas)
+            .schemas(*schemas.get().toTypedArray())
             .locations(*inputDirectory.map { "$FILESYSTEM_PREFIX${it.absolutePath}" }.toTypedArray())
             .defaultSchema(defaultFlywaySchema())
             .table(flywayTableName())
@@ -192,7 +193,7 @@ open class GenerateJooqClassesTask @Inject constructor(
             .migrate()
     }
 
-    private fun defaultFlywaySchema() = flywayProperties[DEFAULT_SCHEMA] ?: schemas.first()
+    private fun defaultFlywaySchema() = flywayProperties[DEFAULT_SCHEMA] ?: schemas.get().first()
 
     private fun flywayTableName() = flywayProperties[TABLE] ?: "flyway_schema_history"
 
@@ -219,7 +220,7 @@ open class GenerateJooqClassesTask @Inject constructor(
         .withName(JavaGenerator::class.qualifiedName)
         .withDatabase(
             Database()
-                .withSchemata(schemas.map(this::toSchemaMappingType))
+                .withSchemata(schemas.get().map(this::toSchemaMappingType))
                 .withIncludes(".*")
                 .withExcludes("")
         )

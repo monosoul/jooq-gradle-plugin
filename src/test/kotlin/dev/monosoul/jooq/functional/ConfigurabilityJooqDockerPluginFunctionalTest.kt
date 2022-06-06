@@ -23,7 +23,7 @@ class ConfigurabilityJooqDockerPluginFunctionalTest : JooqDockerPluginFunctional
 
                 tasks {
                     generateJooqClasses {
-                        schemas = arrayOf("public", "other")
+                        schemas.set(listOf("public", "other"))
                     }
                 }
 
@@ -70,7 +70,7 @@ class ConfigurabilityJooqDockerPluginFunctionalTest : JooqDockerPluginFunctional
 
                 tasks {
                     generateJooqClasses {
-                        schemas = arrayOf("public", "other")
+                        schemas.set(listOf("public", "other"))
                         schemaToPackageMapping = mapOf("public" to "fancy_name")
                     }
                 }

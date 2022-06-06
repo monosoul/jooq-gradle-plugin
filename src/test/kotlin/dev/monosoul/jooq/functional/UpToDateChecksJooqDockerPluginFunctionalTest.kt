@@ -161,7 +161,7 @@ class UpToDateChecksJooqDockerPluginFunctionalTest : JooqDockerPluginFunctionalT
 
             tasks {
                 generateJooqClasses {
-                    schemas = arrayOf("public", "other")
+                    schemas.set(listOf("public", "other"))
                     usingJavaConfig {
                         database.withExcludes("BAR")
                     }
@@ -184,7 +184,7 @@ class UpToDateChecksJooqDockerPluginFunctionalTest : JooqDockerPluginFunctionalT
 
             tasks {
                 generateJooqClasses {
-                    schemas = arrayOf("public", "other")
+                    schemas.set(listOf("public", "other"))
                     usingJavaConfig {
                         database.withExcludes(".*")
                     }

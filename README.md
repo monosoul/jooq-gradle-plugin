@@ -69,7 +69,7 @@ repositories {
 
 tasks {
     generateJooqClasses {
-        schemas = arrayOf("public", "other_schema")
+        schemas.set(listOf("public", "other_schema"))
         basePackageName = "org.jooq.generated"
         inputDirectory.setFrom(project.files("src/main/resources/db/migration"))
         outputDirectory.set(project.layout.buildDirectory.dir("generated-jooq"))
@@ -217,7 +217,7 @@ repositories {
 
 tasks {
     generateJooqClasses {
-        schemas = arrayOf("other")
+        schemas.set(listOf("other"))
         usingJavaConfig {
             database.withExcludes("flyway_schema_history")
         }

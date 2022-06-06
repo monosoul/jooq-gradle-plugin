@@ -102,7 +102,7 @@ class FlywayConfigurationJooqDockerPluginFunctionalTest : JooqDockerPluginFuncti
 
                 tasks {
                     generateJooqClasses {
-                        schemas = arrayOf("other", "public")
+                        schemas.set(listOf("other", "public"))
                     }
                 }
 

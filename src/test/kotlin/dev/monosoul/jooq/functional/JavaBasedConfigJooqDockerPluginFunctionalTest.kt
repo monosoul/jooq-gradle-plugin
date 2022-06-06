@@ -24,7 +24,7 @@ class JavaBasedConfigJooqDockerPluginFunctionalTest : JooqDockerPluginFunctional
 
                 tasks {
                     generateJooqClasses {
-                        schemas = arrayOf("public", "other")
+                        schemas.set(listOf("public", "other"))
                         usingJavaConfig {
                             database.withExcludes("BAR")
                         }

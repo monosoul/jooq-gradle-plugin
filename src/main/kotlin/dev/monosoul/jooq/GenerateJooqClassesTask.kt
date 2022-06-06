@@ -182,14 +182,17 @@ open class GenerateJooqClassesTask @Inject constructor(
     fun generateClasses() {
         getPluginSettings()
             .runWithDatabaseCredentials(jdbcAwareClassLoaderProvider) { jdbcAwareClassLoader, credentials ->
-                migrationRunner.migrateDb(jdbcAwareClassLoader, credentials)
-                generateJooqClasses(jdbcAwareClassLoader, credentials)
+                val schemaVersion = migrationRunner.migrateDb(jdbcAwareClassLoader, credentials)
+                generateJooqClasses(jdbcAwareClassLoader, credentials, schemaVersion)
             }
     }
 
-    private fun generateJooqClasses(jdbcAwareClassLoader: ClassLoader, credentials: DatabaseCredentials) {
+    private fun generateJooqClasses(
+        jdbcAwareClassLoader: ClassLoader,
+        credentials: DatabaseCredentials,
+        schemaVersion: String
+    ) {
         project.delete(outputDirectory)
-        FlywaySchemaVersionProvider.setup(migrationRunner.defaultFlywaySchema(), migrationRunner.flywayTableName())
         codegenRunner.generateJooqClasses(
             jdbcAwareClassLoader = jdbcAwareClassLoader,
             configuration = generatorConfig.get().also {
@@ -202,6 +205,7 @@ open class GenerateJooqClassesTask @Inject constructor(
                         .withUser(credentials.username)
                         .withPassword(credentials.password)
                 )
+                generator.database.schemaVersionProvider = schemaVersion
             }
         )
     }
@@ -231,9 +235,6 @@ open class GenerateJooqClassesTask @Inject constructor(
                     )
                 )
             }
-            database.withSchemaVersionProvider(
-                FlywaySchemaVersionProvider::class.qualifiedName
-            )
         }
     }
 

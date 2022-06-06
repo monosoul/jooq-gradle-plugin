@@ -15,17 +15,17 @@ internal class MigrationRunner(
     private val flywayProperties: MapProperty<String, String>,
 ) {
 
-    fun migrateDb(jdbcAwareClassLoader: ClassLoader, credentials: DatabaseCredentials) {
-        Flyway.configure(jdbcAwareClassLoader)
-            .dataSource(credentials.jdbcUrl, credentials.username, credentials.password)
-            .schemas(*schemas.get().toTypedArray())
-            .locations(*inputDirectory.map { "${Location.FILESYSTEM_PREFIX}${it.absolutePath}" }.toTypedArray())
-            .defaultSchema(defaultFlywaySchema())
-            .table(flywayTableName())
-            .configuration(flywayProperties.get())
-            .load()
-            .migrate()
-    }
+    fun migrateDb(jdbcAwareClassLoader: ClassLoader, credentials: DatabaseCredentials): String = Flyway
+        .configure(jdbcAwareClassLoader)
+        .dataSource(credentials.jdbcUrl, credentials.username, credentials.password)
+        .schemas(*schemas.get().toTypedArray())
+        .locations(*inputDirectory.map { "${Location.FILESYSTEM_PREFIX}${it.absolutePath}" }.toTypedArray())
+        .defaultSchema(defaultFlywaySchema())
+        .table(flywayTableName())
+        .configuration(flywayProperties.get())
+        .load()
+        .migrate()
+        .targetSchemaVersion
 
     fun defaultFlywaySchema() = flywayProperties.getting(DEFAULT_SCHEMA)
         .orElse(schemas.map { it.first() }).get()

@@ -124,18 +124,6 @@ open class GenerateJooqClassesTask @Inject constructor(
     @Suppress("unused")
     fun usingJavaConfig(closure: Closure<Generator>) = usingJavaConfig(closure::callWith)
 
-    @Deprecated(
-        message = "Use usingJavaConfig instead",
-        replaceWith = ReplaceWith("usingJavaConfig(customizer)"),
-    )
-    fun customizeGenerator(customizer: Action<Generator>) = usingJavaConfig(customizer)
-
-    @Deprecated(
-        message = "Use usingJavaConfig instead",
-        replaceWith = ReplaceWith("usingJavaConfig(closure)"),
-    )
-    fun customizeGenerator(closure: Closure<Generator>) = usingJavaConfig(closure::callWith)
-
     @TaskAction
     fun generateClasses() {
         getPluginSettings()

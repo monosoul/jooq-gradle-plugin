@@ -24,7 +24,6 @@ import org.gradle.kotlin.dsl.listProperty
 import org.gradle.kotlin.dsl.mapProperty
 import org.gradle.kotlin.dsl.property
 import org.gradle.kotlin.dsl.setProperty
-import org.jooq.impl.DSL
 import org.jooq.meta.jaxb.Configuration
 import org.jooq.meta.jaxb.Database
 import org.jooq.meta.jaxb.Generate
@@ -190,7 +189,7 @@ open class GenerateJooqClassesTask @Inject constructor(
 
     private fun generateJooqClasses(jdbcAwareClassLoader: ClassLoader, credentials: DatabaseCredentials) {
         project.delete(outputDirectory)
-        SchemaPackageRenameGeneratorStrategy.schemaToPackageMapping.set(schemaToPackageMapping.get())
+        FlywaySchemaVersionProvider.setup(migrationRunner.defaultFlywaySchema(), migrationRunner.flywayTableName())
         codegenRunner.generateJooqClasses(
             jdbcAwareClassLoader = jdbcAwareClassLoader,
             configuration = generatorConfig.get().also {
@@ -221,23 +220,19 @@ open class GenerateJooqClassesTask @Inject constructor(
         }
         .applyCommonConfiguration()
 
-    private fun Configuration.applyCommonConfiguration() = also {
-        it.generator.apply {
+    private fun Configuration.applyCommonConfiguration() = also { config ->
+        config.generator.apply {
             withLogging(Logging.DEBUG)
             withTarget(codeGenTarget())
-            withStrategy(
-                Strategy().withName(SchemaPackageRenameGeneratorStrategy::class.qualifiedName)
-            )
+            schemaToPackageMapping.get().takeIf { it.isNotEmpty() }?.also { mapping ->
+                withStrategy(
+                    Strategy().withMatchers(
+                        mapping.toMatchersStrategy()
+                    )
+                )
+            }
             database.withSchemaVersionProvider(
-                DSL.select(DSL.max(DSL.field("version")).`as`("max_version"))
-                    .from(
-                        DSL.table(
-                            DSL.name(
-                                migrationRunner.defaultFlywaySchema(),
-                                migrationRunner.flywayTableName(),
-                            )
-                        )
-                    ).sql
+                FlywaySchemaVersionProvider::class.qualifiedName
             )
         }
     }

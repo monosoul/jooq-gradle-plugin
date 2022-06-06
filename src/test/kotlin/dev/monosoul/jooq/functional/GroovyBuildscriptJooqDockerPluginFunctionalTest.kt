@@ -46,7 +46,7 @@ class GroovyBuildscriptJooqDockerPluginFunctionalTest : JooqDockerPluginFunction
 
                 tasks {
                     generateJooqClasses {
-                        flywayProperties = ["flyway.placeholderReplacement": "false"]
+                        flywayProperties.put("flyway.placeholderReplacement", "false")
                         usingJavaConfig {
                             database.withExcludes("BAR")
                         }
@@ -112,7 +112,7 @@ class GroovyBuildscriptJooqDockerPluginFunctionalTest : JooqDockerPluginFunction
 
                 tasks {
                     generateJooqClasses {
-                        flywayProperties = ["flyway.placeholderReplacement": "false"]
+                        flywayProperties.put("flyway.placeholderReplacement", "false")
                         usingJavaConfig {
                             database.withExcludes("BAR")
                         }
@@ -165,7 +165,7 @@ class GroovyBuildscriptJooqDockerPluginFunctionalTest : JooqDockerPluginFunction
 
                 tasks {
                     generateJooqClasses {
-                        flywayProperties = ["flyway.placeholderReplacement": "false"]
+                        flywayProperties.put("flyway.placeholderReplacement", "false")
                         usingXmlConfig(project.file("src/main/resources/db/jooq.xml")) {
                             database.withExcludes("BAR")
                         }

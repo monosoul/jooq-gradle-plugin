@@ -23,6 +23,7 @@ import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
 import org.gradle.kotlin.dsl.getByType
 import org.gradle.kotlin.dsl.listProperty
+import org.gradle.kotlin.dsl.mapProperty
 import org.gradle.kotlin.dsl.property
 import org.jooq.codegen.GenerationTool
 import org.jooq.codegen.JavaGenerator
@@ -59,7 +60,7 @@ open class GenerateJooqClassesTask @Inject constructor(
      * Flyway configuration.
      */
     @Input
-    var flywayProperties = emptyMap<String, String>()
+    val flywayProperties = objectFactory.mapProperty<String, String>().convention(emptyMap())
 
     /**
      * List of schemas to not generate schema information for (generate classes as for default schema).
@@ -188,14 +189,15 @@ open class GenerateJooqClassesTask @Inject constructor(
             .locations(*inputDirectory.map { "$FILESYSTEM_PREFIX${it.absolutePath}" }.toTypedArray())
             .defaultSchema(defaultFlywaySchema())
             .table(flywayTableName())
-            .configuration(flywayProperties)
+            .configuration(flywayProperties.get())
             .load()
             .migrate()
     }
 
-    private fun defaultFlywaySchema() = flywayProperties[DEFAULT_SCHEMA] ?: schemas.get().first()
+    private fun defaultFlywaySchema() = flywayProperties.getting(DEFAULT_SCHEMA)
+        .orElse(schemas.map { it.first() }).get()
 
-    private fun flywayTableName() = flywayProperties[TABLE] ?: "flyway_schema_history"
+    private fun flywayTableName() = flywayProperties.getting(TABLE).getOrElse("flyway_schema_history")
 
     private fun generateJooqClasses(jdbcAwareClassLoader: ClassLoader, credentials: DatabaseCredentials) {
         project.delete(outputDirectory)

@@ -66,7 +66,7 @@ class ExcludeFlywayHistoryTableJooqDockerPluginFunctionalTest : JooqDockerPlugin
                 tasks {
                     generateJooqClasses {
                         excludeFlywayTable = true
-                        flywayProperties = mapOf("flyway.table" to "some_schema_table")
+                        flywayProperties.put("flyway.table", "some_schema_table")
                     }
                 }
 

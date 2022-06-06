@@ -23,7 +23,7 @@ class FlywayConfigurationJooqDockerPluginFunctionalTest : JooqDockerPluginFuncti
 
                 tasks {
                     generateJooqClasses {
-                        flywayProperties = mapOf("flyway.placeholderReplacement" to "false")
+                        flywayProperties.put("flyway.placeholderReplacement", "false")
                     }
                 }
 
@@ -64,7 +64,7 @@ class FlywayConfigurationJooqDockerPluginFunctionalTest : JooqDockerPluginFuncti
 
                 tasks {
                     generateJooqClasses {
-                        flywayProperties = mapOf("flyway.table" to "some_schema_table")
+                        flywayProperties.put("flyway.table", "some_schema_table")
                     }
                 }
 

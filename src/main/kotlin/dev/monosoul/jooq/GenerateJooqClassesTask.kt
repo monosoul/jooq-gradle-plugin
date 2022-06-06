@@ -5,11 +5,8 @@ import dev.monosoul.jooq.settings.JooqDockerPluginSettings
 import dev.monosoul.jooq.settings.JooqDockerPluginSettings.WithContainer
 import dev.monosoul.jooq.settings.JooqDockerPluginSettings.WithoutContainer
 import dev.monosoul.jooq.settings.SettingsAware
+import dev.monosoul.jooq.util.MigrationRunner
 import groovy.lang.Closure
-import org.flywaydb.core.Flyway
-import org.flywaydb.core.api.Location.FILESYSTEM_PREFIX
-import org.flywaydb.core.internal.configuration.ConfigUtils.DEFAULT_SCHEMA
-import org.flywaydb.core.internal.configuration.ConfigUtils.TABLE
 import org.gradle.api.Action
 import org.gradle.api.DefaultTask
 import org.gradle.api.model.ObjectFactory
@@ -117,6 +114,10 @@ open class GenerateJooqClassesTask @Inject constructor(
 
     private fun globalPluginSettings() = project.extensions.getByType<JooqExtension>().pluginSettings
 
+    private val migrationRunner by lazy {
+        MigrationRunner(schemas, inputDirectory, flywayProperties)
+    }
+
     init {
         group = "jooq"
     }
@@ -178,31 +179,14 @@ open class GenerateJooqClassesTask @Inject constructor(
     fun generateClasses() {
         getPluginSettings()
             .runWithDatabaseCredentials(project.jdbcAwareClassloaderProvider()) { jdbcAwareClassLoader, credentials ->
-                migrateDb(jdbcAwareClassLoader, credentials)
+                migrationRunner.migrateDb(jdbcAwareClassLoader, credentials)
                 generateJooqClasses(jdbcAwareClassLoader, credentials)
             }
     }
 
-    private fun migrateDb(jdbcAwareClassLoader: ClassLoader, credentials: DatabaseCredentials) {
-        Flyway.configure(jdbcAwareClassLoader)
-            .dataSource(credentials.jdbcUrl, credentials.username, credentials.password)
-            .schemas(*schemas.get().toTypedArray())
-            .locations(*inputDirectory.map { "$FILESYSTEM_PREFIX${it.absolutePath}" }.toTypedArray())
-            .defaultSchema(defaultFlywaySchema())
-            .table(flywayTableName())
-            .configuration(flywayProperties.get())
-            .load()
-            .migrate()
-    }
-
-    private fun defaultFlywaySchema() = flywayProperties.getting(DEFAULT_SCHEMA)
-        .orElse(schemas.map { it.first() }).get()
-
-    private fun flywayTableName() = flywayProperties.getting(TABLE).getOrElse("flyway_schema_history")
-
     private fun generateJooqClasses(jdbcAwareClassLoader: ClassLoader, credentials: DatabaseCredentials) {
         project.delete(outputDirectory)
-        FlywaySchemaVersionProvider.setup(defaultFlywaySchema(), flywayTableName())
+        FlywaySchemaVersionProvider.setup(migrationRunner.defaultFlywaySchema(), migrationRunner.flywayTableName())
         SchemaPackageRenameGeneratorStrategy.schemaToPackageMapping.set(schemaToPackageMapping.get())
         val tool = GenerationTool()
         tool.setClassLoader(jdbcAwareClassLoader)
@@ -262,7 +246,7 @@ open class GenerateJooqClassesTask @Inject constructor(
     }
 
     private fun addFlywaySchemaHistoryToExcludes(currentExcludes: String?): String {
-        return listOf(currentExcludes, flywayTableName())
+        return listOf(currentExcludes, migrationRunner.flywayTableName())
             .filterNot(String?::isNullOrEmpty)
             .joinToString("|")
     }

@@ -119,6 +119,8 @@ open class GenerateJooqClassesTask @Inject constructor(
 
     private val codegenRunner = JooqCodegenRunner()
 
+    private val jdbcAwareClassLoaderProvider = project.jdbcAwareClassloaderProvider()
+
     init {
         group = "jooq"
     }
@@ -179,7 +181,7 @@ open class GenerateJooqClassesTask @Inject constructor(
     @TaskAction
     fun generateClasses() {
         getPluginSettings()
-            .runWithDatabaseCredentials(project.jdbcAwareClassloaderProvider()) { jdbcAwareClassLoader, credentials ->
+            .runWithDatabaseCredentials(jdbcAwareClassLoaderProvider) { jdbcAwareClassLoader, credentials ->
                 migrationRunner.migrateDb(jdbcAwareClassLoader, credentials)
                 generateJooqClasses(jdbcAwareClassLoader, credentials)
             }

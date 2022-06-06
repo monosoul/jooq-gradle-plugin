@@ -69,8 +69,8 @@ internal object PropertiesReader {
         val envVarsPrefix = "$prefix${::envVars.name}."
         project.properties.filterKeys { it.startsWith(envVarsPrefix) }.map { (key, value) ->
             key.removePrefix(envVarsPrefix) to value.toString()
-        }.toMap().takeIf { it.isNotEmpty() }?.also {
-            envVars = it
+        }.takeIf { it.isNotEmpty() }?.also {
+            envVars = it.toMap()
         }
     }
 

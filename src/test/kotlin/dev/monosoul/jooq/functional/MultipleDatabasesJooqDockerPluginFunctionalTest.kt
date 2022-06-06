@@ -93,7 +93,7 @@ class MultipleDatabasesJooqDockerPluginFunctionalTest : JooqDockerPluginFunction
     }
 
     @Test
-    fun `local task configuration should inherit global configuration`() {
+    fun `local task configuration should inherit global configuration when running with container`() {
         // given
         prepareBuildGradleFile {
             """
@@ -149,6 +149,62 @@ class MultipleDatabasesJooqDockerPluginFunctionalTest : JooqDockerPluginFunction
 
         // when
         val result = runGradleWithArguments("generateJooqClasses")
+
+        // then
+        expect {
+            that(result).generateJooqClassesTask.outcome isEqualTo SUCCESS
+            that(
+                projectFile("build/generated-jooq/org/jooq/generated/tables/Foo.java")
+            ).exists()
+        }
+    }
+
+    @Test
+    fun `local task configuration should inherit global configuration when running without container`() {
+        // given
+        val postgresContainer = PostgresContainer().also { it.start() }
+        prepareBuildGradleFile {
+            """
+                plugins {
+                    id("dev.monosoul.jooq-docker")
+                }
+
+                repositories {
+                    mavenCentral()
+                }
+
+                jooq {
+                    withoutContainer {
+                        db {
+                            username = "${postgresContainer.username}"
+                            password = "${postgresContainer.password}"
+                            name = "${postgresContainer.databaseName}"
+                            host = "${postgresContainer.host}"
+                            port = 6666
+                        }
+                    }
+                }
+                
+                tasks {
+                    generateJooqClasses {
+                        withoutContainer {
+                            db {
+                                port = ${postgresContainer.firstMappedPort}
+                            }
+                        }
+                    }
+                }
+
+                dependencies {
+                    jdbc("org.postgresql:postgresql:42.3.6")
+                }
+            """.trimIndent()
+        }
+        copyResource(from = "/V01__init_mysql.sql", to = "src/main/resources/db/migration/V01__init_mysql.sql")
+
+        // when
+        val result = runGradleWithArguments("generateJooqClasses")
+        postgresContainer.stop()
 
         // then
         expect {

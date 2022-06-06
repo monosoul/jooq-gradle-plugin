@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestFactory
 import org.junit.jupiter.api.extension.ExtendWith
 import org.testcontainers.containers.JdbcDatabaseContainer.NoDriverFoundException
+import strikt.api.expectThat
 import strikt.api.expectThrows
 import strikt.assertions.isEqualTo
 import strikt.assertions.message
@@ -115,6 +116,42 @@ class GenericDatabaseContainerTest {
         verify(exactly = 1) {
             jdbcAwareClassLoader.loadClass(database.jdbc.driverClassName)
         }
+    }
+
+    @Test
+    fun `should delegate getDatabaseName method to the database object as is`() {
+        // when
+        val actual = container.databaseName
+
+        // then
+        expectThat(actual) isEqualTo database.name
+    }
+
+    @Test
+    fun `should delegate getDriverClassName method to the jdbc object as is`() {
+        // when
+        val actual = container.driverClassName
+
+        // then
+        expectThat(actual) isEqualTo database.jdbc.driverClassName
+    }
+
+    @Test
+    fun `should delegate getUsername method to the database object as is`() {
+        // when
+        val actual = container.username
+
+        // then
+        expectThat(actual) isEqualTo database.username
+    }
+
+    @Test
+    fun `should delegate getPassword method to the database object as is`() {
+        // when
+        val actual = container.password
+
+        // then
+        expectThat(actual) isEqualTo database.password
     }
 
     private class TestDriver(val mockDriver: Driver = mockk()) : Driver by mockDriver

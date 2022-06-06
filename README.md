@@ -76,7 +76,7 @@ tasks {
         flywayProperties.put("flyway.placeholderReplacement", "false")
         excludeFlywayTable = true
         outputSchemaToDefault.add("public")
-        schemaToPackageMapping = mapOf("public" to "fancy_name")
+        schemaToPackageMapping.put("public", "fancy_name")
         usingJavaConfig {
             /* "this" here is the org.jooq.meta.jaxb.Generator configure it as you please */
         }

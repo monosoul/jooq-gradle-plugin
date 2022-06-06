@@ -73,7 +73,7 @@ open class GenerateJooqClassesTask @Inject constructor(
      * Map of schema name to specific package name.
      */
     @Input
-    var schemaToPackageMapping = emptyMap<String, String>()
+    val schemaToPackageMapping = objectFactory.mapProperty<String, String>().convention(emptyMap())
 
     /**
      * Exclude Flyway migration history table from generated code.
@@ -203,7 +203,7 @@ open class GenerateJooqClassesTask @Inject constructor(
     private fun generateJooqClasses(jdbcAwareClassLoader: ClassLoader, credentials: DatabaseCredentials) {
         project.delete(outputDirectory)
         FlywaySchemaVersionProvider.setup(defaultFlywaySchema(), flywayTableName())
-        SchemaPackageRenameGeneratorStrategy.schemaToPackageMapping.set(schemaToPackageMapping.toMap())
+        SchemaPackageRenameGeneratorStrategy.schemaToPackageMapping.set(schemaToPackageMapping.get())
         val tool = GenerationTool()
         tool.setClassLoader(jdbcAwareClassLoader)
         generatorConfig.get().also {

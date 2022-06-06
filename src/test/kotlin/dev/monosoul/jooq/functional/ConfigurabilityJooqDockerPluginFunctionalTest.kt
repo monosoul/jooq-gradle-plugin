@@ -71,7 +71,7 @@ class ConfigurabilityJooqDockerPluginFunctionalTest : JooqDockerPluginFunctional
                 tasks {
                     generateJooqClasses {
                         schemas.set(listOf("public", "other"))
-                        schemaToPackageMapping = mapOf("public" to "fancy_name")
+                        schemaToPackageMapping.put("public", "fancy_name")
                     }
                 }
 

@@ -24,6 +24,7 @@ import org.gradle.kotlin.dsl.listProperty
 import org.gradle.kotlin.dsl.mapProperty
 import org.gradle.kotlin.dsl.property
 import org.gradle.kotlin.dsl.setProperty
+import org.jooq.impl.DSL
 import org.jooq.meta.jaxb.Configuration
 import org.jooq.meta.jaxb.Database
 import org.jooq.meta.jaxb.Generate
@@ -189,7 +190,6 @@ open class GenerateJooqClassesTask @Inject constructor(
 
     private fun generateJooqClasses(jdbcAwareClassLoader: ClassLoader, credentials: DatabaseCredentials) {
         project.delete(outputDirectory)
-        FlywaySchemaVersionProvider.setup(migrationRunner.defaultFlywaySchema(), migrationRunner.flywayTableName())
         SchemaPackageRenameGeneratorStrategy.schemaToPackageMapping.set(schemaToPackageMapping.get())
         codegenRunner.generateJooqClasses(
             jdbcAwareClassLoader = jdbcAwareClassLoader,
@@ -228,7 +228,17 @@ open class GenerateJooqClassesTask @Inject constructor(
             withStrategy(
                 Strategy().withName(SchemaPackageRenameGeneratorStrategy::class.qualifiedName)
             )
-            database.withSchemaVersionProvider(FlywaySchemaVersionProvider::class.qualifiedName)
+            database.withSchemaVersionProvider(
+                DSL.select(DSL.max(DSL.field("version")).`as`("max_version"))
+                    .from(
+                        DSL.table(
+                            DSL.name(
+                                migrationRunner.defaultFlywaySchema(),
+                                migrationRunner.flywayTableName(),
+                            )
+                        )
+                    ).sql
+            )
         }
     }
 

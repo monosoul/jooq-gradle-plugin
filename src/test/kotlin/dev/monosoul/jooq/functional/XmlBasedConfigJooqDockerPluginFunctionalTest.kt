@@ -30,7 +30,7 @@ class XmlBasedConfigJooqDockerPluginFunctionalTest : JooqDockerPluginFunctionalT
                 }
 
                 dependencies {
-                    jdbc("org.postgresql:postgresql:42.3.6")
+                    jooqCodegen("org.postgresql:postgresql:42.3.6")
                 }
             """.trimIndent()
         }
@@ -78,7 +78,7 @@ class XmlBasedConfigJooqDockerPluginFunctionalTest : JooqDockerPluginFunctionalT
                 }
 
                 dependencies {
-                    jdbc("org.postgresql:postgresql:42.3.6")
+                    jooqCodegen("org.postgresql:postgresql:42.3.6")
                 }
             """.trimIndent()
         }

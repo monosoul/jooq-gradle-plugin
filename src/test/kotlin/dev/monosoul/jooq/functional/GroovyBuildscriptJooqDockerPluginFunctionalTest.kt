@@ -54,7 +54,7 @@ class GroovyBuildscriptJooqDockerPluginFunctionalTest : JooqDockerPluginFunction
                 }
 
                 dependencies {
-                    jdbc "org.postgresql:postgresql:42.3.6"
+                    jooqCodegen "org.postgresql:postgresql:42.3.6"
                 }
             """.trimIndent()
         }
@@ -120,7 +120,7 @@ class GroovyBuildscriptJooqDockerPluginFunctionalTest : JooqDockerPluginFunction
                 }
 
                 dependencies {
-                    jdbc "org.postgresql:postgresql:42.3.6"
+                    jooqCodegen "org.postgresql:postgresql:42.3.6"
                 }
             """.trimIndent()
         }
@@ -173,7 +173,7 @@ class GroovyBuildscriptJooqDockerPluginFunctionalTest : JooqDockerPluginFunction
                 }
 
                 dependencies {
-                    jdbc "org.postgresql:postgresql:42.3.6"
+                    jooqCodegen "org.postgresql:postgresql:42.3.6"
                 }
             """.trimIndent()
         }
@@ -241,7 +241,7 @@ class GroovyBuildscriptJooqDockerPluginFunctionalTest : JooqDockerPluginFunction
 
                 dependencies {
                     implementation("org.jetbrains.kotlin:kotlin-stdlib")
-                    jdbc("org.postgresql:postgresql:42.3.6")
+                    jooqCodegen("org.postgresql:postgresql:42.3.6")
                     implementation("org.jooq:jooq:3.16.6")
                 }
             """.trimIndent()

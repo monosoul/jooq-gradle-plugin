@@ -23,7 +23,7 @@ class SourceSetsAndTasksConfigurationJooqDockerPluginFunctionalTest : JooqDocker
             }
 
             dependencies {
-                jdbc("org.postgresql:postgresql:42.3.6")
+                jooqCodegen("org.postgresql:postgresql:42.3.6")
                 implementation("org.jooq:jooq:3.16.6")
                 implementation("javax.annotation:javax.annotation-api:1.3.2")
             }
@@ -39,7 +39,7 @@ class SourceSetsAndTasksConfigurationJooqDockerPluginFunctionalTest : JooqDocker
             }
 
             dependencies {
-                jdbc("org.postgresql:postgresql:42.3.6")
+                jooqCodegen("org.postgresql:postgresql:42.3.6")
                 "implementation"("org.jooq:jooq:3.16.6")
                 "implementation"("javax.annotation:javax.annotation-api:1.3.2")
             }
@@ -55,7 +55,7 @@ class SourceSetsAndTasksConfigurationJooqDockerPluginFunctionalTest : JooqDocker
             }
 
             dependencies {
-                jdbc("org.postgresql:postgresql:42.3.6")
+                jooqCodegen("org.postgresql:postgresql:42.3.6")
                 "implementation"("org.jooq:jooq:3.16.6")
                 "implementation"("javax.annotation:javax.annotation-api:1.3.2")
             }
@@ -115,7 +115,7 @@ class SourceSetsAndTasksConfigurationJooqDockerPluginFunctionalTest : JooqDocker
 
             dependencies {
                 implementation(kotlin("stdlib"))
-                jdbc("org.postgresql:postgresql:42.3.6")
+                jooqCodegen("org.postgresql:postgresql:42.3.6")
                 implementation("org.jooq:jooq:3.16.6")
                 implementation("javax.annotation:javax.annotation-api:1.3.2")
             }
@@ -138,7 +138,7 @@ class SourceSetsAndTasksConfigurationJooqDockerPluginFunctionalTest : JooqDocker
 
             dependencies {
                 "implementation"(kotlin("stdlib"))
-                jdbc("org.postgresql:postgresql:42.3.6")
+                jooqCodegen("org.postgresql:postgresql:42.3.6")
                 "implementation"("org.jooq:jooq:3.16.6")
                 "implementation"("javax.annotation:javax.annotation-api:1.3.2")
             }

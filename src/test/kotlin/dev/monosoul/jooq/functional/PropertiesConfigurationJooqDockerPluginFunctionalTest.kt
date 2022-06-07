@@ -32,7 +32,7 @@ class PropertiesConfigurationJooqDockerPluginFunctionalTest : JooqDockerPluginFu
                 }
 
                 dependencies {
-                    jdbc("org.postgresql:postgresql:42.3.6")
+                    jooqCodegen("org.postgresql:postgresql:42.3.6")
                 }
             """.trimIndent()
         }
@@ -82,7 +82,7 @@ class PropertiesConfigurationJooqDockerPluginFunctionalTest : JooqDockerPluginFu
                 }
 
                 dependencies {
-                    jdbc("org.postgresql:postgresql:42.3.6")
+                    jooqCodegen("org.postgresql:postgresql:42.3.6")
                 }
             """.trimIndent()
         }
@@ -128,7 +128,7 @@ class PropertiesConfigurationJooqDockerPluginFunctionalTest : JooqDockerPluginFu
                 }
 
                 dependencies {
-                    jdbc("org.postgresql:postgresql:42.3.6")
+                    jooqCodegen("org.postgresql:postgresql:42.3.6")
                 }
             """.trimIndent()
         }
@@ -182,7 +182,7 @@ class PropertiesConfigurationJooqDockerPluginFunctionalTest : JooqDockerPluginFu
                 }
 
                 dependencies {
-                    jdbc("mysql:mysql-connector-java:8.0.29")
+                    jooqCodegen("mysql:mysql-connector-java:8.0.29")
                 }
             """.trimIndent()
         }
@@ -226,7 +226,7 @@ class PropertiesConfigurationJooqDockerPluginFunctionalTest : JooqDockerPluginFu
                 }
 
                 dependencies {
-                    jdbc("org.postgresql:postgresql:42.3.6")
+                    jooqCodegen("org.postgresql:postgresql:42.3.6")
                 }
             """.trimIndent()
         }

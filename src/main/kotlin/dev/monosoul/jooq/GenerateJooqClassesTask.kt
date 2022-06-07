@@ -6,6 +6,7 @@ import dev.monosoul.jooq.settings.JooqDockerPluginSettings
 import dev.monosoul.jooq.settings.JooqDockerPluginSettings.WithContainer
 import dev.monosoul.jooq.settings.JooqDockerPluginSettings.WithoutContainer
 import dev.monosoul.jooq.settings.SettingsAware
+import dev.monosoul.jooq.util.CodegenClasspathAwareClassLoaders
 import dev.monosoul.jooq.util.MigrationRunner
 import groovy.lang.Closure
 import org.gradle.api.Action
@@ -13,6 +14,7 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.ProviderFactory
 import org.gradle.api.tasks.CacheableTask
+import org.gradle.api.tasks.Classpath
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.OutputDirectory
@@ -101,6 +103,14 @@ open class GenerateJooqClassesTask @Inject constructor(
     val outputDirectory =
         objectFactory.directoryProperty().convention(project.layout.buildDirectory.dir("generated-jooq"))
 
+    /**
+     * Classpath for code generation. Derived from jooqCodegen configuration.
+     */
+    @Classpath
+    val codegenClasspath = objectFactory.fileCollection().from(
+        project.configurations.named(JooqDockerPlugin.CONFIGURATION_NAME)
+    )
+
     private var localPluginSettings: JooqDockerPluginSettings? = null
 
     /**
@@ -119,7 +129,7 @@ open class GenerateJooqClassesTask @Inject constructor(
 
     private val codegenRunner = UniversalJooqCodegenRunner()
 
-    private val classloaders = project.codegenClasspathAwareClassloaderProvider()
+    private fun classLoaders() = CodegenClasspathAwareClassLoaders.from(codegenClasspath)
 
     init {
         group = "jooq"
@@ -181,14 +191,14 @@ open class GenerateJooqClassesTask @Inject constructor(
     @TaskAction
     fun generateClasses() {
         getPluginSettings()
-            .runWithDatabaseCredentials(classloaders) { jdbcAwareClassLoader, credentials ->
+            .runWithDatabaseCredentials(classLoaders()) { jdbcAwareClassLoader, credentials ->
                 val schemaVersion = migrationRunner.migrateDb(jdbcAwareClassLoader.buildscriptInclusive, credentials)
                 generateJooqClasses(jdbcAwareClassLoader, credentials, schemaVersion)
             }
     }
 
     private fun generateJooqClasses(
-        jdbcAwareClassLoader: Classloaders,
+        jdbcAwareClassLoader: CodegenClasspathAwareClassLoaders,
         credentials: DatabaseCredentials,
         schemaVersion: String
     ) {

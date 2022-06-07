@@ -48,7 +48,7 @@ repositories {
 
 dependencies {
     implementation("org.jooq:jooq:3.16.5")
-    jdbc("org.postgresql:postgresql:42.3.6")
+    jooqCodegen("org.postgresql:postgresql:42.3.6")
 }
 ```
 
@@ -85,7 +85,7 @@ tasks {
 
 dependencies {
     implementation("org.jooq:jooq:3.16.5")
-    jdbc("org.postgresql:postgresql:42.3.6")
+    jooqCodegen("org.postgresql:postgresql:42.3.6")
 }
 ```
 
@@ -126,7 +126,7 @@ jooq {
 
 dependencies {
     implementation("org.jooq:jooq:3.16.5")
-    jdbc("mysql:mysql-connector-java:8.0.29")
+    jooqCodegen("mysql:mysql-connector-java:8.0.29")
 }
 ```
 
@@ -156,7 +156,7 @@ tasks {
 
 dependencies {
     implementation("org.jooq:jooq:3.16.5")
-    jdbc("org.postgresql:postgresql:42.3.6")
+    jooqCodegen("org.postgresql:postgresql:42.3.6")
 }
 ```
 
@@ -179,7 +179,7 @@ tasks {
 
 dependencies {
     implementation("org.jooq:jooq:3.16.5")
-    jdbc("org.postgresql:postgresql:42.3.6")
+    jooqCodegen("org.postgresql:postgresql:42.3.6")
 }
 ```
 
@@ -226,7 +226,7 @@ tasks {
 
 dependencies {
     implementation("org.jooq:jooq:3.16.5")
-    jdbc("org.postgresql:postgresql:42.3.6")
+    jooqCodegen("org.postgresql:postgresql:42.3.6")
 }
 ```
 
@@ -255,7 +255,7 @@ repositories {
 
 dependencies {
     implementation("org.jooq:jooq:3.12.0")
-    jdbc("org.postgresql:postgresql:42.3.6")
+    jooqCodegen("org.postgresql:postgresql:42.3.6")
 }
 ```
 
@@ -296,7 +296,7 @@ jooq {
 }
 
 dependencies {
-    jdbc("org.postgresql:postgresql:42.3.6")
+    jooqCodegen("org.postgresql:postgresql:42.3.6")
 }
 ```
 
@@ -356,8 +356,8 @@ tasks {
 
 dependencies {
     implementation(kotlin("stdlib"))
-    jdbc("org.postgresql:postgresql:42.3.6")
-    jdbc("mysql:mysql-connector-java:8.0.29")
+    jooqCodegen("org.postgresql:postgresql:42.3.6")
+    jooqCodegen("mysql:mysql-connector-java:8.0.29")
     implementation("org.jooq:jooq:3.16.6")
 }
 ```
@@ -413,7 +413,7 @@ repositories {
 }
 
 dependencies {
-    jdbc("mysql:mysql-connector-java:8.0.29")
+    jooqCodegen("mysql:mysql-connector-java:8.0.29")
     implementation("org.jooq:jooq:3.16.6")
 }
 ```

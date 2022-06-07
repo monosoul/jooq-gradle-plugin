@@ -28,7 +28,7 @@ class FlywayConfigurationJooqDockerPluginFunctionalTest : JooqDockerPluginFuncti
                 }
 
                 dependencies {
-                    jdbc("org.postgresql:postgresql:42.3.6")
+                    jooqCodegen("org.postgresql:postgresql:42.3.6")
                 }
             """.trimIndent()
         }
@@ -69,7 +69,7 @@ class FlywayConfigurationJooqDockerPluginFunctionalTest : JooqDockerPluginFuncti
                 }
 
                 dependencies {
-                    jdbc("org.postgresql:postgresql:42.3.6")
+                    jooqCodegen("org.postgresql:postgresql:42.3.6")
                 }
             """.trimIndent()
         }
@@ -107,7 +107,7 @@ class FlywayConfigurationJooqDockerPluginFunctionalTest : JooqDockerPluginFuncti
                 }
 
                 dependencies {
-                    jdbc("org.postgresql:postgresql:42.3.6")
+                    jooqCodegen("org.postgresql:postgresql:42.3.6")
                 }
             """.trimIndent()
         }

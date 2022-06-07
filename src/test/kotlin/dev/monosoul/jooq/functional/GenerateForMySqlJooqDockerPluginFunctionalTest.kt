@@ -45,7 +45,7 @@ class GenerateForMySqlJooqDockerPluginFunctionalTest : JooqDockerPluginFunctiona
                 }
 
                 dependencies {
-                    jdbc("mysql:mysql-connector-java:8.0.29")
+                    jooqCodegen("mysql:mysql-connector-java:8.0.29")
                 }
             """.trimIndent()
         }

@@ -62,8 +62,8 @@ class MultipleDatabasesJooqDockerPluginFunctionalTest : JooqDockerPluginFunction
 
                 dependencies {
                     implementation(kotlin("stdlib"))
-                    jdbc("org.postgresql:postgresql:42.3.6")
-                    jdbc("mysql:mysql-connector-java:8.0.29")
+                    jooqCodegen("org.postgresql:postgresql:42.3.6")
+                    jooqCodegen("mysql:mysql-connector-java:8.0.29")
                     implementation("org.jooq:jooq:3.16.6")
                 }
             """.trimIndent()
@@ -141,7 +141,7 @@ class MultipleDatabasesJooqDockerPluginFunctionalTest : JooqDockerPluginFunction
                 }
 
                 dependencies {
-                    jdbc("mysql:mysql-connector-java:8.0.29")
+                    jooqCodegen("mysql:mysql-connector-java:8.0.29")
                 }
             """.trimIndent()
         }
@@ -196,7 +196,7 @@ class MultipleDatabasesJooqDockerPluginFunctionalTest : JooqDockerPluginFunction
                 }
 
                 dependencies {
-                    jdbc("org.postgresql:postgresql:42.3.6")
+                    jooqCodegen("org.postgresql:postgresql:42.3.6")
                 }
             """.trimIndent()
         }
@@ -256,7 +256,7 @@ class MultipleDatabasesJooqDockerPluginFunctionalTest : JooqDockerPluginFunction
 
                 dependencies {
                     implementation(kotlin("stdlib"))
-                    jdbc("org.postgresql:postgresql:42.3.6")
+                    jooqCodegen("org.postgresql:postgresql:42.3.6")
                     implementation("org.jooq:jooq:3.16.6")
                 }
             """.trimIndent()

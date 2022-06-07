@@ -32,7 +32,7 @@ class JavaBasedConfigJooqDockerPluginFunctionalTest : JooqDockerPluginFunctional
                 }
 
                 dependencies {
-                    jdbc("org.postgresql:postgresql:42.3.6")
+                    jooqCodegen("org.postgresql:postgresql:42.3.6")
                 }
             """.trimIndent()
         }
@@ -78,7 +78,7 @@ class JavaBasedConfigJooqDockerPluginFunctionalTest : JooqDockerPluginFunctional
                 }
 
                 dependencies {
-                    jdbc("org.postgresql:postgresql:42.3.6")
+                    jooqCodegen("org.postgresql:postgresql:42.3.6")
                 }
             """.trimIndent()
         }

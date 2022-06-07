@@ -1,16 +1,15 @@
 package dev.monosoul.jooq.settings
 
-import dev.monosoul.jooq.Classloaders
 import dev.monosoul.jooq.container.GenericDatabaseContainer
+import dev.monosoul.jooq.util.CodegenClasspathAwareClassLoaders
 import org.gradle.api.Action
-import org.gradle.api.provider.Provider
 import java.io.Serializable
 
 sealed class JooqDockerPluginSettings : Serializable {
     internal abstract val database: Database
     internal abstract fun runWithDatabaseCredentials(
-        classloaderProvider: Provider<Classloaders>,
-        block: (Classloaders, DatabaseCredentials) -> Unit
+        classloaders: CodegenClasspathAwareClassLoaders,
+        block: (CodegenClasspathAwareClassLoaders, DatabaseCredentials) -> Unit
     )
 
     internal abstract fun copy(): JooqDockerPluginSettings
@@ -25,19 +24,18 @@ sealed class JooqDockerPluginSettings : Serializable {
         }
 
         override fun runWithDatabaseCredentials(
-            classloaderProvider: Provider<Classloaders>,
-            block: (Classloaders, DatabaseCredentials) -> Unit
+            classloaders: CodegenClasspathAwareClassLoaders,
+            block: (CodegenClasspathAwareClassLoaders, DatabaseCredentials) -> Unit
         ) {
-            val jdbcAwareClassloader = classloaderProvider.get()
             val dbContainer = GenericDatabaseContainer(
                 image = image,
                 database = database,
-                jdbcAwareClassLoader = jdbcAwareClassloader.buildscriptInclusive,
+                jdbcAwareClassLoader = classloaders.buildscriptInclusive,
             ).also { it.start() }
 
             try {
                 block(
-                    jdbcAwareClassloader,
+                    classloaders,
                     DatabaseCredentials(
                         jdbcDriverClassName = dbContainer.driverClassName,
                         jdbcUrl = dbContainer.jdbcUrl,
@@ -67,11 +65,11 @@ sealed class JooqDockerPluginSettings : Serializable {
         }
 
         override fun runWithDatabaseCredentials(
-            classloaderProvider: Provider<Classloaders>,
-            block: (Classloaders, DatabaseCredentials) -> Unit
+            classloaders: CodegenClasspathAwareClassLoaders,
+            block: (CodegenClasspathAwareClassLoaders, DatabaseCredentials) -> Unit
         ) {
             block(
-                classloaderProvider.get(),
+                classloaders,
                 DatabaseCredentials(
                     jdbcDriverClassName = database.jdbc.driverClassName,
                     jdbcUrl = database.getJdbcUrl(),

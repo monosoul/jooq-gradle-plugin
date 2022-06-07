@@ -3,13 +3,14 @@ package dev.monosoul.jooq.functional
 import org.gradle.testkit.runner.TaskOutcome.SUCCESS
 import org.junit.jupiter.api.Test
 import strikt.api.expect
+import strikt.assertions.contains
 import strikt.assertions.isEqualTo
 import strikt.java.exists
 
-class FlywayConfigurationJooqDockerPluginFunctionalTest : JooqDockerPluginFunctionalTestBase() {
+class SchemaVersionJooqDockerPluginFunctionalTest : JooqDockerPluginFunctionalTestBase() {
 
     @Test
-    fun `should override flyway configuration with flywayProperties task input`() {
+    fun `schema version provider should be aware of flyway table name override`() {
         // given
         prepareBuildGradleFile {
             """
@@ -23,7 +24,7 @@ class FlywayConfigurationJooqDockerPluginFunctionalTest : JooqDockerPluginFuncti
 
                 tasks {
                     generateJooqClasses {
-                        flywayProperties.put("flyway.placeholderReplacement", "false")
+                        flywayProperties.put("flyway.table", "some_schema_table")
                     }
                 }
 
@@ -32,10 +33,7 @@ class FlywayConfigurationJooqDockerPluginFunctionalTest : JooqDockerPluginFuncti
                 }
             """.trimIndent()
         }
-        copyResource(
-            from = "/V01__init_with_placeholders.sql",
-            to = "src/main/resources/db/migration/V01__init_with_placeholders.sql"
-        )
+        copyResource(from = "/V01__init.sql", to = "src/main/resources/db/migration/V01__init.sql")
 
         // when
         val result = runGradleWithArguments("generateJooqClasses")
@@ -44,13 +42,15 @@ class FlywayConfigurationJooqDockerPluginFunctionalTest : JooqDockerPluginFuncti
         expect {
             that(result).generateJooqClassesTask.outcome isEqualTo SUCCESS
             that(
-                projectFile("build/generated-jooq/org/jooq/generated/tables/Foo.java")
-            ).exists()
+                projectFile("build/generated-jooq/org/jooq/generated/tables/SomeSchemaTable.java")
+            ).exists().and {
+                get { readText() } contains "schema version:01"
+            }
         }
     }
 
     @Test
-    fun `should generate flyway table in first schema by default`() {
+    fun `generated jOOQ classes should have schema version in the Generated annotation`() {
         // given
         prepareBuildGradleFile {
             """
@@ -62,21 +62,13 @@ class FlywayConfigurationJooqDockerPluginFunctionalTest : JooqDockerPluginFuncti
                     mavenCentral()
                 }
 
-                tasks {
-                    generateJooqClasses {
-                        schemas.set(listOf("other", "public"))
-                    }
-                }
-
                 dependencies {
                     jooqCodegen("org.postgresql:postgresql:42.3.6")
                 }
             """.trimIndent()
         }
-        copyResource(
-            from = "/V01__init_multiple_schemas.sql",
-            to = "src/main/resources/db/migration/V01__init_multiple_schemas.sql"
-        )
+        copyResource(from = "/V01__init.sql", to = "src/main/resources/db/migration/V01__init.sql")
+        copyResource(from = "/V02__add_bar.sql", to = "src/main/resources/db/migration/V02__add_bar.sql")
 
         // when
         val result = runGradleWithArguments("generateJooqClasses")
@@ -85,14 +77,22 @@ class FlywayConfigurationJooqDockerPluginFunctionalTest : JooqDockerPluginFuncti
         expect {
             that(result).generateJooqClassesTask.outcome isEqualTo SUCCESS
             that(
-                projectFile("build/generated-jooq/org/jooq/generated/public_/tables/Foo.java")
-            ).exists()
+                projectFile("build/generated-jooq/org/jooq/generated/tables/Foo.java").also {
+                    println(it.readText())
+                }
+            ).exists().and {
+                get { readText() } contains "schema version:02"
+            }
             that(
-                projectFile("build/generated-jooq/org/jooq/generated/other/tables/Bar.java")
-            ).exists()
+                projectFile("build/generated-jooq/org/jooq/generated/tables/Bar.java")
+            ).exists().and {
+                get { readText() } contains "schema version:02"
+            }
             that(
-                projectFile("build/generated-jooq/org/jooq/generated/other/tables/FlywaySchemaHistory.java")
-            ).exists()
+                projectFile("build/generated-jooq/org/jooq/generated/tables/FlywaySchemaHistory.java")
+            ).exists().and {
+                get { readText() } contains "schema version:02"
+            }
         }
     }
 }

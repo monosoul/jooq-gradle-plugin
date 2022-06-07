@@ -91,7 +91,47 @@ dependencies {
 }
 ```
 
-To configure the plugin to work with another DB like MySQL following config can be applied:
+To configure the plugin to use another version or edition of Flyway the following config can be used:
+
+```kotlin
+import dev.monosoul.jooq.RecommendedVersions
+
+plugins {
+    id("dev.monosoul.jooq-docker")
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation("org.jooq:jooq:${RecommendedVersions.JOOQ_VERSION}")
+    jooqCodegen("org.postgresql:postgresql:42.3.6")
+    jooqCodegen("org.flywaydb.enterprise:flyway-core:${RecommendedVersions.FLYWAY_VERSION}")
+}
+```
+
+To configure the plugin to use another version or edition of jOOQ the following config can be used:
+
+```kotlin
+plugins {
+    id("dev.monosoul.jooq-docker")
+}
+
+repositories {
+    mavenCentral()
+}
+
+val jooqVersion = "3.15.10"
+
+dependencies {
+    implementation("org.jooq:jooq:$jooqVersion")
+    jooqCodegen("org.postgresql:postgresql:42.3.6")
+    jooqCodegen("org.jooq:jooq-codegen:$jooqVersion")
+}
+```
+
+To configure the plugin to work with another DB like MySQL the following config can be applied:
 
 ```kotlin
 import dev.monosoul.jooq.RecommendedVersions

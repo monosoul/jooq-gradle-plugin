@@ -91,8 +91,6 @@ dependencies {
     implementation("org.jooq:jooq-codegen:$jooqVersion")
 
     implementation("org.flywaydb:flyway-core:$flywayVersion")
-    implementation("org.flywaydb:flyway-mysql:$flywayVersion")
-    implementation("org.flywaydb:flyway-sqlserver:$flywayVersion")
     val testcontainersVersion = "1.17.2"
     implementation("org.testcontainers:jdbc:$testcontainersVersion")
 

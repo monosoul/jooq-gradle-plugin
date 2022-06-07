@@ -15,6 +15,7 @@ class MultipleDatabasesJooqDockerPluginFunctionalTest : JooqDockerPluginFunction
         prepareBuildGradleFile {
             """
                 import dev.monosoul.jooq.GenerateJooqClassesTask
+                import dev.monosoul.jooq.RecommendedVersions
                 
                 plugins {
                     kotlin("jvm") version "1.6.21"
@@ -64,7 +65,8 @@ class MultipleDatabasesJooqDockerPluginFunctionalTest : JooqDockerPluginFunction
                     implementation(kotlin("stdlib"))
                     jooqCodegen("org.postgresql:postgresql:42.3.6")
                     jooqCodegen("mysql:mysql-connector-java:8.0.29")
-                    implementation("org.jooq:jooq:3.16.6")
+                    jooqCodegen("org.flywaydb:flyway-mysql:${'$'}{RecommendedVersions.FLYWAY_VERSION}")
+                    implementation("org.jooq:jooq:${'$'}{RecommendedVersions.JOOQ_VERSION}")
                 }
             """.trimIndent()
         }
@@ -97,6 +99,8 @@ class MultipleDatabasesJooqDockerPluginFunctionalTest : JooqDockerPluginFunction
         // given
         prepareBuildGradleFile {
             """
+                import dev.monosoul.jooq.RecommendedVersions
+                
                 plugins {
                     id("dev.monosoul.jooq-docker")
                 }
@@ -142,6 +146,7 @@ class MultipleDatabasesJooqDockerPluginFunctionalTest : JooqDockerPluginFunction
 
                 dependencies {
                     jooqCodegen("mysql:mysql-connector-java:8.0.29")
+                    jooqCodegen("org.flywaydb:flyway-mysql:${'$'}{RecommendedVersions.FLYWAY_VERSION}")
                 }
             """.trimIndent()
         }
@@ -222,6 +227,7 @@ class MultipleDatabasesJooqDockerPluginFunctionalTest : JooqDockerPluginFunction
         prepareBuildGradleFile {
             """
                 import dev.monosoul.jooq.GenerateJooqClassesTask
+                import dev.monosoul.jooq.RecommendedVersions
                 
                 plugins {
                     kotlin("jvm") version "1.6.21"
@@ -257,7 +263,7 @@ class MultipleDatabasesJooqDockerPluginFunctionalTest : JooqDockerPluginFunction
                 dependencies {
                     implementation(kotlin("stdlib"))
                     jooqCodegen("org.postgresql:postgresql:42.3.6")
-                    implementation("org.jooq:jooq:3.16.6")
+                    implementation("org.jooq:jooq:${'$'}{RecommendedVersions.JOOQ_VERSION}")
                 }
             """.trimIndent()
         }

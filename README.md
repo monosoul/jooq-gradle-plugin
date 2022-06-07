@@ -59,6 +59,8 @@ as shown in examples below.
 Configuring schema names and other parameters of the task:
 
 ```kotlin
+import dev.monosoul.jooq.RecommendedVersions
+
 plugins {
     id("dev.monosoul.jooq-docker")
 }
@@ -84,7 +86,7 @@ tasks {
 }
 
 dependencies {
-    implementation("org.jooq:jooq:3.16.5")
+    implementation("org.jooq:jooq:${RecommendedVersions.JOOQ_VERSION}")
     jooqCodegen("org.postgresql:postgresql:42.3.6")
 }
 ```
@@ -92,6 +94,8 @@ dependencies {
 To configure the plugin to work with another DB like MySQL following config can be applied:
 
 ```kotlin
+import dev.monosoul.jooq.RecommendedVersions
+
 plugins {
     id("dev.monosoul.jooq-docker")
 }
@@ -127,6 +131,7 @@ jooq {
 dependencies {
     implementation("org.jooq:jooq:3.16.5")
     jooqCodegen("mysql:mysql-connector-java:8.0.29")
+    jooqCodegen("org.flywaydb:flyway-mysql:${RecommendedVersions.FLYWAY_VERSION}")
 }
 ```
 
@@ -309,6 +314,7 @@ Here's an example how to generate jOOQ classes for PostgreSQL and MySQL in a sin
 
 ```kotlin
 import dev.monosoul.jooq.GenerateJooqClassesTask
+import dev.monosoul.jooq.RecommendedVersions
 
 plugins {
     kotlin("jvm") version "1.6.21"
@@ -358,6 +364,7 @@ dependencies {
     implementation(kotlin("stdlib"))
     jooqCodegen("org.postgresql:postgresql:42.3.6")
     jooqCodegen("mysql:mysql-connector-java:8.0.29")
+    jooqCodegen("org.flywaydb:flyway-mysql:${RecommendedVersions.FLYWAY_VERSION}")
     implementation("org.jooq:jooq:3.16.6")
 }
 ```
@@ -375,7 +382,7 @@ Basically, the plugin has 2 sets of configurations: **global** (or project-wide)
 block and **local** (or task-specific) configuration declared for each task separately.
 
 Local (or task-specific) configuration initial values are inherited from the global (or project-wide) configuration.
-So if you modify the global configuration first, and then modify the local configuration, the local configuration's 
+So if you modify the global configuration first, and then modify the local configuration, the local configuration's
 initial values will be equal to the global configuration's values.
 
 Modifying the local configuration *will not affect* the global configuration.
@@ -403,6 +410,8 @@ dev.monosoul.jooq.withContainer.image.envVars.MYSQL_DATABASE=mysql
 `build.gradle.kts`:
 
 ```kotlin
+import dev.monosoul.jooq.RecommendedVersions
+
 plugins {
     kotlin("jvm") version "1.6.21"
     id("dev.monosoul.jooq-docker")
@@ -414,11 +423,13 @@ repositories {
 
 dependencies {
     jooqCodegen("mysql:mysql-connector-java:8.0.29")
-    implementation("org.jooq:jooq:3.16.6")
+    jooqCodegen("org.flywaydb:flyway-mysql:${RecommendedVersions.FLYWAY_VERSION}")
+    implementation("org.jooq:jooq:${RecommendedVersions.JOOQ_VERSION}")
 }
 ```
 
 And here's an example how to customize the plugin configuration from command line:
+
 ```shell
 ./gradlew build -Pdev.monosoul.jooq.withContainer.db.username=root -Pdev.monosoul.jooq.withContainer.db.password=password
 ```

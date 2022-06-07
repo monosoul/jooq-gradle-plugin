@@ -173,6 +173,8 @@ class PropertiesConfigurationJooqDockerPluginFunctionalTest : JooqDockerPluginFu
         }
         prepareBuildGradleFile {
             """
+                import dev.monosoul.jooq.RecommendedVersions
+                
                 plugins {
                     id("dev.monosoul.jooq-docker")
                 }
@@ -183,6 +185,7 @@ class PropertiesConfigurationJooqDockerPluginFunctionalTest : JooqDockerPluginFu
 
                 dependencies {
                     jooqCodegen("mysql:mysql-connector-java:8.0.29")
+                    jooqCodegen("org.flywaydb:flyway-mysql:${'$'}{RecommendedVersions.FLYWAY_VERSION}")
                 }
             """.trimIndent()
         }

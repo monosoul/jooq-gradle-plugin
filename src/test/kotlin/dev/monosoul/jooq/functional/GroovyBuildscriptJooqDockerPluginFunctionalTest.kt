@@ -207,6 +207,7 @@ class GroovyBuildscriptJooqDockerPluginFunctionalTest : JooqDockerPluginFunction
             // language=gradle
             """
                 import dev.monosoul.jooq.GenerateJooqClassesTask
+                import dev.monosoul.jooq.RecommendedVersions
                 
                 plugins {
                     id "org.jetbrains.kotlin.jvm" version "1.6.21"
@@ -242,7 +243,7 @@ class GroovyBuildscriptJooqDockerPluginFunctionalTest : JooqDockerPluginFunction
                 dependencies {
                     implementation("org.jetbrains.kotlin:kotlin-stdlib")
                     jooqCodegen("org.postgresql:postgresql:42.3.6")
-                    implementation("org.jooq:jooq:3.16.6")
+                    implementation("org.jooq:jooq:" + RecommendedVersions.JOOQ_VERSION)
                 }
             """.trimIndent()
         }

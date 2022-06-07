@@ -77,9 +77,7 @@ class SchemaVersionJooqDockerPluginFunctionalTest : JooqDockerPluginFunctionalTe
         expect {
             that(result).generateJooqClassesTask.outcome isEqualTo SUCCESS
             that(
-                projectFile("build/generated-jooq/org/jooq/generated/tables/Foo.java").also {
-                    println(it.readText())
-                }
+                projectFile("build/generated-jooq/org/jooq/generated/tables/Foo.java")
             ).exists().and {
                 get { readText() } contains "schema version:02"
             }

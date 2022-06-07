@@ -13,6 +13,8 @@ class GenerateForMySqlJooqDockerPluginFunctionalTest : JooqDockerPluginFunctiona
         // given
         prepareBuildGradleFile {
             """
+                import dev.monosoul.jooq.RecommendedVersions
+                
                 plugins {
                     id("dev.monosoul.jooq-docker")
                 }
@@ -45,6 +47,7 @@ class GenerateForMySqlJooqDockerPluginFunctionalTest : JooqDockerPluginFunctiona
                 }
 
                 dependencies {
+                    jooqCodegen("org.flywaydb:flyway-mysql:${'$'}{RecommendedVersions.FLYWAY_VERSION}")
                     jooqCodegen("mysql:mysql-connector-java:8.0.29")
                 }
             """.trimIndent()

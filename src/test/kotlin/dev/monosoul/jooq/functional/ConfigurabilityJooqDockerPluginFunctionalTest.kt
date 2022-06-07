@@ -23,12 +23,12 @@ class ConfigurabilityJooqDockerPluginFunctionalTest : JooqDockerPluginFunctional
 
                 tasks {
                     generateJooqClasses {
-                        schemas = arrayOf("public", "other")
+                        schemas.set(listOf("public", "other"))
                     }
                 }
 
                 dependencies {
-                    jdbc("org.postgresql:postgresql:42.3.6")
+                    jooqCodegen("org.postgresql:postgresql:42.3.6")
                 }
             """.trimIndent()
         }
@@ -70,13 +70,13 @@ class ConfigurabilityJooqDockerPluginFunctionalTest : JooqDockerPluginFunctional
 
                 tasks {
                     generateJooqClasses {
-                        schemas = arrayOf("public", "other")
-                        schemaToPackageMapping = mapOf("public" to "fancy_name")
+                        schemas.set(listOf("public", "other"))
+                        schemaToPackageMapping.put("public", "fancy_name")
                     }
                 }
 
                 dependencies {
-                    jdbc("org.postgresql:postgresql:42.3.6")
+                    jooqCodegen("org.postgresql:postgresql:42.3.6")
                 }
             """.trimIndent()
         }
@@ -115,12 +115,12 @@ class ConfigurabilityJooqDockerPluginFunctionalTest : JooqDockerPluginFunctional
 
                 tasks {
                     generateJooqClasses {
-                        basePackageName = "com.example"
+                        basePackageName.set("com.example")
                     }
                 }
 
                 dependencies {
-                    jdbc("org.postgresql:postgresql:42.3.6")
+                    jooqCodegen("org.postgresql:postgresql:42.3.6")
                 }
             """.trimIndent()
         }
@@ -153,12 +153,12 @@ class ConfigurabilityJooqDockerPluginFunctionalTest : JooqDockerPluginFunctional
 
                 tasks {
                     generateJooqClasses {
-                        outputSchemaToDefault = setOf("public")
+                        outputSchemaToDefault.add("public")
                     }
                 }
 
                 dependencies {
-                    jdbc("org.postgresql:postgresql:42.3.6")
+                    jooqCodegen("org.postgresql:postgresql:42.3.6")
                 }
             """.trimIndent()
         }
@@ -202,7 +202,7 @@ class ConfigurabilityJooqDockerPluginFunctionalTest : JooqDockerPluginFunctional
                 }
 
                 dependencies {
-                    jdbc("org.postgresql:postgresql:42.3.6")
+                    jooqCodegen("org.postgresql:postgresql:42.3.6")
                 }
             """.trimIndent()
         }

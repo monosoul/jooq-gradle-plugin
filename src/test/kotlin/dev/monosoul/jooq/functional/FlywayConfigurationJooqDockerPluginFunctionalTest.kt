@@ -23,12 +23,12 @@ class FlywayConfigurationJooqDockerPluginFunctionalTest : JooqDockerPluginFuncti
 
                 tasks {
                     generateJooqClasses {
-                        flywayProperties = mapOf("flyway.placeholderReplacement" to "false")
+                        flywayProperties.put("flyway.placeholderReplacement", "false")
                     }
                 }
 
                 dependencies {
-                    jdbc("org.postgresql:postgresql:42.3.6")
+                    jooqCodegen("org.postgresql:postgresql:42.3.6")
                 }
             """.trimIndent()
         }
@@ -50,44 +50,6 @@ class FlywayConfigurationJooqDockerPluginFunctionalTest : JooqDockerPluginFuncti
     }
 
     @Test
-    fun `schema version provider should be aware of flyway table name override`() {
-        // given
-        prepareBuildGradleFile {
-            """
-                plugins {
-                    id("dev.monosoul.jooq-docker")
-                }
-
-                repositories {
-                    mavenCentral()
-                }
-
-                tasks {
-                    generateJooqClasses {
-                        flywayProperties = mapOf("flyway.table" to "some_schema_table")
-                    }
-                }
-
-                dependencies {
-                    jdbc("org.postgresql:postgresql:42.3.6")
-                }
-            """.trimIndent()
-        }
-        copyResource(from = "/V01__init.sql", to = "src/main/resources/db/migration/V01__init.sql")
-
-        // when
-        val result = runGradleWithArguments("generateJooqClasses")
-
-        // then
-        expect {
-            that(result).generateJooqClassesTask.outcome isEqualTo SUCCESS
-            that(
-                projectFile("build/generated-jooq/org/jooq/generated/tables/SomeSchemaTable.java")
-            ).exists()
-        }
-    }
-
-    @Test
     fun `should generate flyway table in first schema by default`() {
         // given
         prepareBuildGradleFile {
@@ -102,12 +64,12 @@ class FlywayConfigurationJooqDockerPluginFunctionalTest : JooqDockerPluginFuncti
 
                 tasks {
                     generateJooqClasses {
-                        schemas = arrayOf("other", "public")
+                        schemas.set(listOf("other", "public"))
                     }
                 }
 
                 dependencies {
-                    jdbc("org.postgresql:postgresql:42.3.6")
+                    jooqCodegen("org.postgresql:postgresql:42.3.6")
                 }
             """.trimIndent()
         }

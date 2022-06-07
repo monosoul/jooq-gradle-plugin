@@ -6,10 +6,10 @@ import strikt.api.expect
 import strikt.assertions.isEqualTo
 import strikt.java.exists
 
-class ZeroConfigurationJooqDockerPluginFunctionalTest : JooqDockerPluginFunctionalTestBase() {
+class RunContainerWithCommandJooqDockerPluginFunctionalTest : JooqDockerPluginFunctionalTestBase() {
 
     @Test
-    fun `should generate jooq classes for PostgreSQL db with default config`() {
+    fun `should support running DB containers with command`() {
         // given
         prepareBuildGradleFile {
             """
@@ -19,6 +19,18 @@ class ZeroConfigurationJooqDockerPluginFunctionalTest : JooqDockerPluginFunction
 
                 repositories {
                     mavenCentral()
+                }
+                
+                jooq {
+                    withContainer {
+                        image {
+                            command = "postgres -p 6666"
+                        }
+
+                        db {
+                            port = 6666
+                        }
+                    }
                 }
 
                 dependencies {

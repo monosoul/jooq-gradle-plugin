@@ -24,12 +24,12 @@ class ExcludeFlywayHistoryTableJooqDockerPluginFunctionalTest : JooqDockerPlugin
 
                 tasks {
                     generateJooqClasses {
-                        excludeFlywayTable = true
+                        excludeFlywayTable.set(true)
                     }
                 }
 
                 dependencies {
-                    jdbc("org.postgresql:postgresql:42.3.6")
+                    jooqCodegen("org.postgresql:postgresql:42.3.6")
                 }
             """.trimIndent()
         }
@@ -65,13 +65,13 @@ class ExcludeFlywayHistoryTableJooqDockerPluginFunctionalTest : JooqDockerPlugin
 
                 tasks {
                     generateJooqClasses {
-                        excludeFlywayTable = true
-                        flywayProperties = mapOf("flyway.table" to "some_schema_table")
+                        excludeFlywayTable.set(true)
+                        flywayProperties.put("flyway.table", "some_schema_table")
                     }
                 }
 
                 dependencies {
-                    jdbc("org.postgresql:postgresql:42.3.6")
+                    jooqCodegen("org.postgresql:postgresql:42.3.6")
                 }
             """.trimIndent()
         }
@@ -107,8 +107,8 @@ class ExcludeFlywayHistoryTableJooqDockerPluginFunctionalTest : JooqDockerPlugin
 
                 tasks {
                     generateJooqClasses {
-                        excludeFlywayTable = true
-                        schemas = arrayOf("public", "other")
+                        excludeFlywayTable.set(true)
+                        schemas.set(listOf("public", "other"))
                         usingJavaConfig {
                             database.withExcludes("BAR")
                         }
@@ -116,7 +116,7 @@ class ExcludeFlywayHistoryTableJooqDockerPluginFunctionalTest : JooqDockerPlugin
                 }
 
                 dependencies {
-                    jdbc("org.postgresql:postgresql:42.3.6")
+                    jooqCodegen("org.postgresql:postgresql:42.3.6")
                 }
             """.trimIndent()
         }

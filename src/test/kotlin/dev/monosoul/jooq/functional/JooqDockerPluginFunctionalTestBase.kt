@@ -30,7 +30,7 @@ abstract class JooqDockerPluginFunctionalTestBase {
         .withProjectDir(projectDir)
         .withPluginClasspath()
         .forwardOutput()
-        .withArguments(*arguments, "--stacktrace", "--debug")
+        .withArguments(*arguments, "--stacktrace", "--info")
         .build()
 
     protected fun copyResource(from: String, to: String) {

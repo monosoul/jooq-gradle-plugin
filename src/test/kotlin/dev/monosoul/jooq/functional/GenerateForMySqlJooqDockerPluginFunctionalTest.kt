@@ -13,6 +13,8 @@ class GenerateForMySqlJooqDockerPluginFunctionalTest : JooqDockerPluginFunctiona
         // given
         prepareBuildGradleFile {
             """
+                import dev.monosoul.jooq.RecommendedVersions
+                
                 plugins {
                     id("dev.monosoul.jooq-docker")
                 }
@@ -22,35 +24,31 @@ class GenerateForMySqlJooqDockerPluginFunctionalTest : JooqDockerPluginFunctiona
                 }
 
                 jooq {
-                    image {
-                        repository = "mysql"
-                        tag = "8.0.29"
-                        envVars = mapOf(
-                            "MYSQL_ROOT_PASSWORD" to "mysql",
-                            "MYSQL_DATABASE" to "mysql")
-                        containerName = "uniqueMySqlContainerName"
-                        readinessProbe = { host: String, port: Int ->
-                            arrayOf("sh", "-c", "until mysqladmin -h${'$'}host -P${'$'}port -uroot -pmysql ping; do echo wait; sleep 1; done;")
+                    withContainer {
+                        image {
+                            name = "mysql:8.0.29"
+                            envVars = mapOf(
+                                "MYSQL_ROOT_PASSWORD" to "mysql",
+                                "MYSQL_DATABASE" to "mysql"
+                            )
                         }
-                    }
-
-                    db {
-                        username = "root"
-                        password = "mysql"
-                        name = "mysql"
-                        port = 3306
-                    }
-
-                    jdbc {
-                        schema = "jdbc:mysql"
-                        driverClassName = "com.mysql.cj.jdbc.Driver"
-                        jooqMetaName = "org.jooq.meta.mysql.MySQLDatabase"
-                        urlQueryParams = "?useSSL=false"
+                        db {
+                            username = "root"
+                            password = "mysql"
+                            name = "mysql"
+                            port = 3306
+                            
+                            jdbc {
+                                schema = "jdbc:mysql"
+                                driverClassName = "com.mysql.cj.jdbc.Driver"
+                            }
+                        }
                     }
                 }
 
                 dependencies {
-                    jdbc("mysql:mysql-connector-java:8.0.29")
+                    jooqCodegen("org.flywaydb:flyway-mysql:${'$'}{RecommendedVersions.FLYWAY_VERSION}")
+                    jooqCodegen("mysql:mysql-connector-java:8.0.29")
                 }
             """.trimIndent()
         }

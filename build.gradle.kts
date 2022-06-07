@@ -75,28 +75,26 @@ tasks {
     }
 }
 
-afterEvaluate {
-    tasks.jacocoTestReport {
-        classDirectories.setFrom(classDirectories.files.map {
-            fileTree(it) {
-                exclude("dev/monosoul/shaded/org/testcontainers/**/*")
-            }
-        })
+val jooqVersion = "3.16.6"
+val flywayVersion = "8.5.12"
+
+tasks.withType<ProcessResources> {
+    filesMatching("**/dev.monosoul.jooq.dependency.versions") {
+        filter {
+            it.replace("@jooq.version@", jooqVersion)
+                .replace("@flyway.version@", flywayVersion)
+        }
     }
 }
 
-
 dependencies {
-    implementation("org.jooq:jooq-codegen:3.16.6")
-    implementation("org.glassfish.jaxb:jaxb-runtime:3.0.2")
-    implementation("com.github.docker-java:docker-java-transport-okhttp:3.2.13")
-    implementation("org.flywaydb:flyway-core:8.5.12")
-    implementation("org.flywaydb:flyway-mysql:8.5.12")
-    implementation("org.flywaydb:flyway-sqlserver:8.5.12")
-    implementation("org.zeroturnaround:zt-exec:1.12")
-    implementation("org.apache.commons:commons-lang3:3.12.0")
-    compileOnly("javax.annotation:javax.annotation-api:1.3.2")
+    implementation("org.jooq:jooq-codegen:$jooqVersion")
 
+    implementation("org.flywaydb:flyway-core:$flywayVersion")
+    val testcontainersVersion = "1.17.2"
+    implementation("org.testcontainers:jdbc:$testcontainersVersion")
+
+    testImplementation("org.testcontainers:postgresql:$testcontainersVersion")
     testImplementation(enforcedPlatform("org.junit:junit-bom:5.8.2"))
     testImplementation("org.junit.jupiter:junit-jupiter")
     testImplementation("io.strikt:strikt-jvm:0.34.1")

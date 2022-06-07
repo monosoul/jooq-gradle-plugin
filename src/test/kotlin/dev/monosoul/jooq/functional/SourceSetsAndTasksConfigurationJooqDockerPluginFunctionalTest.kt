@@ -13,6 +13,8 @@ class SourceSetsAndTasksConfigurationJooqDockerPluginFunctionalTest : JooqDocker
     @TestFactory
     fun `should configure source sets and tasks for java project`() = sequenceOf(
         "when jooq plugin is applied after java plugin" to """
+            import dev.monosoul.jooq.RecommendedVersions
+            
             plugins {
                 java
                 id("dev.monosoul.jooq-docker")
@@ -23,12 +25,14 @@ class SourceSetsAndTasksConfigurationJooqDockerPluginFunctionalTest : JooqDocker
             }
 
             dependencies {
-                jdbc("org.postgresql:postgresql:42.3.6")
-                implementation("org.jooq:jooq:3.16.6")
+                jooqCodegen("org.postgresql:postgresql:42.3.6")
+                implementation("org.jooq:jooq:${'$'}{RecommendedVersions.JOOQ_VERSION}")
                 implementation("javax.annotation:javax.annotation-api:1.3.2")
             }
         """.trimIndent(),
         "when jooq plugin is applied before java plugin" to """
+            import dev.monosoul.jooq.RecommendedVersions
+            
             plugins {
                 id("dev.monosoul.jooq-docker")
             }
@@ -39,12 +43,14 @@ class SourceSetsAndTasksConfigurationJooqDockerPluginFunctionalTest : JooqDocker
             }
 
             dependencies {
-                jdbc("org.postgresql:postgresql:42.3.6")
-                "implementation"("org.jooq:jooq:3.16.6")
+                jooqCodegen("org.postgresql:postgresql:42.3.6")
+                "implementation"("org.jooq:jooq:${'$'}{RecommendedVersions.JOOQ_VERSION}")
                 "implementation"("javax.annotation:javax.annotation-api:1.3.2")
             }
         """.trimIndent(),
         "when jooq plugin is applied before java-library plugin" to """
+            import dev.monosoul.jooq.RecommendedVersions
+            
             plugins {
                 id("dev.monosoul.jooq-docker")
             }
@@ -55,8 +61,8 @@ class SourceSetsAndTasksConfigurationJooqDockerPluginFunctionalTest : JooqDocker
             }
 
             dependencies {
-                jdbc("org.postgresql:postgresql:42.3.6")
-                "implementation"("org.jooq:jooq:3.16.6")
+                jooqCodegen("org.postgresql:postgresql:42.3.6")
+                "implementation"("org.jooq:jooq:${'$'}{RecommendedVersions.JOOQ_VERSION}")
                 "implementation"("javax.annotation:javax.annotation-api:1.3.2")
             }
         """.trimIndent()
@@ -104,6 +110,8 @@ class SourceSetsAndTasksConfigurationJooqDockerPluginFunctionalTest : JooqDocker
     @TestFactory
     fun `should configure source sets and tasks for kotlin project`() = sequenceOf(
         "when jooq plugin is applied after kotlin plugin" to """
+            import dev.monosoul.jooq.RecommendedVersions
+            
             plugins {
                 kotlin("jvm") version "1.6.21"
                 id("dev.monosoul.jooq-docker")
@@ -115,12 +123,14 @@ class SourceSetsAndTasksConfigurationJooqDockerPluginFunctionalTest : JooqDocker
 
             dependencies {
                 implementation(kotlin("stdlib"))
-                jdbc("org.postgresql:postgresql:42.3.6")
-                implementation("org.jooq:jooq:3.16.6")
+                jooqCodegen("org.postgresql:postgresql:42.3.6")
+                implementation("org.jooq:jooq:${'$'}{RecommendedVersions.JOOQ_VERSION}")
                 implementation("javax.annotation:javax.annotation-api:1.3.2")
             }
         """.trimIndent(),
         "when jooq plugin is applied before kotlin plugin" to """
+            import dev.monosoul.jooq.RecommendedVersions
+            
             buildscript {
                 dependencies {
                     classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.6.21")
@@ -138,8 +148,8 @@ class SourceSetsAndTasksConfigurationJooqDockerPluginFunctionalTest : JooqDocker
 
             dependencies {
                 "implementation"(kotlin("stdlib"))
-                jdbc("org.postgresql:postgresql:42.3.6")
-                "implementation"("org.jooq:jooq:3.16.6")
+                jooqCodegen("org.postgresql:postgresql:42.3.6")
+                "implementation"("org.jooq:jooq:${'$'}{RecommendedVersions.JOOQ_VERSION}")
                 "implementation"("javax.annotation:javax.annotation-api:1.3.2")
             }
         """.trimIndent()

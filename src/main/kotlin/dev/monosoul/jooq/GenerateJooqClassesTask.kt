@@ -124,9 +124,7 @@ open class GenerateJooqClassesTask @Inject constructor(
 
     private fun globalPluginSettings() = project.extensions.getByType<JooqExtension>().pluginSettings
 
-    private val migrationRunner by lazy {
-        UniversalMigrationRunner(schemas, inputDirectory, flywayProperties)
-    }
+    private val migrationRunner = UniversalMigrationRunner(schemas, inputDirectory, flywayProperties)
 
     private val codegenRunner = UniversalJooqCodegenRunner()
 
@@ -134,6 +132,7 @@ open class GenerateJooqClassesTask @Inject constructor(
 
     init {
         group = "jooq"
+        description = "Generates jOOQ classes from Flyway migrations"
     }
 
     override fun withContainer(configure: Action<WithContainer>) {
@@ -267,7 +266,7 @@ open class GenerateJooqClassesTask @Inject constructor(
     }
 
     private fun addFlywaySchemaHistoryToExcludes(currentExcludes: String?): String {
-        return listOf(currentExcludes, migrationRunner.flywayTableName())
+        return listOf(currentExcludes, migrationRunner.flywayTableName)
             .filterNot(String?::isNullOrEmpty)
             .joinToString("|")
     }

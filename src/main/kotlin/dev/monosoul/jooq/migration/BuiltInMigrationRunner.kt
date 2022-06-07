@@ -3,19 +3,18 @@ package dev.monosoul.jooq.migration
 import dev.monosoul.jooq.settings.DatabaseCredentials
 import org.flywaydb.core.Flyway
 
-internal class BuiltInMigrationRunner(
-    codegenAwareClassLoader: ClassLoader,
-    private val schemas: Array<String>,
-    private val migrationLocations: Array<String>,
-    private val flywayProperties: Map<String, String>,
-    private val credentials: DatabaseCredentials,
-    private val defaultFlywaySchema: String,
-    private val flywayTable: String,
-) : MigrationRunner {
+internal class BuiltInMigrationRunner(codegenAwareClassLoader: ClassLoader) : MigrationRunner {
 
     private val flyway = Flyway.configure(codegenAwareClassLoader)
 
-    override fun migrateDb() = flyway
+    override fun migrateDb(
+        schemas: Array<String>,
+        migrationLocations: Array<String>,
+        flywayProperties: Map<String, String>,
+        credentials: DatabaseCredentials,
+        defaultFlywaySchema: String,
+        flywayTable: String
+    ) = flyway
         .dataSource(credentials.jdbcUrl, credentials.username, credentials.password)
         .schemas(*schemas)
         .locations(*migrationLocations)

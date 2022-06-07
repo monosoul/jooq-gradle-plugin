@@ -1,7 +1,14 @@
 package dev.monosoul.jooq.migration
 
-internal interface MigrationRunner {
-    fun migrateDb(): SchemaVersion
-}
+import dev.monosoul.jooq.settings.DatabaseCredentials
 
-internal data class SchemaVersion(val value: String)
+internal interface MigrationRunner {
+    fun migrateDb(
+        schemas: Array<String>,
+        migrationLocations: Array<String>,
+        flywayProperties: Map<String, String>,
+        credentials: DatabaseCredentials,
+        defaultFlywaySchema: String,
+        flywayTable: String,
+    ): SchemaVersion
+}

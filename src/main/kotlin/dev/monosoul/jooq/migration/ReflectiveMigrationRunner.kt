@@ -9,19 +9,18 @@ import kotlin.reflect.KFunction2
 import kotlin.reflect.KFunction4
 import kotlin.reflect.jvm.jvmName
 
-internal class ReflectiveMigrationRunner(
-    codegenAwareClassLoader: ClassLoader,
-    private val schemas: Array<String>,
-    private val migrationLocations: Array<String>,
-    private val flywayProperties: Map<String, String>,
-    private val credentials: DatabaseCredentials,
-    private val defaultFlywaySchema: String,
-    private val flywayTable: String,
-) : MigrationRunner {
+internal class ReflectiveMigrationRunner(codegenAwareClassLoader: ClassLoader) : MigrationRunner {
 
     private val flyway = ReflectiveFlywayConfiguration(codegenAwareClassLoader)
 
-    override fun migrateDb() = flyway
+    override fun migrateDb(
+        schemas: Array<String>,
+        migrationLocations: Array<String>,
+        flywayProperties: Map<String, String>,
+        credentials: DatabaseCredentials,
+        defaultFlywaySchema: String,
+        flywayTable: String
+    ) = flyway
         .dataSource(credentials)
         .schemas(*schemas)
         .locations(*migrationLocations)

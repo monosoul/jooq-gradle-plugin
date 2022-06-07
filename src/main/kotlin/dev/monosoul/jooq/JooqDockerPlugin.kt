@@ -13,6 +13,7 @@ open class JooqDockerPlugin : Plugin<Project> {
 
     override fun apply(project: Project) {
         project.configurations.create(CONFIGURATION_NAME)
+        project.configurations.create(CONFIGURATION_NAME_2)
         project.extensions.create<JooqExtension>("jooq")
         project.tasks.register<GenerateJooqClassesTask>("generateJooqClasses")
         project.afterEvaluate {
@@ -28,5 +29,6 @@ open class JooqDockerPlugin : Plugin<Project> {
 
     internal companion object {
         const val CONFIGURATION_NAME = "jdbc"
+        const val CONFIGURATION_NAME_2 = "jooqCodegen"
     }
 }

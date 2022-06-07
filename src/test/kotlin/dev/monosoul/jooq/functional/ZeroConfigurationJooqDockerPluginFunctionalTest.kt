@@ -22,6 +22,8 @@ class ZeroConfigurationJooqDockerPluginFunctionalTest : JooqDockerPluginFunction
                 }
 
                 dependencies {
+                    jooqCodegen("org.jooq:jooq-codegen:3.14.15")
+                    jooqCodegen("org.postgresql:postgresql:42.3.6")
                     jdbc("org.postgresql:postgresql:42.3.6")
                 }
             """.trimIndent()
@@ -35,7 +37,9 @@ class ZeroConfigurationJooqDockerPluginFunctionalTest : JooqDockerPluginFunction
         expect {
             that(result).generateJooqClassesTask.outcome isEqualTo SUCCESS
             that(
-                projectFile("build/generated-jooq/org/jooq/generated/tables/Foo.java")
+                projectFile("build/generated-jooq/org/jooq/generated/tables/Foo.java").also {
+                    println(it.readText())
+                }
             ).exists()
             that(
                 projectFile("build/generated-jooq/org/jooq/generated/tables/FlywaySchemaHistory.java")

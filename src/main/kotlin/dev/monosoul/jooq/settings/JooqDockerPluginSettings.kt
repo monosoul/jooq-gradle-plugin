@@ -1,16 +1,16 @@
 package dev.monosoul.jooq.settings
 
+import dev.monosoul.jooq.Classloaders
 import dev.monosoul.jooq.container.GenericDatabaseContainer
 import org.gradle.api.Action
 import org.gradle.api.provider.Provider
 import java.io.Serializable
-import java.net.URLClassLoader
 
 sealed class JooqDockerPluginSettings : Serializable {
     internal abstract val database: Database
     internal abstract fun runWithDatabaseCredentials(
-        classloaderProvider: Provider<URLClassLoader>,
-        block: (URLClassLoader, DatabaseCredentials) -> Unit
+        classloaderProvider: Provider<Classloaders>,
+        block: (Classloaders, DatabaseCredentials) -> Unit
     )
 
     internal abstract fun copy(): JooqDockerPluginSettings
@@ -25,14 +25,14 @@ sealed class JooqDockerPluginSettings : Serializable {
         }
 
         override fun runWithDatabaseCredentials(
-            classloaderProvider: Provider<URLClassLoader>,
-            block: (URLClassLoader, DatabaseCredentials) -> Unit
+            classloaderProvider: Provider<Classloaders>,
+            block: (Classloaders, DatabaseCredentials) -> Unit
         ) {
             val jdbcAwareClassloader = classloaderProvider.get()
             val dbContainer = GenericDatabaseContainer(
                 image = image,
                 database = database,
-                jdbcAwareClassLoader = jdbcAwareClassloader,
+                jdbcAwareClassLoader = jdbcAwareClassloader.buildscriptInclusive,
             ).also { it.start() }
 
             try {
@@ -67,8 +67,8 @@ sealed class JooqDockerPluginSettings : Serializable {
         }
 
         override fun runWithDatabaseCredentials(
-            classloaderProvider: Provider<URLClassLoader>,
-            block: (URLClassLoader, DatabaseCredentials) -> Unit
+            classloaderProvider: Provider<Classloaders>,
+            block: (Classloaders, DatabaseCredentials) -> Unit
         ) {
             block(
                 classloaderProvider.get(),

@@ -1,11 +1,11 @@
 package dev.monosoul.jooq
 
+import dev.monosoul.jooq.codegen.UniversalJooqCodegenRunner
 import dev.monosoul.jooq.settings.DatabaseCredentials
 import dev.monosoul.jooq.settings.JooqDockerPluginSettings
 import dev.monosoul.jooq.settings.JooqDockerPluginSettings.WithContainer
 import dev.monosoul.jooq.settings.JooqDockerPluginSettings.WithoutContainer
 import dev.monosoul.jooq.settings.SettingsAware
-import dev.monosoul.jooq.util.JooqCodegenRunner
 import dev.monosoul.jooq.util.MigrationRunner
 import groovy.lang.Closure
 import org.gradle.api.Action
@@ -117,9 +117,9 @@ open class GenerateJooqClassesTask @Inject constructor(
         MigrationRunner(schemas, inputDirectory, flywayProperties)
     }
 
-    private val codegenRunner = JooqCodegenRunner()
+    private val codegenRunner = UniversalJooqCodegenRunner()
 
-    private val jdbcAwareClassLoaderProvider = project.jdbcAwareClassloaderProvider()
+    private val classloaders = project.codegenClasspathAwareClassloaderProvider()
 
     init {
         group = "jooq"
@@ -145,7 +145,7 @@ open class GenerateJooqClassesTask @Inject constructor(
     ) {
         generatorConfig.set(
             providerFactory.provider {
-                file.inputStream().use(JooqCodegenRunner::load).applyCommonConfiguration().also {
+                file.inputStream().use(UniversalJooqCodegenRunner::load).applyCommonConfiguration().also {
                     it.generator.apply(customizer::execute)
                 }
             }
@@ -181,20 +181,20 @@ open class GenerateJooqClassesTask @Inject constructor(
     @TaskAction
     fun generateClasses() {
         getPluginSettings()
-            .runWithDatabaseCredentials(jdbcAwareClassLoaderProvider) { jdbcAwareClassLoader, credentials ->
-                val schemaVersion = migrationRunner.migrateDb(jdbcAwareClassLoader, credentials)
+            .runWithDatabaseCredentials(classloaders) { jdbcAwareClassLoader, credentials ->
+                val schemaVersion = migrationRunner.migrateDb(jdbcAwareClassLoader.buildscriptInclusive, credentials)
                 generateJooqClasses(jdbcAwareClassLoader, credentials, schemaVersion)
             }
     }
 
     private fun generateJooqClasses(
-        jdbcAwareClassLoader: ClassLoader,
+        jdbcAwareClassLoader: Classloaders,
         credentials: DatabaseCredentials,
         schemaVersion: String
     ) {
         project.delete(outputDirectory)
         codegenRunner.generateJooqClasses(
-            jdbcAwareClassLoader = jdbcAwareClassLoader,
+            codegenAwareClassLoader = jdbcAwareClassLoader,
             configuration = generatorConfig.get().also {
                 excludeFlywaySchemaIfNeeded(it.generator)
             }.apply {
@@ -211,7 +211,7 @@ open class GenerateJooqClassesTask @Inject constructor(
     }
 
     private fun defaultGeneratorConfig() = Generator()
-        .withName(JooqCodegenRunner.javaGeneratorName)
+        .withName(UniversalJooqCodegenRunner.javaGeneratorName)
         .withDatabase(
             Database()
                 .withSchemata(schemas.get().map(this::toSchemaMappingType))

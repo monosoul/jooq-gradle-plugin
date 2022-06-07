@@ -1,4 +1,4 @@
-package dev.monosoul.jooq
+package dev.monosoul.jooq.util
 
 import org.jooq.meta.jaxb.MatcherRule
 import org.jooq.meta.jaxb.MatcherTransformType.AS_IS

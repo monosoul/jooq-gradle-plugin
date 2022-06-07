@@ -1,4 +1,4 @@
-package dev.monosoul.jooq
+package dev.monosoul.jooq.util
 
 import groovy.lang.Closure
 

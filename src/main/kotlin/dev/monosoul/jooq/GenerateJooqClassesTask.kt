@@ -9,6 +9,8 @@ import dev.monosoul.jooq.settings.JooqDockerPluginSettings.WithContainer
 import dev.monosoul.jooq.settings.JooqDockerPluginSettings.WithoutContainer
 import dev.monosoul.jooq.settings.SettingsAware
 import dev.monosoul.jooq.util.CodegenClasspathAwareClassLoaders
+import dev.monosoul.jooq.util.callWith
+import dev.monosoul.jooq.util.toMatchersStrategy
 import groovy.lang.Closure
 import org.gradle.api.Action
 import org.gradle.api.DefaultTask

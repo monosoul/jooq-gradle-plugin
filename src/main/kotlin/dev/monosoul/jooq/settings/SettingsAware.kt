@@ -1,8 +1,8 @@
 package dev.monosoul.jooq.settings
 
-import dev.monosoul.jooq.callWith
 import dev.monosoul.jooq.settings.JooqDockerPluginSettings.WithContainer
 import dev.monosoul.jooq.settings.JooqDockerPluginSettings.WithoutContainer
+import dev.monosoul.jooq.util.callWith
 import groovy.lang.Closure
 import org.gradle.api.Action
 

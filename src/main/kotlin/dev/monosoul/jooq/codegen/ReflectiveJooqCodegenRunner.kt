@@ -18,11 +18,18 @@ internal class ReflectiveJooqCodegenRunner(
 
     override fun generateJooqClasses(configuration: Configuration) = codeGenTool.run(configuration)
 
+    /**
+     * Wrapper for jOOQ code generation tool object obtained via reflection.
+     * @see GenerationTool
+     */
     private class ReflectiveGenerationTool(codegenAwareClassLoader: ClassLoader) {
         private val toolClass = codegenAwareClassLoader.loadClass(GenerationTool::class.jvmName)
         private val configurationClass = codegenAwareClassLoader.loadClass(Configuration::class.jvmName)
         private val tool = toolClass.getDeclaredConstructor().newInstance()
 
+        /**
+         * @see GenerationTool.setClassLoader
+         */
         fun setClassLoader(classLoader: ClassLoader) {
             val setClassLoaderMethod = toolClass.getDeclaredMethod(
                 GenerationTool::setClassLoader.name,
@@ -31,6 +38,9 @@ internal class ReflectiveJooqCodegenRunner(
             setClassLoaderMethod.invoke(tool, classLoader)
         }
 
+        /**
+         * @see GenerationTool.run
+         */
         fun run(configuration: Configuration) {
             val preparedConfiguration = load(configuration.toXmlByteArray())
             val runMethod = toolClass.getMethod(GenerationTool::run.name, configurationClass)
@@ -44,6 +54,9 @@ internal class ReflectiveJooqCodegenRunner(
             }
         }.toByteArray()
 
+        /**
+         * @see GenerationTool.load
+         */
         private fun load(xmlByteArray: ByteArray): Any {
             val loadMethod = toolClass.getMethod(GenerationTool::load.name, InputStream::class.java)
             return ByteArrayInputStream(xmlByteArray).use {

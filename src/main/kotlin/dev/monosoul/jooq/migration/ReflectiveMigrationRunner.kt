@@ -30,6 +30,10 @@ internal class ReflectiveMigrationRunner(codegenAwareClassLoader: ClassLoader) :
         .load()
         .migrate()
 
+    /**
+     * Wrapper for Flyway configuration object obtained via reflection.
+     * @see FluentConfiguration
+     */
     private class ReflectiveFlywayConfiguration(private val codegenAwareClassLoader: ClassLoader) {
         private val flywayClass = codegenAwareClassLoader.loadClass(Flyway::class.jvmName)
         private val configurationClass = codegenAwareClassLoader.loadClass(FluentConfiguration::class.jvmName)
@@ -38,6 +42,10 @@ internal class ReflectiveMigrationRunner(codegenAwareClassLoader: ClassLoader) :
             flywayClass.getMethod(oneArgFunctionName(Flyway::configure), ClassLoader::class.java)
         private val configuration = configureMethod.invoke(null, codegenAwareClassLoader)
 
+        /**
+         * FluentConfiguration.dataSource(String, String, String)
+         * @see FluentConfiguration.dataSource
+         */
         fun dataSource(credentials: DatabaseCredentials) = also {
             val dataSourceMethod = configurationClass.getMethod(
                 fourArgFunctionName(FluentConfiguration::dataSource),
@@ -48,6 +56,10 @@ internal class ReflectiveMigrationRunner(codegenAwareClassLoader: ClassLoader) :
             dataSourceMethod.invoke(configuration, credentials.jdbcUrl, credentials.username, credentials.password)
         }
 
+        /**
+         * FluentConfiguration.schemas(String...)
+         * @see FluentConfiguration.schemas
+         */
         fun schemas(vararg schemas: String) = also {
             val schemasMethod = configurationClass.getMethod(
                 twoArgFunctionName(FluentConfiguration::schemas),
@@ -56,6 +68,10 @@ internal class ReflectiveMigrationRunner(codegenAwareClassLoader: ClassLoader) :
             schemasMethod.invoke(configuration, schemas)
         }
 
+        /**
+         * FluentConfiguration.locations(String...)
+         * @see FluentConfiguration.locations
+         */
         fun locations(vararg locations: String) = also {
             val locationsMethod = configurationClass.getMethod(
                 twoArgFunctionName<FluentConfiguration, Array<String>, FluentConfiguration>(
@@ -66,6 +82,10 @@ internal class ReflectiveMigrationRunner(codegenAwareClassLoader: ClassLoader) :
             locationsMethod.invoke(configuration, locations)
         }
 
+        /**
+         * FluentConfiguration.defaultSchema(String)
+         * @see FluentConfiguration.defaultSchema
+         */
         fun defaultSchema(schema: String) = also {
             val defaultSchemaMethod = configurationClass.getMethod(
                 twoArgFunctionName(FluentConfiguration::defaultSchema),
@@ -74,6 +94,10 @@ internal class ReflectiveMigrationRunner(codegenAwareClassLoader: ClassLoader) :
             defaultSchemaMethod.invoke(configuration, schema)
         }
 
+        /**
+         * FluentConfiguration.table(String)
+         * @see FluentConfiguration.table
+         */
         fun table(table: String) = also {
             val tableMethod = configurationClass.getMethod(
                 twoArgFunctionName(FluentConfiguration::table),
@@ -82,6 +106,11 @@ internal class ReflectiveMigrationRunner(codegenAwareClassLoader: ClassLoader) :
             tableMethod.invoke(configuration, table)
         }
 
+        /**
+         *
+         * FluentConfiguration.configuration(Map<String,String>)
+         * @see FluentConfiguration.configuration
+         */
         fun configuration(props: Map<String, String>) = also {
             val configurationMethod = configurationClass.getMethod(
                 twoArgFunctionName<FluentConfiguration, Map<String, String>, FluentConfiguration>(
@@ -92,6 +121,10 @@ internal class ReflectiveMigrationRunner(codegenAwareClassLoader: ClassLoader) :
             configurationMethod.invoke(configuration, props)
         }
 
+        /**
+         * FluentConfiguration.load()
+         * @see FluentConfiguration.load
+         */
         fun load(): ReflectiveFlyway {
             val loadMethod = configurationClass.getMethod(FluentConfiguration::load.name)
 
@@ -103,17 +136,28 @@ internal class ReflectiveMigrationRunner(codegenAwareClassLoader: ClassLoader) :
         }
 
         private companion object {
+            // those functions are required to provide a hint for overloaded functions
             fun <P, R> oneArgFunctionName(ref: KFunction1<P, R>) = ref.name
             fun <T, P, R> twoArgFunctionName(ref: KFunction2<T, P, R>) = ref.name
             fun <T, P1, P2, P3, R> fourArgFunctionName(ref: KFunction4<T, P1, P2, P3, R>) = ref.name
         }
     }
 
+    /**
+     * Wrapper for Flyway object obtained via reflection.
+     * @see Flyway
+     */
     private class ReflectiveFlyway(
         private val flywayClass: Class<*>,
         private val migrateResultClass: Class<*>,
         private val flywayInstance: Any,
     ) {
+
+        /**
+         * Flyway.migrate()
+         * @see Flyway.migrate
+         * @see MigrateResult.targetSchemaVersion
+         */
         fun migrate(): SchemaVersion {
             val migrateMethod = flywayClass.getMethod(Flyway::migrate.name)
             val migrateResult = migrateMethod.invoke(flywayInstance)

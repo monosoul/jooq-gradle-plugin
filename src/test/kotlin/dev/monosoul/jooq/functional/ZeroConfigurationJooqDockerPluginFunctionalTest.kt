@@ -38,7 +38,7 @@ class ZeroConfigurationJooqDockerPluginFunctionalTest : JooqDockerPluginFunction
             that(result).generateJooqClassesTask.outcome isEqualTo SUCCESS
             that(
                 projectFile("build/generated-jooq/org/jooq/generated/tables/Foo.java").also {
-                    println(it.readText())
+                    println(it.readText()) // TODO: remove
                 }
             ).exists()
             that(

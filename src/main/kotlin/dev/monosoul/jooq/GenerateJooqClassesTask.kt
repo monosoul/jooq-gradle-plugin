@@ -1,7 +1,8 @@
 package dev.monosoul.jooq
 
 import dev.monosoul.jooq.codegen.UniversalJooqCodegenRunner
-import dev.monosoul.jooq.migration.MigrationRunner
+import dev.monosoul.jooq.migration.SchemaVersion
+import dev.monosoul.jooq.migration.UniversalMigrationRunner
 import dev.monosoul.jooq.settings.DatabaseCredentials
 import dev.monosoul.jooq.settings.JooqDockerPluginSettings
 import dev.monosoul.jooq.settings.JooqDockerPluginSettings.WithContainer
@@ -124,7 +125,7 @@ open class GenerateJooqClassesTask @Inject constructor(
     private fun globalPluginSettings() = project.extensions.getByType<JooqExtension>().pluginSettings
 
     private val migrationRunner by lazy {
-        MigrationRunner(schemas, inputDirectory, flywayProperties)
+        UniversalMigrationRunner(schemas, inputDirectory, flywayProperties)
     }
 
     private val codegenRunner = UniversalJooqCodegenRunner()
@@ -192,7 +193,7 @@ open class GenerateJooqClassesTask @Inject constructor(
     fun generateClasses() {
         getPluginSettings()
             .runWithDatabaseCredentials(classLoaders()) { classLoaders, credentials ->
-                val schemaVersion = migrationRunner.migrateDb(classLoaders.buildscriptInclusive, credentials)
+                val schemaVersion = migrationRunner.migrateDb(classLoaders, credentials)
                 generateJooqClasses(classLoaders, credentials, schemaVersion)
             }
     }
@@ -200,7 +201,7 @@ open class GenerateJooqClassesTask @Inject constructor(
     private fun generateJooqClasses(
         jdbcAwareClassLoader: CodegenClasspathAwareClassLoaders,
         credentials: DatabaseCredentials,
-        schemaVersion: String
+        schemaVersion: SchemaVersion
     ) {
         project.delete(outputDirectory)
         codegenRunner.generateJooqClasses(
@@ -215,7 +216,7 @@ open class GenerateJooqClassesTask @Inject constructor(
                         .withUser(credentials.username)
                         .withPassword(credentials.password)
                 )
-                generator.database.schemaVersionProvider = schemaVersion
+                generator.database.schemaVersionProvider = schemaVersion.value
             }
         )
     }

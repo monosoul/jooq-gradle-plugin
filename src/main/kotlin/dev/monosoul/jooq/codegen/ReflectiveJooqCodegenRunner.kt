@@ -18,9 +18,7 @@ internal class ReflectiveJooqCodegenRunner(
 
     override fun generateJooqClasses(configuration: Configuration) = codeGenTool.run(configuration)
 
-    private class ReflectiveGenerationTool(
-        codegenAwareClassLoader: ClassLoader
-    ) {
+    private class ReflectiveGenerationTool(codegenAwareClassLoader: ClassLoader) {
         private val toolClass = codegenAwareClassLoader.loadClass(GenerationTool::class.jvmName)
         private val configurationClass = codegenAwareClassLoader.loadClass(Configuration::class.jvmName)
         private val tool = toolClass.getDeclaredConstructor().newInstance()

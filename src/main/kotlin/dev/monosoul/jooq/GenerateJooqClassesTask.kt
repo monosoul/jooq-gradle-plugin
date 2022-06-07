@@ -1,13 +1,13 @@
 package dev.monosoul.jooq
 
 import dev.monosoul.jooq.codegen.UniversalJooqCodegenRunner
+import dev.monosoul.jooq.migration.MigrationRunner
 import dev.monosoul.jooq.settings.DatabaseCredentials
 import dev.monosoul.jooq.settings.JooqDockerPluginSettings
 import dev.monosoul.jooq.settings.JooqDockerPluginSettings.WithContainer
 import dev.monosoul.jooq.settings.JooqDockerPluginSettings.WithoutContainer
 import dev.monosoul.jooq.settings.SettingsAware
 import dev.monosoul.jooq.util.CodegenClasspathAwareClassLoaders
-import dev.monosoul.jooq.util.MigrationRunner
 import groovy.lang.Closure
 import org.gradle.api.Action
 import org.gradle.api.DefaultTask

@@ -1,4 +1,4 @@
-package dev.monosoul.jooq.util
+package dev.monosoul.jooq.migration
 
 import dev.monosoul.jooq.settings.DatabaseCredentials
 import org.flywaydb.core.Flyway

@@ -34,7 +34,7 @@ class RunContainerWithCommandJooqDockerPluginFunctionalTest : JooqDockerPluginFu
                 }
 
                 dependencies {
-                    jdbc("org.postgresql:postgresql:42.3.6")
+                    jooqCodegen("org.postgresql:postgresql:42.3.6")
                 }
             """.trimIndent()
         }

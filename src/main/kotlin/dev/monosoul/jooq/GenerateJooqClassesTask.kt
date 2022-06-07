@@ -1,19 +1,21 @@
 package dev.monosoul.jooq
 
+import dev.monosoul.jooq.codegen.UniversalJooqCodegenRunner
+import dev.monosoul.jooq.migration.SchemaVersion
+import dev.monosoul.jooq.migration.UniversalMigrationRunner
 import dev.monosoul.jooq.settings.DatabaseCredentials
 import dev.monosoul.jooq.settings.JooqDockerPluginSettings
 import dev.monosoul.jooq.settings.JooqDockerPluginSettings.WithContainer
 import dev.monosoul.jooq.settings.JooqDockerPluginSettings.WithoutContainer
+import dev.monosoul.jooq.settings.SettingsAware
+import dev.monosoul.jooq.util.CodegenClasspathAwareClassLoaders
 import groovy.lang.Closure
-import org.flywaydb.core.Flyway
-import org.flywaydb.core.api.Location.FILESYSTEM_PREFIX
-import org.flywaydb.core.internal.configuration.ConfigUtils.DEFAULT_SCHEMA
-import org.flywaydb.core.internal.configuration.ConfigUtils.TABLE
 import org.gradle.api.Action
 import org.gradle.api.DefaultTask
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.ProviderFactory
 import org.gradle.api.tasks.CacheableTask
+import org.gradle.api.tasks.Classpath
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.OutputDirectory
@@ -21,9 +23,10 @@ import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
 import org.gradle.kotlin.dsl.getByType
+import org.gradle.kotlin.dsl.listProperty
+import org.gradle.kotlin.dsl.mapProperty
 import org.gradle.kotlin.dsl.property
-import org.jooq.codegen.GenerationTool
-import org.jooq.codegen.JavaGenerator
+import org.gradle.kotlin.dsl.setProperty
 import org.jooq.meta.jaxb.Configuration
 import org.jooq.meta.jaxb.Database
 import org.jooq.meta.jaxb.Generate
@@ -38,44 +41,44 @@ import javax.inject.Inject
 
 @CacheableTask
 open class GenerateJooqClassesTask @Inject constructor(
-    private val objectFactory: ObjectFactory,
+    objectFactory: ObjectFactory,
     private val providerFactory: ProviderFactory,
 ) : DefaultTask(), SettingsAware {
     /**
      * List of schemas to take into account when running migrations and generating code.
      */
     @Input
-    var schemas = arrayOf("public")
+    val schemas = objectFactory.listProperty<String>().convention(listOf("public"))
 
     /**
      * Base package for generated classes.
      */
     @Input
-    var basePackageName = "org.jooq.generated"
+    val basePackageName = objectFactory.property<String>().convention("org.jooq.generated")
 
     /**
      * Flyway configuration.
      */
     @Input
-    var flywayProperties = emptyMap<String, String>()
+    val flywayProperties = objectFactory.mapProperty<String, String>().convention(emptyMap())
 
     /**
      * List of schemas to not generate schema information for (generate classes as for default schema).
      */
     @Input
-    var outputSchemaToDefault = emptySet<String>()
+    val outputSchemaToDefault = objectFactory.setProperty<String>().convention(emptySet())
 
     /**
      * Map of schema name to specific package name.
      */
     @Input
-    var schemaToPackageMapping = emptyMap<String, String>()
+    val schemaToPackageMapping = objectFactory.mapProperty<String, String>().convention(emptyMap())
 
     /**
      * Exclude Flyway migration history table from generated code.
      */
     @Input
-    var excludeFlywayTable = false
+    val excludeFlywayTable = objectFactory.property<Boolean>().convention(false)
 
     /**
      * Code generator configuration.
@@ -101,6 +104,14 @@ open class GenerateJooqClassesTask @Inject constructor(
     val outputDirectory =
         objectFactory.directoryProperty().convention(project.layout.buildDirectory.dir("generated-jooq"))
 
+    /**
+     * Classpath for code generation. Derived from jooqCodegen configuration.
+     */
+    @Classpath
+    val codegenClasspath = objectFactory.fileCollection().from(
+        project.configurations.named(JooqDockerPlugin.CONFIGURATION_NAME)
+    )
+
     private var localPluginSettings: JooqDockerPluginSettings? = null
 
     /**
@@ -113,8 +124,15 @@ open class GenerateJooqClassesTask @Inject constructor(
 
     private fun globalPluginSettings() = project.extensions.getByType<JooqExtension>().pluginSettings
 
+    private val migrationRunner = UniversalMigrationRunner(schemas, inputDirectory, flywayProperties)
+
+    private val codegenRunner = UniversalJooqCodegenRunner()
+
+    private fun classLoaders() = CodegenClasspathAwareClassLoaders.from(codegenClasspath)
+
     init {
         group = "jooq"
+        description = "Generates jOOQ classes from Flyway migrations"
     }
 
     override fun withContainer(configure: Action<WithContainer>) {
@@ -137,7 +155,7 @@ open class GenerateJooqClassesTask @Inject constructor(
     ) {
         generatorConfig.set(
             providerFactory.provider {
-                file.inputStream().use(GenerationTool::load).applyCommonConfiguration().also {
+                file.inputStream().use(UniversalJooqCodegenRunner::load).applyCommonConfiguration().also {
                     it.generator.apply(customizer::execute)
                 }
             }
@@ -173,52 +191,40 @@ open class GenerateJooqClassesTask @Inject constructor(
     @TaskAction
     fun generateClasses() {
         getPluginSettings()
-            .runWithDatabaseCredentials(project.jdbcAwareClassloaderProvider()) { jdbcAwareClassLoader, credentials ->
-                migrateDb(jdbcAwareClassLoader, credentials)
-                generateJooqClasses(jdbcAwareClassLoader, credentials)
+            .runWithDatabaseCredentials(classLoaders()) { classLoaders, credentials ->
+                val schemaVersion = migrationRunner.migrateDb(classLoaders, credentials)
+                generateJooqClasses(classLoaders, credentials, schemaVersion)
             }
     }
 
-    private fun migrateDb(jdbcAwareClassLoader: ClassLoader, credentials: DatabaseCredentials) {
-        Flyway.configure(jdbcAwareClassLoader)
-            .dataSource(credentials.jdbcUrl, credentials.username, credentials.password)
-            .schemas(*schemas)
-            .locations(*inputDirectory.map { "$FILESYSTEM_PREFIX${it.absolutePath}" }.toTypedArray())
-            .defaultSchema(defaultFlywaySchema())
-            .table(flywayTableName())
-            .configuration(flywayProperties)
-            .load()
-            .migrate()
-    }
-
-    private fun defaultFlywaySchema() = flywayProperties[DEFAULT_SCHEMA] ?: schemas.first()
-
-    private fun flywayTableName() = flywayProperties[TABLE] ?: "flyway_schema_history"
-
-    private fun generateJooqClasses(jdbcAwareClassLoader: ClassLoader, credentials: DatabaseCredentials) {
+    private fun generateJooqClasses(
+        jdbcAwareClassLoader: CodegenClasspathAwareClassLoaders,
+        credentials: DatabaseCredentials,
+        schemaVersion: SchemaVersion
+    ) {
         project.delete(outputDirectory)
-        FlywaySchemaVersionProvider.setup(defaultFlywaySchema(), flywayTableName())
-        SchemaPackageRenameGeneratorStrategy.schemaToPackageMapping.set(schemaToPackageMapping.toMap())
-        val tool = GenerationTool()
-        tool.setClassLoader(jdbcAwareClassLoader)
-        generatorConfig.get().also {
-            excludeFlywaySchemaIfNeeded(it.generator)
-        }.apply {
-            withJdbc(
-                Jdbc()
-                    .withDriver(credentials.jdbcDriverClassName)
-                    .withUrl(credentials.jdbcUrl)
-                    .withUser(credentials.username)
-                    .withPassword(credentials.password)
-            )
-        }.run(tool::run)
+        codegenRunner.generateJooqClasses(
+            codegenAwareClassLoader = jdbcAwareClassLoader,
+            configuration = generatorConfig.get().also {
+                excludeFlywaySchemaIfNeeded(it.generator)
+            }.apply {
+                withJdbc(
+                    Jdbc()
+                        .withDriver(credentials.jdbcDriverClassName)
+                        .withUrl(credentials.jdbcUrl)
+                        .withUser(credentials.username)
+                        .withPassword(credentials.password)
+                )
+                generator.database.schemaVersionProvider = schemaVersion.value
+            }
+        )
     }
 
     private fun defaultGeneratorConfig() = Generator()
-        .withName(JavaGenerator::class.qualifiedName)
+        .withName(UniversalJooqCodegenRunner.javaGeneratorName)
         .withDatabase(
             Database()
-                .withSchemata(schemas.map(this::toSchemaMappingType))
+                .withSchemata(schemas.get().map(this::toSchemaMappingType))
                 .withIncludes(".*")
                 .withExcludes("")
         )
@@ -228,19 +234,22 @@ open class GenerateJooqClassesTask @Inject constructor(
         }
         .applyCommonConfiguration()
 
-    private fun Configuration.applyCommonConfiguration() = also {
-        it.generator.apply {
+    private fun Configuration.applyCommonConfiguration() = also { config ->
+        config.generator.apply {
             withLogging(Logging.DEBUG)
             withTarget(codeGenTarget())
-            withStrategy(
-                Strategy().withName(SchemaPackageRenameGeneratorStrategy::class.qualifiedName)
-            )
-            database.withSchemaVersionProvider(FlywaySchemaVersionProvider::class.qualifiedName)
+            schemaToPackageMapping.get().takeIf { it.isNotEmpty() }?.also { mapping ->
+                withStrategy(
+                    Strategy().withMatchers(
+                        mapping.toMatchersStrategy()
+                    )
+                )
+            }
         }
     }
 
     private fun codeGenTarget() = Target()
-        .withPackageName(basePackageName)
+        .withPackageName(basePackageName.get())
         .withDirectory(outputDirectory.asFile.get().toString())
         .withEncoding("UTF-8")
         .withClean(true)
@@ -248,16 +257,16 @@ open class GenerateJooqClassesTask @Inject constructor(
     private fun toSchemaMappingType(schemaName: String): SchemaMappingType {
         return SchemaMappingType()
             .withInputSchema(schemaName)
-            .withOutputSchemaToDefault(outputSchemaToDefault.contains(schemaName))
+            .withOutputSchemaToDefault(outputSchemaToDefault.get().contains(schemaName))
     }
 
     private fun excludeFlywaySchemaIfNeeded(generator: Generator) {
-        if (excludeFlywayTable)
+        if (excludeFlywayTable.get())
             generator.database.withExcludes(addFlywaySchemaHistoryToExcludes(generator.database.excludes))
     }
 
     private fun addFlywaySchemaHistoryToExcludes(currentExcludes: String?): String {
-        return listOf(currentExcludes, flywayTableName())
+        return listOf(currentExcludes, migrationRunner.flywayTableName)
             .filterNot(String?::isNullOrEmpty)
             .joinToString("|")
     }

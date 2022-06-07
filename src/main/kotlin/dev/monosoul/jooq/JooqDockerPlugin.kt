@@ -27,6 +27,6 @@ open class JooqDockerPlugin : Plugin<Project> {
     }
 
     internal companion object {
-        const val CONFIGURATION_NAME = "jdbc"
+        const val CONFIGURATION_NAME = "jooqCodegen"
     }
 }

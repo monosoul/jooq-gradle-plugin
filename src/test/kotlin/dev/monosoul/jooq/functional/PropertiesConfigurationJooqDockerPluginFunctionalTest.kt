@@ -32,7 +32,7 @@ class PropertiesConfigurationJooqDockerPluginFunctionalTest : JooqDockerPluginFu
                 }
 
                 dependencies {
-                    jdbc("org.postgresql:postgresql:42.3.6")
+                    jooqCodegen("org.postgresql:postgresql:42.3.6")
                 }
             """.trimIndent()
         }
@@ -82,7 +82,7 @@ class PropertiesConfigurationJooqDockerPluginFunctionalTest : JooqDockerPluginFu
                 }
 
                 dependencies {
-                    jdbc("org.postgresql:postgresql:42.3.6")
+                    jooqCodegen("org.postgresql:postgresql:42.3.6")
                 }
             """.trimIndent()
         }
@@ -128,7 +128,7 @@ class PropertiesConfigurationJooqDockerPluginFunctionalTest : JooqDockerPluginFu
                 }
 
                 dependencies {
-                    jdbc("org.postgresql:postgresql:42.3.6")
+                    jooqCodegen("org.postgresql:postgresql:42.3.6")
                 }
             """.trimIndent()
         }
@@ -173,6 +173,8 @@ class PropertiesConfigurationJooqDockerPluginFunctionalTest : JooqDockerPluginFu
         }
         prepareBuildGradleFile {
             """
+                import dev.monosoul.jooq.RecommendedVersions
+                
                 plugins {
                     id("dev.monosoul.jooq-docker")
                 }
@@ -182,7 +184,8 @@ class PropertiesConfigurationJooqDockerPluginFunctionalTest : JooqDockerPluginFu
                 }
 
                 dependencies {
-                    jdbc("mysql:mysql-connector-java:8.0.29")
+                    jooqCodegen("mysql:mysql-connector-java:8.0.29")
+                    jooqCodegen("org.flywaydb:flyway-mysql:${'$'}{RecommendedVersions.FLYWAY_VERSION}")
                 }
             """.trimIndent()
         }
@@ -226,7 +229,7 @@ class PropertiesConfigurationJooqDockerPluginFunctionalTest : JooqDockerPluginFu
                 }
 
                 dependencies {
-                    jdbc("org.postgresql:postgresql:42.3.6")
+                    jooqCodegen("org.postgresql:postgresql:42.3.6")
                 }
             """.trimIndent()
         }

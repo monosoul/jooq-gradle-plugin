@@ -24,13 +24,13 @@ class XmlBasedConfigJooqDockerPluginFunctionalTest : JooqDockerPluginFunctionalT
 
                 tasks {
                     generateJooqClasses {
-                        schemas = arrayOf("public", "other")
+                        schemas.set(listOf("public", "other"))
                         usingXmlConfig()
                     }
                 }
 
                 dependencies {
-                    jdbc("org.postgresql:postgresql:42.3.6")
+                    jooqCodegen("org.postgresql:postgresql:42.3.6")
                 }
             """.trimIndent()
         }
@@ -70,7 +70,7 @@ class XmlBasedConfigJooqDockerPluginFunctionalTest : JooqDockerPluginFunctionalT
 
                 tasks {
                     generateJooqClasses {
-                        schemas = arrayOf("public", "other")
+                        schemas.set(listOf("public", "other"))
                         usingXmlConfig {
                             database.withExcludes("BAR")
                         }
@@ -78,7 +78,7 @@ class XmlBasedConfigJooqDockerPluginFunctionalTest : JooqDockerPluginFunctionalT
                 }
 
                 dependencies {
-                    jdbc("org.postgresql:postgresql:42.3.6")
+                    jooqCodegen("org.postgresql:postgresql:42.3.6")
                 }
             """.trimIndent()
         }

@@ -10,7 +10,7 @@ import org.gradle.api.Project
 import java.io.Serializable
 import javax.inject.Inject
 
-open class JooqExtension @Inject constructor(private val project: Project) : Serializable, SettingsAware {
+open class JooqClassLoaderExtension @Inject constructor(private val project: Project) : Serializable, SettingsAware {
     internal var pluginSettings: JooqDockerPluginSettings = WithContainer().applyPropertiesFrom(project)
 
     @Suppress("unused")

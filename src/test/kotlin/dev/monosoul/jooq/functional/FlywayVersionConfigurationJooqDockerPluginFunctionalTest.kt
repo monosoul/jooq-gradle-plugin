@@ -2,18 +2,22 @@ package dev.monosoul.jooq.functional
 
 import org.gradle.testkit.runner.TaskOutcome.SUCCESS
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 import strikt.api.expect
+import strikt.assertions.contains
 import strikt.assertions.isEqualTo
 import strikt.java.exists
-import strikt.java.notExists
 
-class JavaBasedConfigJooqDockerPluginFunctionalTest : JooqDockerPluginFunctionalTestBase() {
+class FlywayVersionConfigurationJooqDockerPluginFunctionalTest : JooqDockerPluginFunctionalTestBase() {
 
     @Test
-    fun `should respect the generator customizations`() {
+    fun `should provide recommended Flyway version`() {
         // given
         prepareBuildGradleFile {
             """
+                import dev.monosoul.jooq.RecommendedVersions
+                
                 plugins {
                     id("dev.monosoul.jooq-docker")
                 }
@@ -22,62 +26,8 @@ class JavaBasedConfigJooqDockerPluginFunctionalTest : JooqDockerPluginFunctional
                     mavenCentral()
                 }
 
-                tasks {
-                    generateJooqClasses {
-                        schemas.set(listOf("public", "other"))
-                        usingJavaConfig {
-                            database.withExcludes("BAR")
-                        }
-                    }
-                }
-
                 dependencies {
-                    jooqCodegen("org.postgresql:postgresql:42.3.6")
-                }
-            """.trimIndent()
-        }
-        copyResource(
-            from = "/V01__init_multiple_schemas.sql",
-            to = "src/main/resources/db/migration/V01__init_multiple_schemas.sql"
-        )
-
-        // when
-        val result = runGradleWithArguments("generateJooqClasses")
-
-        // then
-        expect {
-            that(result).generateJooqClassesTask.outcome isEqualTo SUCCESS
-            that(
-                projectFile("build/generated-jooq/org/jooq/generated/public_/tables/Foo.java")
-            ).exists()
-            that(
-                projectFile("build/generated-jooq/org/jooq/generated/other/tables/Bar.java")
-            ).notExists()
-        }
-    }
-
-    @Test
-    fun `customizer should have default generate object defined`() {
-        // given
-        prepareBuildGradleFile {
-            """
-                plugins {
-                    id("dev.monosoul.jooq-docker")
-                }
-
-                repositories {
-                    mavenCentral()
-                }
-
-                tasks {
-                    generateJooqClasses {
-                        usingJavaConfig {
-                            generate.setDeprecated(true)
-                        }
-                    }
-                }
-
-                dependencies {
+                    jooqCodegen("org.flywaydb:flyway-core:${'$'}{RecommendedVersions.FLYWAY_VERSION}")
                     jooqCodegen("org.postgresql:postgresql:42.3.6")
                 }
             """.trimIndent()
@@ -90,6 +40,46 @@ class JavaBasedConfigJooqDockerPluginFunctionalTest : JooqDockerPluginFunctional
         // then
         expect {
             that(result).generateJooqClassesTask.outcome isEqualTo SUCCESS
+            that(
+                projectFile("build/generated-jooq/org/jooq/generated/tables/Foo.java")
+            ).exists()
+            that(
+                projectFile("build/generated-jooq/org/jooq/generated/tables/FlywaySchemaHistory.java")
+            ).exists()
+        }
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = ["8.5.12", "8.4.4", "8.0.5", "7.15.0"])
+    fun `should be possible to specify Flyway version to use`(flywayVersion: String) {
+        // given
+        prepareBuildGradleFile {
+            """
+                plugins {
+                    id("dev.monosoul.jooq-docker")
+                }
+
+                repositories {
+                    mavenCentral()
+                }
+
+                dependencies {
+                    jooqCodegen("org.flywaydb:flyway-core:$flywayVersion")
+                    jooqCodegen("org.postgresql:postgresql:42.3.6")
+                }
+            """.trimIndent()
+        }
+        copyResource(from = "/V01__init.sql", to = "src/main/resources/db/migration/V01__init.sql")
+
+        // when
+        val result = runGradleWithArguments("generateJooqClasses")
+
+        // then
+        expect {
+            that(result) {
+                generateJooqClassesTask.outcome isEqualTo SUCCESS
+                get { output } contains "Flyway Community Edition $flywayVersion by Redgate"
+            }
             that(
                 projectFile("build/generated-jooq/org/jooq/generated/tables/Foo.java")
             ).exists()

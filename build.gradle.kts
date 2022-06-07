@@ -75,12 +75,22 @@ tasks {
     }
 }
 
+val jooqVersion = "3.16.6"
+val flywayVersion = "8.5.12"
+
+tasks.withType<ProcessResources> {
+    filesMatching("**/dev.monosoul.jooq.dependency.versions") {
+        filter {
+            it.replace("@jooq.version@", jooqVersion)
+                .replace("@flyway.version@", flywayVersion)
+        }
+    }
+}
+
 dependencies {
-    implementation("org.jooq:jooq-codegen:3.16.6")
-    val flywayVersion = "8.5.12"
+    implementation("org.jooq:jooq-codegen:$jooqVersion")
+
     implementation("org.flywaydb:flyway-core:$flywayVersion")
-    implementation("org.flywaydb:flyway-mysql:$flywayVersion")
-    implementation("org.flywaydb:flyway-sqlserver:$flywayVersion")
     val testcontainersVersion = "1.17.2"
     implementation("org.testcontainers:jdbc:$testcontainersVersion")
 

@@ -46,7 +46,7 @@ class GroovyBuildscriptJooqDockerPluginFunctionalTest : JooqDockerPluginFunction
 
                 tasks {
                     generateJooqClasses {
-                        flywayProperties = ["flyway.placeholderReplacement": "false"]
+                        flywayProperties.put("flyway.placeholderReplacement", "false")
                         usingJavaConfig {
                             database.withExcludes("BAR")
                         }
@@ -54,7 +54,7 @@ class GroovyBuildscriptJooqDockerPluginFunctionalTest : JooqDockerPluginFunction
                 }
 
                 dependencies {
-                    jdbc "org.postgresql:postgresql:42.3.6"
+                    jooqCodegen "org.postgresql:postgresql:42.3.6"
                 }
             """.trimIndent()
         }
@@ -112,7 +112,7 @@ class GroovyBuildscriptJooqDockerPluginFunctionalTest : JooqDockerPluginFunction
 
                 tasks {
                     generateJooqClasses {
-                        flywayProperties = ["flyway.placeholderReplacement": "false"]
+                        flywayProperties.put("flyway.placeholderReplacement", "false")
                         usingJavaConfig {
                             database.withExcludes("BAR")
                         }
@@ -120,7 +120,7 @@ class GroovyBuildscriptJooqDockerPluginFunctionalTest : JooqDockerPluginFunction
                 }
 
                 dependencies {
-                    jdbc "org.postgresql:postgresql:42.3.6"
+                    jooqCodegen "org.postgresql:postgresql:42.3.6"
                 }
             """.trimIndent()
         }
@@ -165,7 +165,7 @@ class GroovyBuildscriptJooqDockerPluginFunctionalTest : JooqDockerPluginFunction
 
                 tasks {
                     generateJooqClasses {
-                        flywayProperties = ["flyway.placeholderReplacement": "false"]
+                        flywayProperties.put("flyway.placeholderReplacement", "false")
                         usingXmlConfig(project.file("src/main/resources/db/jooq.xml")) {
                             database.withExcludes("BAR")
                         }
@@ -173,7 +173,7 @@ class GroovyBuildscriptJooqDockerPluginFunctionalTest : JooqDockerPluginFunction
                 }
 
                 dependencies {
-                    jdbc "org.postgresql:postgresql:42.3.6"
+                    jooqCodegen "org.postgresql:postgresql:42.3.6"
                 }
             """.trimIndent()
         }
@@ -207,6 +207,7 @@ class GroovyBuildscriptJooqDockerPluginFunctionalTest : JooqDockerPluginFunction
             // language=gradle
             """
                 import dev.monosoul.jooq.GenerateJooqClassesTask
+                import dev.monosoul.jooq.RecommendedVersions
                 
                 plugins {
                     id "org.jetbrains.kotlin.jvm" version "1.6.21"
@@ -219,13 +220,13 @@ class GroovyBuildscriptJooqDockerPluginFunctionalTest : JooqDockerPluginFunction
                 
                 tasks {
                     generateJooqClasses {
-                        basePackageName = "org.jooq.generated.local"
+                        basePackageName.set("org.jooq.generated.local")
                         outputDirectory.set(project.layout.buildDirectory.dir("local"))
                     }
                 }
                 
                 tasks.register('generateJooqClassesForExternal', GenerateJooqClassesTask) {
-                    basePackageName = "org.jooq.generated.remote"
+                    basePackageName.set("org.jooq.generated.remote")
                     outputDirectory.set(project.layout.buildDirectory.dir("remote"))
                     
                     withoutContainer {
@@ -241,8 +242,8 @@ class GroovyBuildscriptJooqDockerPluginFunctionalTest : JooqDockerPluginFunction
 
                 dependencies {
                     implementation("org.jetbrains.kotlin:kotlin-stdlib")
-                    jdbc("org.postgresql:postgresql:42.3.6")
-                    implementation("org.jooq:jooq:3.16.6")
+                    jooqCodegen("org.postgresql:postgresql:42.3.6")
+                    implementation("org.jooq:jooq:" + RecommendedVersions.JOOQ_VERSION)
                 }
             """.trimIndent()
         }

@@ -7,9 +7,9 @@ internal class BuiltInJooqCodegenRunner(
     private val codegenAwareClassLoader: ClassLoader
 ) : JooqCodegenRunner {
 
-    override fun generateJooqClasses(configuration: Configuration) {
-        GenerationTool().apply {
-            setClassLoader(codegenAwareClassLoader)
-        }.run(configuration)
+    private val codeGenTool = GenerationTool().apply {
+        setClassLoader(codegenAwareClassLoader)
     }
+
+    override fun generateJooqClasses(configuration: Configuration) = codeGenTool.run(configuration)
 }

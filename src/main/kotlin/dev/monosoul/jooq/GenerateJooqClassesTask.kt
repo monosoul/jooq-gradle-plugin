@@ -191,9 +191,9 @@ open class GenerateJooqClassesTask @Inject constructor(
     @TaskAction
     fun generateClasses() {
         getPluginSettings()
-            .runWithDatabaseCredentials(classLoaders()) { jdbcAwareClassLoader, credentials ->
-                val schemaVersion = migrationRunner.migrateDb(jdbcAwareClassLoader.buildscriptInclusive, credentials)
-                generateJooqClasses(jdbcAwareClassLoader, credentials, schemaVersion)
+            .runWithDatabaseCredentials(classLoaders()) { classLoaders, credentials ->
+                val schemaVersion = migrationRunner.migrateDb(classLoaders.buildscriptInclusive, credentials)
+                generateJooqClasses(classLoaders, credentials, schemaVersion)
             }
     }
 

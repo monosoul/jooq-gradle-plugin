@@ -9,16 +9,14 @@ import java.io.InputStream
 import kotlin.reflect.jvm.jvmName
 
 internal class ReflectiveJooqCodegenRunner(
-    private val codegenAwareClassLoader: ClassLoader
+    codegenAwareClassLoader: ClassLoader
 ) : JooqCodegenRunner {
 
-    private val codeGenTool = ReflectiveGenerationTool(codegenAwareClassLoader)
-
-    override fun generateJooqClasses(configuration: Configuration) {
-        codeGenTool.also {
-            it.setClassLoader(codegenAwareClassLoader)
-        }.run(configuration)
+    private val codeGenTool = ReflectiveGenerationTool(codegenAwareClassLoader).apply {
+        setClassLoader(codegenAwareClassLoader)
     }
+
+    override fun generateJooqClasses(configuration: Configuration) = codeGenTool.run(configuration)
 
     private class ReflectiveGenerationTool(
         codegenAwareClassLoader: ClassLoader

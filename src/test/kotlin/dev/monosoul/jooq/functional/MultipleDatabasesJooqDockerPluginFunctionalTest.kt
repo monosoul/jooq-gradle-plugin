@@ -81,13 +81,13 @@ class MultipleDatabasesJooqDockerPluginFunctionalTest : JooqDockerPluginFunction
         expect {
             that(result).generateJooqClassesTask.outcome isEqualTo SUCCESS
             that(
-                projectFile("build/postgres/org/jooq/generated/postgres/tables/Foo.java")
+                projectFile("build/classes/java/main/org/jooq/generated/postgres/tables/Foo.class")
             ).exists()
             that(
-                projectFile("build/mysql/org/jooq/generated/mysql/tables/Foo.java")
+                projectFile("build/classes/java/main/org/jooq/generated/mysql/tables/Foo.class")
             ).exists()
             that(
-                projectFile("build/mysql/org/jooq/generated/mysql/tables/FlywaySchemaHistory.java")
+                projectFile("build/classes/java/main/org/jooq/generated/mysql/tables/FlywaySchemaHistory.class")
             ).exists()
         }
     }
@@ -276,13 +276,13 @@ class MultipleDatabasesJooqDockerPluginFunctionalTest : JooqDockerPluginFunction
         expect {
             that(result).generateJooqClassesTask.outcome isEqualTo SUCCESS
             that(
-                projectFile("build/local/org/jooq/generated/local/tables/Foo.java")
+                projectFile("build/classes/java/main/org/jooq/generated/local/tables/Foo.class")
             ).exists()
             that(
-                projectFile("build/remote/org/jooq/generated/remote/tables/Foo.java")
+                projectFile("build/classes/java/main/org/jooq/generated/remote/tables/Foo.class")
             ).exists()
             that(
-                projectFile("build/remote/org/jooq/generated/remote/tables/FlywaySchemaHistory.java")
+                projectFile("build/classes/java/main/org/jooq/generated/remote/tables/FlywaySchemaHistory.class")
             ).exists()
         }
     }

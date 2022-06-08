@@ -57,9 +57,6 @@ class CacheJooqDockerPluginFunctionalTest : JooqDockerPluginFunctionalTestBase()
                 projectFile("build/generated-jooq/org/jooq/generated/tables/Foo.java")
             ).exists()
             that(
-                projectFile("build/generated-jooq/org/jooq/generated/tables/FlywaySchemaHistory.java")
-            ).exists()
-            that(
                 projectFile("build/generated-jooq/org/jooq/generated/tables/Bar.java")
             ).exists()
         }

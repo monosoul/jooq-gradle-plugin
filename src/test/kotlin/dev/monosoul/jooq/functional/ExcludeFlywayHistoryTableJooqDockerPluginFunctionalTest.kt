@@ -10,7 +10,7 @@ import strikt.java.notExists
 class ExcludeFlywayHistoryTableJooqDockerPluginFunctionalTest : JooqDockerPluginFunctionalTestBase() {
 
     @Test
-    fun `should exclude flyway schema history`() {
+    fun `should exclude flyway schema history by default`() {
         // given
         prepareBuildGradleFile {
             """
@@ -20,12 +20,6 @@ class ExcludeFlywayHistoryTableJooqDockerPluginFunctionalTest : JooqDockerPlugin
 
                 repositories {
                     mavenCentral()
-                }
-
-                tasks {
-                    generateJooqClasses {
-                        excludeFlywayTable.set(true)
-                    }
                 }
 
                 dependencies {
@@ -51,6 +45,47 @@ class ExcludeFlywayHistoryTableJooqDockerPluginFunctionalTest : JooqDockerPlugin
     }
 
     @Test
+    fun `should be possible to include Flyway history table`() {
+        // given
+        prepareBuildGradleFile {
+            """
+                plugins {
+                    id("dev.monosoul.jooq-docker")
+                }
+
+                repositories {
+                    mavenCentral()
+                }
+
+                tasks {
+                    generateJooqClasses {
+                        includeFlywayTable.set(true)
+                    }
+                }
+
+                dependencies {
+                    jooqCodegen("org.postgresql:postgresql:42.3.6")
+                }
+            """.trimIndent()
+        }
+        copyResource(from = "/V01__init.sql", to = "src/main/resources/db/migration/V01__init.sql")
+
+        // when
+        val result = runGradleWithArguments("generateJooqClasses")
+
+        // then
+        expect {
+            that(result).generateJooqClassesTask.outcome isEqualTo SUCCESS
+            that(
+                projectFile("build/generated-jooq/org/jooq/generated/tables/Foo.java")
+            ).exists()
+            that(
+                projectFile("build/generated-jooq/org/jooq/generated/tables/FlywaySchemaHistory.java")
+            ).exists()
+        }
+    }
+
+    @Test
     fun `should exclude flyway schema history given custom Flyway table name`() {
         // given
         prepareBuildGradleFile {
@@ -65,7 +100,6 @@ class ExcludeFlywayHistoryTableJooqDockerPluginFunctionalTest : JooqDockerPlugin
 
                 tasks {
                     generateJooqClasses {
-                        excludeFlywayTable.set(true)
                         flywayProperties.put("flyway.table", "some_schema_table")
                     }
                 }
@@ -107,7 +141,6 @@ class ExcludeFlywayHistoryTableJooqDockerPluginFunctionalTest : JooqDockerPlugin
 
                 tasks {
                     generateJooqClasses {
-                        excludeFlywayTable.set(true)
                         schemas.set(listOf("public", "other"))
                         usingJavaConfig {
                             database.withExcludes("BAR")

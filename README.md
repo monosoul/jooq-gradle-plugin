@@ -275,35 +275,6 @@ dependencies {
 }
 ```
 
-To enforce version of the plugin dependencies:
-
-```kotlin
-plugins {
-    id("dev.monosoul.jooq-docker")
-}
-
-buildscript {
-    repositories {
-        mavenCentral()
-    }
-
-    dependencies {
-        classpath("org.jooq:jooq-codegen:3.12.0") {
-            isForce = true
-        }
-    }
-}
-
-repositories {
-    mavenCentral()
-}
-
-dependencies {
-    implementation("org.jooq:jooq:3.12.0")
-    jooqCodegen("org.postgresql:postgresql:42.3.6")
-}
-```
-
 ### Remote docker setup
 
 The plugin uses [testcontainers library](https://www.testcontainers.org) to spin up the DB

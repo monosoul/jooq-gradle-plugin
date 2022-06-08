@@ -1,5 +1,7 @@
 package dev.monosoul.jooq
 
+import dev.monosoul.jooq.codegen.ConfigurationProvider
+import dev.monosoul.jooq.codegen.ConfigurationProvider.Companion.postProcess
 import dev.monosoul.jooq.codegen.UniversalJooqCodegenRunner
 import dev.monosoul.jooq.migration.SchemaVersion
 import dev.monosoul.jooq.migration.UniversalMigrationRunner
@@ -10,7 +12,6 @@ import dev.monosoul.jooq.settings.JooqDockerPluginSettings.WithoutContainer
 import dev.monosoul.jooq.settings.SettingsAware
 import dev.monosoul.jooq.util.CodegenClasspathAwareClassLoaders
 import dev.monosoul.jooq.util.callWith
-import dev.monosoul.jooq.util.toMatchersStrategy
 import groovy.lang.Closure
 import org.gradle.api.Action
 import org.gradle.api.DefaultTask
@@ -30,14 +31,7 @@ import org.gradle.kotlin.dsl.mapProperty
 import org.gradle.kotlin.dsl.property
 import org.gradle.kotlin.dsl.setProperty
 import org.jooq.meta.jaxb.Configuration
-import org.jooq.meta.jaxb.Database
-import org.jooq.meta.jaxb.Generate
 import org.jooq.meta.jaxb.Generator
-import org.jooq.meta.jaxb.Jdbc
-import org.jooq.meta.jaxb.Logging
-import org.jooq.meta.jaxb.SchemaMappingType
-import org.jooq.meta.jaxb.Strategy
-import org.jooq.meta.jaxb.Target
 import java.io.File
 import javax.inject.Inject
 
@@ -89,7 +83,9 @@ open class GenerateJooqClassesTask @Inject constructor(
      */
     @Input
     val generatorConfig = objectFactory.property<Configuration>().convention(
-        providerFactory.provider(::defaultGeneratorConfig)
+        providerFactory.provider {
+            configurationProvider.defaultConfiguration()
+        }
     )
 
     /**
@@ -130,6 +126,9 @@ open class GenerateJooqClassesTask @Inject constructor(
 
     private val codegenRunner = UniversalJooqCodegenRunner()
 
+    private val configurationProvider =
+        ConfigurationProvider(basePackageName, outputDirectory, outputSchemaToDefault, schemaToPackageMapping, schemas)
+
     private fun classLoaders() = CodegenClasspathAwareClassLoaders.from(codegenClasspath)
 
     init {
@@ -157,7 +156,7 @@ open class GenerateJooqClassesTask @Inject constructor(
     ) {
         generatorConfig.set(
             providerFactory.provider {
-                file.inputStream().use(UniversalJooqCodegenRunner::load).applyCommonConfiguration().also {
+                configurationProvider.fromXml(file).also {
                     it.generator.apply(customizer::execute)
                 }
             }
@@ -177,7 +176,7 @@ open class GenerateJooqClassesTask @Inject constructor(
     fun usingJavaConfig(customizer: Action<Generator>) {
         generatorConfig.set(
             providerFactory.provider {
-                defaultGeneratorConfig().also {
+                configurationProvider.defaultConfiguration().also {
                     customizer.execute(it.generator)
                 }
             }
@@ -207,71 +206,13 @@ open class GenerateJooqClassesTask @Inject constructor(
         project.delete(outputDirectory)
         codegenRunner.generateJooqClasses(
             codegenAwareClassLoader = jdbcAwareClassLoader,
-            configuration = generatorConfig.get().apply {
-                generator.also {
-                    it.excludeFlywayHistoryTableIfNeeded()
-                    it.database.schemaVersionProvider = schemaVersion.value
-                }
-                withJdbc(
-                    Jdbc()
-                        .withDriver(credentials.jdbcDriverClassName)
-                        .withUrl(credentials.jdbcUrl)
-                        .withUser(credentials.username)
-                        .withPassword(credentials.password)
+            configuration = generatorConfig.get().postProcess(
+                schemaVersion = schemaVersion,
+                credentials = credentials,
+                extraTableExclusions = listOfNotNull(
+                    migrationRunner.flywayTableName.takeUnless { includeFlywayTable.get() }
                 )
-            }
+            )
         )
-    }
-
-    private fun defaultGeneratorConfig() = Generator()
-        .withName(UniversalJooqCodegenRunner.javaGeneratorName)
-        .withDatabase(
-            Database()
-                .withSchemata(schemas.get().map(this::toSchemaMappingType))
-                .withIncludes(".*")
-                .withExcludes("")
-        )
-        .withGenerate(Generate())
-        .let {
-            Configuration().withGenerator(it)
-        }
-        .applyCommonConfiguration()
-
-    private fun Configuration.applyCommonConfiguration() = also { config ->
-        config.generator.apply {
-            withLogging(Logging.DEBUG)
-            withTarget(codeGenTarget())
-            schemaToPackageMapping.get().takeIf { it.isNotEmpty() }?.also { mapping ->
-                withStrategy(
-                    Strategy().withMatchers(
-                        mapping.toMatchersStrategy()
-                    )
-                )
-            }
-        }
-    }
-
-    private fun codeGenTarget() = Target()
-        .withPackageName(basePackageName.get())
-        .withDirectory(outputDirectory.asFile.get().toString())
-        .withEncoding("UTF-8")
-        .withClean(true)
-
-    private fun toSchemaMappingType(schemaName: String): SchemaMappingType {
-        return SchemaMappingType()
-            .withInputSchema(schemaName)
-            .withOutputSchemaToDefault(outputSchemaToDefault.get().contains(schemaName))
-    }
-
-    private fun Generator.excludeFlywayHistoryTableIfNeeded() {
-        if (!includeFlywayTable.get()) {
-            database.withExcludes(addFlywayHistoryTableToExcludes(database.excludes))
-        }
-    }
-
-    private fun addFlywayHistoryTableToExcludes(currentExcludes: String?): String {
-        return listOf(currentExcludes, migrationRunner.flywayTableName)
-            .filterNot(String?::isNullOrEmpty)
-            .joinToString("|")
     }
 }

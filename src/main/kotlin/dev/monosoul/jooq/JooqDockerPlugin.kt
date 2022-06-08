@@ -11,14 +11,16 @@ import org.gradle.kotlin.dsl.withType
 
 open class JooqDockerPlugin : Plugin<Project> {
 
-    override fun apply(project: Project) {
-        project.configurations.create(CONFIGURATION_NAME)
-        project.extensions.create<JooqExtension>("jooq")
-        project.tasks.register<GenerateJooqClassesTask>("generateJooqClasses")
-        project.extensions.findByType<JavaPluginExtension>()?.run {
-            sourceSets.named(MAIN_SOURCE_SET_NAME) {
-                java {
-                    srcDirs(project.tasks.withType<GenerateJooqClassesTask>())
+    override fun apply(project: Project) = with(project) {
+        configurations.create(CONFIGURATION_NAME)
+        extensions.create<JooqExtension>("jooq")
+        tasks.register<GenerateJooqClassesTask>("generateJooqClasses")
+        pluginManager.withPlugin("org.gradle.java") {
+            extensions.findByType<JavaPluginExtension>()?.run {
+                sourceSets.named(MAIN_SOURCE_SET_NAME) {
+                    java {
+                        srcDirs(tasks.withType<GenerateJooqClassesTask>())
+                    }
                 }
             }
         }

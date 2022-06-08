@@ -11,9 +11,9 @@ internal object PropertiesReader {
     private const val PREFIX = "dev.monosoul.jooq."
     private val WITH_CONTAINER = "${PREFIX}${functionName(SettingsAware::withContainer)}."
     private val WITHOUT_CONTAINER = "${PREFIX}${functionName(SettingsAware::withoutContainer)}."
-    private val IMAGE_PREFIX = "${functionName(WithContainer::image)}."
+    private val IMAGE_PREFIX = "${functionName(ImageAware::image)}."
     private val DATABASE_PREFIX = "${functionName(DbAware<Database>::db)}."
-    private val JDBC_PREFIX = "${functionName(Database::jdbc)}."
+    private val JDBC_PREFIX = "${functionName(JdbcAware::jdbc)}."
 
     fun WithContainer.applyPropertiesFrom(project: Project): JooqDockerPluginSettings =
         if (project.properties.keys.any { it.startsWith(WITHOUT_CONTAINER) }) {

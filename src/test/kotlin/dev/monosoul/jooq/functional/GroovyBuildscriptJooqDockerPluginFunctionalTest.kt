@@ -228,6 +228,7 @@ class GroovyBuildscriptJooqDockerPluginFunctionalTest : JooqDockerPluginFunction
                 tasks.register('generateJooqClassesForExternal', GenerateJooqClassesTask) {
                     basePackageName.set("org.jooq.generated.remote")
                     outputDirectory.set(project.layout.buildDirectory.dir("remote"))
+                    includeFlywayTable.set(true)
                     
                     withoutContainer {
                         db {
@@ -258,9 +259,6 @@ class GroovyBuildscriptJooqDockerPluginFunctionalTest : JooqDockerPluginFunction
             that(result).generateJooqClassesTask.outcome isEqualTo SUCCESS
             that(
                 projectFile("build/local/org/jooq/generated/local/tables/Foo.java")
-            ).exists()
-            that(
-                projectFile("build/local/org/jooq/generated/local/tables/FlywaySchemaHistory.java")
             ).exists()
             that(
                 projectFile("build/remote/org/jooq/generated/remote/tables/Foo.java")

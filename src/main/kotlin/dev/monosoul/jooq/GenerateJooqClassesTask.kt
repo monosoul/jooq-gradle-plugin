@@ -77,10 +77,10 @@ open class GenerateJooqClassesTask @Inject constructor(
     val schemaToPackageMapping = objectFactory.mapProperty<String, String>().convention(emptyMap())
 
     /**
-     * Exclude Flyway migration history table from generated code.
+     * Include Flyway migration history table to generated code.
      */
     @Input
-    val excludeFlywayTable = objectFactory.property<Boolean>().convention(false)
+    val includeFlywayTable = objectFactory.property<Boolean>().convention(false)
 
     /**
      * Code generator configuration.
@@ -207,9 +207,11 @@ open class GenerateJooqClassesTask @Inject constructor(
         project.delete(outputDirectory)
         codegenRunner.generateJooqClasses(
             codegenAwareClassLoader = jdbcAwareClassLoader,
-            configuration = generatorConfig.get().also {
-                excludeFlywaySchemaIfNeeded(it.generator)
-            }.apply {
+            configuration = generatorConfig.get().apply {
+                generator.also {
+                    it.excludeFlywayHistoryTableIfNeeded()
+                    it.database.schemaVersionProvider = schemaVersion.value
+                }
                 withJdbc(
                     Jdbc()
                         .withDriver(credentials.jdbcDriverClassName)
@@ -217,7 +219,6 @@ open class GenerateJooqClassesTask @Inject constructor(
                         .withUser(credentials.username)
                         .withPassword(credentials.password)
                 )
-                generator.database.schemaVersionProvider = schemaVersion.value
             }
         )
     }
@@ -262,12 +263,13 @@ open class GenerateJooqClassesTask @Inject constructor(
             .withOutputSchemaToDefault(outputSchemaToDefault.get().contains(schemaName))
     }
 
-    private fun excludeFlywaySchemaIfNeeded(generator: Generator) {
-        if (excludeFlywayTable.get())
-            generator.database.withExcludes(addFlywaySchemaHistoryToExcludes(generator.database.excludes))
+    private fun Generator.excludeFlywayHistoryTableIfNeeded() {
+        if (!includeFlywayTable.get()) {
+            database.withExcludes(addFlywayHistoryTableToExcludes(database.excludes))
+        }
     }
 
-    private fun addFlywaySchemaHistoryToExcludes(currentExcludes: String?): String {
+    private fun addFlywayHistoryTableToExcludes(currentExcludes: String?): String {
         return listOf(currentExcludes, migrationRunner.flywayTableName)
             .filterNot(String?::isNullOrEmpty)
             .joinToString("|")

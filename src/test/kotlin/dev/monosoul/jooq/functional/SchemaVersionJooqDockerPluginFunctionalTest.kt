@@ -25,6 +25,7 @@ class SchemaVersionJooqDockerPluginFunctionalTest : JooqDockerPluginFunctionalTe
                 tasks {
                     generateJooqClasses {
                         flywayProperties.put("flyway.table", "some_schema_table")
+                        includeFlywayTable.set(true)
                     }
                 }
 
@@ -83,11 +84,6 @@ class SchemaVersionJooqDockerPluginFunctionalTest : JooqDockerPluginFunctionalTe
             }
             that(
                 projectFile("build/generated-jooq/org/jooq/generated/tables/Bar.java")
-            ).exists().and {
-                get { readText() } contains "schema version:02"
-            }
-            that(
-                projectFile("build/generated-jooq/org/jooq/generated/tables/FlywaySchemaHistory.java")
             ).exists().and {
                 get { readText() } contains "schema version:02"
             }

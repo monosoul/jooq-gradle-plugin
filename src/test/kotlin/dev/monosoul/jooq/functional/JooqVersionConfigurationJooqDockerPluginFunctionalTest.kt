@@ -43,9 +43,6 @@ class JooqVersionConfigurationJooqDockerPluginFunctionalTest : JooqDockerPluginF
             that(
                 projectFile("build/generated-jooq/org/jooq/generated/tables/Foo.java")
             ).exists()
-            that(
-                projectFile("build/generated-jooq/org/jooq/generated/tables/FlywaySchemaHistory.java")
-            ).exists()
         }
     }
 
@@ -82,11 +79,6 @@ class JooqVersionConfigurationJooqDockerPluginFunctionalTest : JooqDockerPluginF
             }
             that(
                 projectFile("build/generated-jooq/org/jooq/generated/tables/Foo.java")
-            ).exists().and {
-                get { readText() } contains "jOOQ version:$jooqVersion"
-            }
-            that(
-                projectFile("build/generated-jooq/org/jooq/generated/tables/FlywaySchemaHistory.java")
             ).exists().and {
                 get { readText() } contains "jOOQ version:$jooqVersion"
             }

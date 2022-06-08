@@ -37,6 +37,7 @@ class MultipleDatabasesJooqDockerPluginFunctionalTest : JooqDockerPluginFunction
                         basePackageName.set("org.jooq.generated.mysql")
                         inputDirectory.setFrom("src/main/resources/mysql/migration")
                         outputDirectory.set(project.layout.buildDirectory.dir("mysql"))
+                        includeFlywayTable.set(true)
                     
                         withContainer {
                             image {
@@ -81,9 +82,6 @@ class MultipleDatabasesJooqDockerPluginFunctionalTest : JooqDockerPluginFunction
             that(result).generateJooqClassesTask.outcome isEqualTo SUCCESS
             that(
                 projectFile("build/postgres/org/jooq/generated/postgres/tables/Foo.java")
-            ).exists()
-            that(
-                projectFile("build/postgres/org/jooq/generated/postgres/tables/FlywaySchemaHistory.java")
             ).exists()
             that(
                 projectFile("build/mysql/org/jooq/generated/mysql/tables/Foo.java")
@@ -247,6 +245,7 @@ class MultipleDatabasesJooqDockerPluginFunctionalTest : JooqDockerPluginFunction
                     register<GenerateJooqClassesTask>("generateJooqClassesForExternal") {
                         basePackageName.set("org.jooq.generated.remote")
                         outputDirectory.set(project.layout.buildDirectory.dir("remote"))
+                        includeFlywayTable.set(true)
                     
                         withoutContainer {
                             db {
@@ -278,9 +277,6 @@ class MultipleDatabasesJooqDockerPluginFunctionalTest : JooqDockerPluginFunction
             that(result).generateJooqClassesTask.outcome isEqualTo SUCCESS
             that(
                 projectFile("build/local/org/jooq/generated/local/tables/Foo.java")
-            ).exists()
-            that(
-                projectFile("build/local/org/jooq/generated/local/tables/FlywaySchemaHistory.java")
             ).exists()
             that(
                 projectFile("build/remote/org/jooq/generated/remote/tables/Foo.java")

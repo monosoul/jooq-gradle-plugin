@@ -65,6 +65,7 @@ class FlywayConfigurationJooqDockerPluginFunctionalTest : JooqDockerPluginFuncti
                 tasks {
                     generateJooqClasses {
                         schemas.set(listOf("other", "public"))
+                        includeFlywayTable.set(true)
                     }
                 }
 

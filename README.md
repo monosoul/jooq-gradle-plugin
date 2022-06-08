@@ -76,7 +76,7 @@ tasks {
         inputDirectory.setFrom(project.files("src/main/resources/db/migration"))
         outputDirectory.set(project.layout.buildDirectory.dir("generated-jooq"))
         flywayProperties.put("flyway.placeholderReplacement", "false")
-        excludeFlywayTable.set(true)
+        includeFlywayTable.set(true)
         outputSchemaToDefault.add("public")
         schemaToPackageMapping.put("public", "fancy_name")
         usingJavaConfig {

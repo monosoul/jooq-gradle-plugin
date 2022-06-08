@@ -54,9 +54,6 @@ class PropertiesConfigurationJooqDockerPluginFunctionalTest : JooqDockerPluginFu
             that(
                 projectFile("build/generated-jooq/org/jooq/generated/tables/Foo.java")
             ).exists()
-            that(
-                projectFile("build/generated-jooq/org/jooq/generated/tables/FlywaySchemaHistory.java")
-            ).exists()
         }
     }
 
@@ -100,9 +97,6 @@ class PropertiesConfigurationJooqDockerPluginFunctionalTest : JooqDockerPluginFu
             that(
                 projectFile("build/generated-jooq/org/jooq/generated/tables/Foo.java")
             ).exists()
-            that(
-                projectFile("build/generated-jooq/org/jooq/generated/tables/FlywaySchemaHistory.java")
-            ).exists()
         }
     }
 
@@ -145,9 +139,6 @@ class PropertiesConfigurationJooqDockerPluginFunctionalTest : JooqDockerPluginFu
             that(result).generateJooqClassesTask.outcome isEqualTo SUCCESS
             that(
                 projectFile("build/generated-jooq/org/jooq/generated/tables/Foo.java")
-            ).exists()
-            that(
-                projectFile("build/generated-jooq/org/jooq/generated/tables/FlywaySchemaHistory.java")
             ).exists()
         }
     }

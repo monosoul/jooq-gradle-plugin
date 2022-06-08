@@ -15,12 +15,10 @@ open class JooqDockerPlugin : Plugin<Project> {
         project.configurations.create(CONFIGURATION_NAME)
         project.extensions.create<JooqExtension>("jooq")
         project.tasks.register<GenerateJooqClassesTask>("generateJooqClasses")
-        project.afterEvaluate {
-            extensions.findByType<JavaPluginExtension>()?.run {
-                sourceSets.named(MAIN_SOURCE_SET_NAME) {
-                    java {
-                        srcDirs(tasks.withType<GenerateJooqClassesTask>())
-                    }
+        project.extensions.findByType<JavaPluginExtension>()?.run {
+            sourceSets.named(MAIN_SOURCE_SET_NAME) {
+                java {
+                    srcDirs(project.tasks.withType<GenerateJooqClassesTask>())
                 }
             }
         }

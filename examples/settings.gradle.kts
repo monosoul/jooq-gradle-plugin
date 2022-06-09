@@ -10,6 +10,9 @@ includeTree {
     module("multiple-databases")
     module("external-database")
     module("properties")
+    module("java-codegen-configuration")
+    module("xml-codegen-configuration")
+    module("recommended-jooq-flyway-versions")
 }
 
 

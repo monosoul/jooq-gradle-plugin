@@ -9,7 +9,7 @@ import strikt.api.expect
 import strikt.assertions.isEqualTo
 import strikt.java.exists
 
-class RunWithExternalDatabaseJooqDockerPluginFunctionalTest : JooqDockerPluginFunctionalTestBase() {
+class ExternalDatabaseJooqDockerPluginFunctionalTest : JooqDockerPluginFunctionalTestBase() {
 
     private val postgresContainer = PostgresContainer()
 

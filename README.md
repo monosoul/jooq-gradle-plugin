@@ -35,6 +35,8 @@ Plugin registers task `generateJooqClasses` that does following steps:
 
 # Examples
 
+Detailed examples are available in the [examples directory](examples) of this repository.
+
 By default plugin is configured to work with PostgreSQL, so the following minimal config is enough:
 
 ```kotlin

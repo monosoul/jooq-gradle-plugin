@@ -38,6 +38,8 @@ Plugin registers task `generateJooqClasses` that does following steps:
 By default plugin is configured to work with PostgreSQL, so the following minimal config is enough:
 
 ```kotlin
+import dev.monosoul.jooq.RecommendedVersions
+
 plugins {
     id("dev.monosoul.jooq-docker")
 }
@@ -47,7 +49,7 @@ repositories {
 }
 
 dependencies {
-    implementation("org.jooq:jooq:3.16.5")
+    implementation("org.jooq:jooq:${RecommendedVersions.JOOQ_VERSION}")
     jooqCodegen("org.postgresql:postgresql:42.3.6")
 }
 ```

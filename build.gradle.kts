@@ -75,7 +75,7 @@ tasks {
     }
 }
 
-val jooqVersion = "3.16.7"
+val jooqVersion = "3.17.0"
 val flywayVersion = "8.5.13"
 
 tasks.withType<ProcessResources> {

@@ -3,7 +3,7 @@ package dev.monosoul.jooq.settings
 import java.io.Serializable
 
 data class Image(
-    var name: String = "postgres:11.2-alpine",
+    var name: String = "postgres:14.4-alpine",
     var envVars: Map<String, String> = mapOf(),
     var testQuery: String = "SELECT 1",
     var command: String? = null,

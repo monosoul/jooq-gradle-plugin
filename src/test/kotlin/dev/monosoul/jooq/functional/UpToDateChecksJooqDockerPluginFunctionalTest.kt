@@ -92,7 +92,7 @@ class UpToDateChecksJooqDockerPluginFunctionalTest : JooqDockerPluginFunctionalT
             jooq {
                 withContainer {
                     image {
-                        name = "postgres:11.2-alpine"
+                        name = "postgres:14.4-alpine"
                     }
                 }
             }
@@ -114,7 +114,7 @@ class UpToDateChecksJooqDockerPluginFunctionalTest : JooqDockerPluginFunctionalT
             jooq {
                 withContainer {
                     image {
-                        name = "postgres:11.3-alpine"
+                        name = "postgres:14.3-alpine"
                     }
                 }
             }

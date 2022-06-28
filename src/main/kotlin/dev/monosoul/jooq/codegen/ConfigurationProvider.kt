@@ -109,7 +109,9 @@ internal class ConfigurationProvider(
 
         private fun Generator.addExcludes(excludes: List<String>) {
             database.withExcludes(
-                (excludes + database.excludes).filterNot(String::isBlank).joinToString("|")
+                listOfNotNull(database.excludes, *excludes.toTypedArray())
+                    .filterNot(String::isBlank)
+                    .joinToString("|")
             )
         }
 

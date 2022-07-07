@@ -75,7 +75,7 @@ tasks {
     }
 }
 
-val jooqVersion = "3.17.1"
+val jooqVersion = "3.17.2"
 val flywayVersion = "8.5.13"
 
 tasks.withType<ProcessResources> {
@@ -91,7 +91,7 @@ dependencies {
     implementation("org.jooq:jooq-codegen:$jooqVersion")
 
     implementation("org.flywaydb:flyway-core:$flywayVersion")
-    val testcontainersVersion = "1.17.2"
+    val testcontainersVersion = "1.17.3"
     implementation("org.testcontainers:jdbc:$testcontainersVersion")
 
     testImplementation("org.testcontainers:postgresql:$testcontainersVersion")

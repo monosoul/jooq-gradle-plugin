@@ -7,7 +7,6 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     `kotlin-dsl`
     jacoco
-    `maven-publish`
     id("com.gradle.plugin-publish") version "1.0.0"
     id("pl.droidsonroids.jacoco.testkit") version "1.0.9"
 }
@@ -29,6 +28,9 @@ gradlePlugin {
         id = "dev.monosoul.jooq-docker"
         implementationClass = "dev.monosoul.jooq.JooqDockerPlugin"
         version = project.version
+
+        displayName = "jOOQ Docker Plugin"
+        description = "Generates jOOQ classes using dockerized database"
     }
 }
 
@@ -36,15 +38,9 @@ pluginBundle {
     website = "https://github.com/monosoul/jooq-gradle-plugin"
     vcsUrl = "https://github.com/monosoul/jooq-gradle-plugin"
 
-    description = "Generates jOOQ classes using dockerized database"
-
-    (plugins) {
-        "jooqDockerPlugin" {
-            displayName = "jOOQ Docker Plugin"
-            tags = listOf("jooq", "docker", "db")
-            version = project.version.toString()
-        }
-    }
+    pluginTags = mapOf(
+        "jooqDockerPlugin" to listOf("jooq", "docker", "db"),
+    )
 }
 
 tasks {

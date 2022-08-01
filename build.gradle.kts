@@ -72,7 +72,7 @@ tasks {
 }
 
 val jooqVersion = "3.17.2"
-val flywayVersion = "9.0.1"
+val flywayVersion = "9.0.4"
 
 tasks.withType<ProcessResources> {
     filesMatching("**/dev.monosoul.jooq.dependency.versions") {
@@ -91,9 +91,9 @@ dependencies {
     implementation("org.testcontainers:jdbc:$testcontainersVersion")
 
     testImplementation("org.testcontainers:postgresql:$testcontainersVersion")
-    testImplementation(enforcedPlatform("org.junit:junit-bom:5.8.2"))
+    testImplementation(enforcedPlatform("org.junit:junit-bom:5.9.0"))
     testImplementation("org.junit.jupiter:junit-jupiter")
     testImplementation("io.strikt:strikt-jvm:0.34.1")
-    testImplementation("io.mockk:mockk:1.12.4")
+    testImplementation("io.mockk:mockk:1.12.5")
     testCompileOnly(gradleTestKit())
 }

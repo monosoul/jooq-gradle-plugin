@@ -9,6 +9,10 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      contents: write
+      pull-requests: write
     concurrency:
       group: ${{ github.ref }}
       cancel-in-progress: true
@@ -32,4 +36,10 @@ jobs:
           report_paths: '**/build/test-results/**/TEST-*.xml'
       - name: Coverage Report
         uses: codecov/codecov-action@v3
-
+      - name: Semantic Release
+        if: ${{ github.ref == 'refs/heads/main' }}
+        uses: cycjimmy/semantic-release-action@v3
+        with:
+          semantic_version: 19
+        env:
+          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}

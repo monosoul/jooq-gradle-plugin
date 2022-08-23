@@ -5,6 +5,7 @@
 [![GitHub Release](https://img.shields.io/github/release/monosoul/jooq-gradle-plugin.svg?label=GitHub%20Release)](https://github.com/monosoul/jooq-gradle-plugin/releases)
 [![Gradle Plugins Release](https://img.shields.io/maven-metadata/v/https/plugins.gradle.org/m2/dev/monosoul/jooq-docker/dev.monosoul.jooq-docker.gradle.plugin/maven-metadata.xml.svg?label=Gradle%20Plugin%20Portal)](https://plugins.gradle.org/plugin/dev.monosoul.jooq-docker)
 [![license](https://img.shields.io/github/license/monosoul/jooq-gradle-plugin.svg)](LICENSE)
+[![Semantic Release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg)](https://github.com/semantic-release/semantic-release)
 
 Copyright 2021 [Adrian Skrobacz](https://github.com/adrianskrobaczrevolut)
 
@@ -26,12 +27,6 @@ Plugin registers task `generateJooqClasses` that does following steps:
 * starts database container
 * runs migrations using Flyway
 * generates jOOQ classes
-
-**Use**:
-
-- **`0.3.x` and later for jOOQ versions `3.12.x` and later**
-- **`0.2.x` and later releases for jOOQ versions `3.11.x` and later**
-- **For earlier versions use `0.1.x` release**
 
 # Examples
 

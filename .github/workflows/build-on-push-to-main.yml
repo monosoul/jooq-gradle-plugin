@@ -1,0 +1,35 @@
+name: Build
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+      - name: Run tests
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: check jacocoTestReport
+      - name: Publish Test Report
+        uses: mikepenz/action-junit-report@v3
+        if: always() # always run even if the previous step fails
+        with:
+          check_name: JUnit Test Report
+          report_paths: '**/build/test-results/**/TEST-*.xml'
+      - name: Coverage Report
+        uses: codecov/codecov-action@v3
+      - name: Semantic Release
+        uses: cycjimmy/semantic-release-action@v3
+        with:
+          semantic_version: 19
+        env:
+          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}

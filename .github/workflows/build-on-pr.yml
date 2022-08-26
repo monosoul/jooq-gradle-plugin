@@ -1,8 +1,6 @@
 name: Build
 
 on:
-  push:
-    branches: [ main ]
   pull_request:
     types: [ opened, synchronize ]
 
@@ -32,10 +30,3 @@ jobs:
           report_paths: '**/build/test-results/**/TEST-*.xml'
       - name: Coverage Report
         uses: codecov/codecov-action@v3
-      - name: Semantic Release
-        if: ${{ github.ref == 'refs/heads/main' }}
-        uses: cycjimmy/semantic-release-action@v3
-        with:
-          semantic_version: 19
-        env:
-          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}

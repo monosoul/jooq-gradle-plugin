@@ -1,17 +1,12 @@
-name: Build
+name: Build main
 
 on:
   push:
     branches: [ main ]
-  pull_request:
-    types: [ opened, synchronize ]
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    concurrency:
-      group: ${{ github.ref }}
-      cancel-in-progress: true
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -33,7 +28,6 @@ jobs:
       - name: Coverage Report
         uses: codecov/codecov-action@v3
       - name: Semantic Release
-        if: ${{ github.ref == 'refs/heads/main' }}
         uses: cycjimmy/semantic-release-action@v3
         with:
           semantic_version: 19

@@ -49,6 +49,7 @@ internal class ReflectiveJooqCodegenRunner(
 
         private fun Configuration.toXmlByteArray() = ByteArrayOutputStream().also { stream ->
             stream.writer().use { writer ->
+                @Suppress("UnstableApiUsage")
                 MiniJAXB.marshal(this, writer)
                 writer.flush()
             }

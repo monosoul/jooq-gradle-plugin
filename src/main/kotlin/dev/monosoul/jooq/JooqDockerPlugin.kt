@@ -38,22 +38,6 @@ open class JooqDockerPlugin @Inject constructor(
         }
     }
 
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as JooqDockerPlugin
-
-        if (providerFactory != other.providerFactory) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        return providerFactory.hashCode()
-    }
-
-
     internal companion object {
         const val CONFIGURATION_NAME = "jooqCodegen"
     }

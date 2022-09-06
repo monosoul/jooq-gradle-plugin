@@ -15,6 +15,7 @@ import dev.monosoul.jooq.util.callWith
 import groovy.lang.Closure
 import org.gradle.api.Action
 import org.gradle.api.DefaultTask
+import org.gradle.api.file.FileSystemOperations
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.ProviderFactory
 import org.gradle.api.tasks.CacheableTask
@@ -39,6 +40,7 @@ import javax.inject.Inject
 open class GenerateJooqClassesTask @Inject constructor(
     objectFactory: ObjectFactory,
     private val providerFactory: ProviderFactory,
+    private val fsOperations: FileSystemOperations,
 ) : DefaultTask(), SettingsAware {
     /**
      * List of schemas to take into account when running migrations and generating code.
@@ -203,7 +205,9 @@ open class GenerateJooqClassesTask @Inject constructor(
         credentials: DatabaseCredentials,
         schemaVersion: SchemaVersion
     ) {
-        project.delete(outputDirectory)
+        fsOperations.delete {
+            delete(outputDirectory)
+        }
         codegenRunner.generateJooqClasses(
             codegenAwareClassLoader = jdbcAwareClassLoader,
             configuration = generatorConfig.get().postProcess(

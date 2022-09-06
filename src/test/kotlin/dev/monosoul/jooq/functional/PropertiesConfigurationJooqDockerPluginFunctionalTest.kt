@@ -19,14 +19,15 @@ class PropertiesConfigurationJooqDockerPluginFunctionalTest : JooqDockerPluginFu
         }
         prepareBuildGradleFile {
             """
-                plugins {
-                    id("dev.monosoul.jooq-docker")
-                }
-                
                 project.setProperty("dev.monosoul.jooq.nonStringProperty", 123)
                 require(project.properties.get("dev.monosoul.jooq.nonStringProperty") !is String) {
                     "nonStringProperty should not be a string"
                 }
+                
+                plugins {
+                    id("dev.monosoul.jooq-docker")
+                }                
+
 
                 repositories {
                     mavenCentral()

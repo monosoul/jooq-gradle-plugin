@@ -16,6 +16,7 @@ import groovy.lang.Closure
 import org.gradle.api.Action
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.FileSystemOperations
+import org.gradle.api.file.ProjectLayout
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.ProviderFactory
 import org.gradle.api.tasks.CacheableTask
@@ -41,6 +42,7 @@ open class GenerateJooqClassesTask @Inject constructor(
     objectFactory: ObjectFactory,
     private val providerFactory: ProviderFactory,
     private val fsOperations: FileSystemOperations,
+    private val projectLayout: ProjectLayout,
 ) : DefaultTask(), SettingsAware {
     /**
      * List of schemas to take into account when running migrations and generating code.
@@ -102,7 +104,7 @@ open class GenerateJooqClassesTask @Inject constructor(
      */
     @OutputDirectory
     val outputDirectory =
-        objectFactory.directoryProperty().convention(project.layout.buildDirectory.dir("generated-jooq"))
+        objectFactory.directoryProperty().convention(projectLayout.buildDirectory.dir("generated-jooq"))
 
     /**
      * Classpath for code generation. Derived from jooqCodegen configuration.
@@ -153,7 +155,7 @@ open class GenerateJooqClassesTask @Inject constructor(
      */
     @Suppress("unused")
     fun usingXmlConfig(
-        file: File = project.file("src/main/resources/db/jooq.xml"),
+        file: File = projectLayout.projectDirectory.file("src/main/resources/db/jooq.xml").asFile,
         customizer: Action<Generator> = Action<Generator> { }
     ) {
         generatorConfig.set(

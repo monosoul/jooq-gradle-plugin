@@ -41,7 +41,7 @@ class ConfigurationCacheJooqDockerPluginFunctionalTest : FunctionalTestBase() {
         val result = runGradleWithArguments("generateJooqClasses", "--configuration-cache")
 
         // second run uses configuration cache
-        val resultFromCache = runGradleWithArguments("generateJooqClasses", "--configuration-cache", "--debug")
+        val resultFromCache = runGradleWithArguments("generateJooqClasses", "--configuration-cache")
 
         // then
         expect {

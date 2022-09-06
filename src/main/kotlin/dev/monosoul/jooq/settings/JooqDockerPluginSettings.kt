@@ -3,6 +3,8 @@ package dev.monosoul.jooq.settings
 import dev.monosoul.jooq.container.GenericDatabaseContainer
 import dev.monosoul.jooq.util.CodegenClasspathAwareClassLoaders
 import org.gradle.api.Action
+import org.testcontainers.shaded.org.apache.commons.lang3.builder.EqualsBuilder.reflectionEquals
+import org.testcontainers.shaded.org.apache.commons.lang3.builder.HashCodeBuilder.reflectionHashCode
 
 sealed class JooqDockerPluginSettings : SettingsElement {
     internal abstract val database: Database
@@ -55,23 +57,8 @@ sealed class JooqDockerPluginSettings : SettingsElement {
         override fun db(customizer: Action<Database.Internal>) = customizer.execute(database)
         override fun image(customizer: Action<Image>) = customizer.execute(image)
 
-        override fun equals(other: Any?): Boolean {
-            if (this === other) return true
-            if (javaClass != other?.javaClass) return false
-
-            other as WithContainer
-
-            if (database != other.database) return false
-            if (image != other.image) return false
-
-            return true
-        }
-
-        override fun hashCode(): Int {
-            var result = database.hashCode()
-            result = 31 * result + image.hashCode()
-            return result
-        }
+        override fun equals(other: Any?) = reflectionEquals(this, other)
+        override fun hashCode(): Int = reflectionHashCode(this)
     }
 
     class WithoutContainer private constructor(
@@ -102,19 +89,7 @@ sealed class JooqDockerPluginSettings : SettingsElement {
 
         override fun db(customizer: Action<Database.External>) = customizer.execute(database)
 
-        override fun equals(other: Any?): Boolean {
-            if (this === other) return true
-            if (javaClass != other?.javaClass) return false
-
-            other as WithoutContainer
-
-            if (database != other.database) return false
-
-            return true
-        }
-
-        override fun hashCode(): Int {
-            return database.hashCode()
-        }
+        override fun equals(other: Any?) = reflectionEquals(this, other)
+        override fun hashCode(): Int = reflectionHashCode(this)
     }
 }

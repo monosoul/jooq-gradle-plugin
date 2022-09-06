@@ -12,6 +12,11 @@ plugins {
     `java-test-fixtures`
 }
 
+// disable test fixtures publishing
+val javaComponent = components["java"] as AdhocComponentWithVariants
+javaComponent.withVariantsFromConfiguration(configurations["testFixturesApiElements"]) { skip() }
+javaComponent.withVariantsFromConfiguration(configurations["testFixturesRuntimeElements"]) { skip() }
+
 repositories {
     mavenCentral()
 }

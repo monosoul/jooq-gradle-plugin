@@ -10,6 +10,48 @@ import strikt.java.exists
 class PropertiesConfigurationJooqDockerPluginFunctionalTest : JooqDockerPluginFunctionalTestBase() {
 
     @Test
+    fun `should ignore non-string properties`() {
+        // given
+        writeProjectFile("gradle.properties") {
+            """
+                dev.monosoul.jooq.nonStringProperty=value-to-override
+            """.trimIndent()
+        }
+        prepareBuildGradleFile {
+            """
+                plugins {
+                    id("dev.monosoul.jooq-docker")
+                }
+                
+                project.setProperty("dev.monosoul.jooq.nonStringProperty", 123)
+                require(project.properties.get("dev.monosoul.jooq.nonStringProperty") !is String) {
+                    "nonStringProperty should not be a string"
+                }
+
+                repositories {
+                    mavenCentral()
+                }
+
+                dependencies {
+                    jooqCodegen("org.postgresql:postgresql:42.3.6")
+                }
+            """.trimIndent()
+        }
+        copyResource(from = "/V01__init.sql", to = "src/main/resources/db/migration/V01__init.sql")
+
+        // when
+        val result = runGradleWithArguments("generateJooqClasses")
+
+        // then
+        expect {
+            that(result).generateJooqClassesTask.outcome isEqualTo SUCCESS
+            that(
+                projectFile("build/generated-jooq/org/jooq/generated/tables/Foo.java")
+            ).exists()
+        }
+    }
+
+    @Test
     fun `should support with container override to without container`() {
         // given
         val postgresContainer = PostgresContainer().also { it.start() }

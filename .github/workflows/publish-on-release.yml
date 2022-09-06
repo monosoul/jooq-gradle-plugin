@@ -30,6 +30,6 @@ jobs:
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: 'build/libs/jooq-gradle-plugin-*.jar'
+          file: 'build/libs/jooq-gradle-plugin-*[0-9].*[0-9].*[0-9]{-javadoc,-sources,}.jar'
           file_glob: true
           tag: ${{ github.ref }}

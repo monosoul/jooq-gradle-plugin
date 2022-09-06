@@ -8,6 +8,7 @@ import strikt.assertions.isFalse
 import strikt.assertions.isTrue
 
 class JooqDockerPluginSettingsTest {
+
     @Test
     fun `WithContainer should implement equals and hashcode`() {
         // given

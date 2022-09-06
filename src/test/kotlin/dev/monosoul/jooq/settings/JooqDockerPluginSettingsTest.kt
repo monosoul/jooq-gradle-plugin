@@ -2,61 +2,54 @@ package dev.monosoul.jooq.settings
 
 import dev.monosoul.jooq.settings.JooqDockerPluginSettings.WithContainer
 import dev.monosoul.jooq.settings.JooqDockerPluginSettings.WithoutContainer
-import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.DynamicTest.dynamicTest
+import org.junit.jupiter.api.TestFactory
 import strikt.api.expect
 import strikt.assertions.isFalse
 import strikt.assertions.isTrue
+import kotlin.streams.asStream
 
 class JooqDockerPluginSettingsTest {
 
-    @Test
-    fun `WithContainer should implement equals and hashcode`() {
-        // given
-        val withContainer1 = WithContainer()
-        val withContainer2 = WithContainer().apply {
-            database.apply {
-                name = "dbname"
+    @TestFactory
+    fun `JooqDockerPluginSettings implementations should implement equals and hashcode`() = sequenceOf(
+        WithContainer().let {
+            Triple(
+                it,
+                it.copy(),
+                WithContainer().apply {
+                    database.apply {
+                        name = "dbname"
+                    }
+                    image.apply {
+                        name = "imagename"
+                    }
+                },
+            )
+        },
+        WithoutContainer().let {
+            Triple(
+                it,
+                it.copy(),
+                WithoutContainer().apply {
+                    database.apply {
+                        name = "dbname"
+                    }
+                },
+            )
+        }
+    ).map { (instance, instanceCopy, differentInstance) ->
+        dynamicTest("${instance::class.simpleName} should implement equals and hashcode") {
+            expect {
+                @Suppress("KotlinConstantConditions")
+                that(instance == instance).isTrue()
+                that(instance == instanceCopy).isTrue()
+                that(instance == differentInstance).isFalse()
+
+                that(instance.hashCode() == instance.hashCode()).isTrue()
+                that(instance.hashCode() == instanceCopy.hashCode()).isTrue()
+                that(instance.hashCode() == differentInstance.hashCode()).isFalse()
             }
-            image.apply {
-                name = "imagename"
-            }
         }
-        val withContainer3 = withContainer1.copy()
-
-        // when & then
-        expect {
-            @Suppress("KotlinConstantConditions")
-            that(withContainer1 == withContainer1).isTrue()
-            that(withContainer1 == withContainer2).isFalse()
-            that(withContainer1 == withContainer3).isTrue()
-
-            that(withContainer1.hashCode() == withContainer1.hashCode()).isTrue()
-            that(withContainer1.hashCode() == withContainer2.hashCode()).isFalse()
-            that(withContainer1.hashCode() == withContainer3.hashCode()).isTrue()
-        }
-    }
-
-    @Test
-    fun `WithoutContainer should implement equals and hashcode`() {
-        // given
-        val withoutContainer1 = WithoutContainer()
-        val withoutContainer2 = WithoutContainer().apply {
-            database.apply {
-                name = "dbname"
-            }
-        }
-        val withoutContainer3 = withoutContainer1.copy()
-
-        // when & then
-        expect {
-            @Suppress("KotlinConstantConditions")
-            that(withoutContainer1 == withoutContainer1).isTrue()
-            that(withoutContainer1 == withoutContainer2).isFalse()
-            that(withoutContainer1 == withoutContainer3).isTrue()
-
-            that(withoutContainer1.hashCode() == withoutContainer1.hashCode()).isTrue()
-            that(withoutContainer1.hashCode() == withoutContainer2.hashCode()).isFalse()
-            that(withoutContainer1.hashCode() == withoutContainer3.hashCode()).isTrue()
-        }
-    }
+    }.asStream()
 }

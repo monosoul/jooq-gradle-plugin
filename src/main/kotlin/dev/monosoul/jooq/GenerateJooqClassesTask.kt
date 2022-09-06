@@ -141,14 +141,12 @@ open class GenerateJooqClassesTask @Inject constructor(
     }
 
     override fun withContainer(configure: Action<WithContainer>) {
-        localPluginSettings = globalPluginSettings.get().let { it as? WithContainer }?.copy()
-            ?.apply(configure::execute)
+        localPluginSettings = globalPluginSettings.get().let { it as? WithContainer }?.copy()?.apply(configure::execute)
             ?: WithContainer(configure)
     }
 
     override fun withoutContainer(configure: Action<WithoutContainer>) {
-        localPluginSettings = globalPluginSettings.get().let { it as? WithoutContainer }?.copy()
-            ?.apply(configure::execute)
+        localPluginSettings = globalPluginSettings.get().let { it as? WithoutContainer }?.copy()?.apply(configure::execute)
             ?: WithoutContainer(configure)
     }
 

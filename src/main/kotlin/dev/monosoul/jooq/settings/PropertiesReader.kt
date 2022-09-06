@@ -3,70 +3,69 @@ package dev.monosoul.jooq.settings
 import dev.monosoul.jooq.settings.JooqDockerPluginSettings.WithContainer
 import dev.monosoul.jooq.settings.JooqDockerPluginSettings.WithoutContainer
 import org.gradle.api.Action
-import org.gradle.api.Project
 import kotlin.reflect.KFunction2
 import kotlin.reflect.KMutableProperty0
 
 internal object PropertiesReader {
-    private const val PREFIX = "dev.monosoul.jooq."
+    const val PREFIX = "dev.monosoul.jooq."
     private val WITH_CONTAINER = "${PREFIX}${functionName(SettingsAware::withContainer)}."
     private val WITHOUT_CONTAINER = "${PREFIX}${functionName(SettingsAware::withoutContainer)}."
     private val IMAGE_PREFIX = "${functionName(ImageAware::image)}."
     private val DATABASE_PREFIX = "${functionName(DbAware<Database>::db)}."
     private val JDBC_PREFIX = "${functionName(JdbcAware::jdbc)}."
 
-    fun WithContainer.applyPropertiesFrom(project: Project): JooqDockerPluginSettings =
-        if (project.properties.keys.any { it.startsWith(WITHOUT_CONTAINER) }) {
+    fun WithContainer.applyPropertiesFrom(pluginProperties: Map<String, String>): JooqDockerPluginSettings =
+        if (pluginProperties.keys.any { it.startsWith(WITHOUT_CONTAINER) }) {
             WithoutContainer {
-                applyPropertiesFrom(project)
+                applyPropertiesFrom(pluginProperties)
             }
         } else {
-            onlyApplyPropertiesFrom(project)
+            onlyApplyPropertiesFrom(pluginProperties)
         }
 
-    private fun WithContainer.onlyApplyPropertiesFrom(project: Project) = apply {
-        image.applyPropertiesFrom(project)
-        database.applyPropertiesFrom(project)
+    private fun WithContainer.onlyApplyPropertiesFrom(pluginProperties: Map<String, String>) = apply {
+        image.applyPropertiesFrom(pluginProperties)
+        database.applyPropertiesFrom(pluginProperties)
     }
 
-    fun WithoutContainer.applyPropertiesFrom(project: Project): JooqDockerPluginSettings = apply {
-        database.applyPropertiesFrom(project)
+    fun WithoutContainer.applyPropertiesFrom(pluginProperties: Map<String, String>): JooqDockerPluginSettings = apply {
+        database.applyPropertiesFrom(pluginProperties)
     }
 
-    private fun Jdbc.applyPropertiesFrom(project: Project, namespace: String) {
+    private fun Jdbc.applyPropertiesFrom(pluginProperties: Map<String, String>, namespace: String) {
         val prefix = "$namespace$JDBC_PREFIX"
-        project.findAndSetProperty(prefix, ::schema)
-        project.findAndSetProperty(prefix, ::driverClassName)
-        project.findAndSetProperty(prefix, ::urlQueryParams)
+        pluginProperties.findAndSetProperty(prefix, ::schema)
+        pluginProperties.findAndSetProperty(prefix, ::driverClassName)
+        pluginProperties.findAndSetProperty(prefix, ::urlQueryParams)
     }
 
-    private fun Database.External.applyPropertiesFrom(project: Project) {
+    private fun Database.External.applyPropertiesFrom(pluginProperties: Map<String, String>) {
         val prefix = "$WITHOUT_CONTAINER$DATABASE_PREFIX"
-        project.findAndSetProperty(prefix, ::host)
-        project.findAndSetProperty(prefix, ::port) { it.toInt() }
-        project.findAndSetProperty(prefix, ::name)
-        project.findAndSetProperty(prefix, ::username)
-        project.findAndSetProperty(prefix, ::password)
-        jdbc.applyPropertiesFrom(project, prefix)
+        pluginProperties.findAndSetProperty(prefix, ::host)
+        pluginProperties.findAndSetProperty(prefix, ::port) { it.toInt() }
+        pluginProperties.findAndSetProperty(prefix, ::name)
+        pluginProperties.findAndSetProperty(prefix, ::username)
+        pluginProperties.findAndSetProperty(prefix, ::password)
+        jdbc.applyPropertiesFrom(pluginProperties, prefix)
     }
 
-    private fun Database.Internal.applyPropertiesFrom(project: Project) {
+    private fun Database.Internal.applyPropertiesFrom(pluginProperties: Map<String, String>) {
         val prefix = "$WITH_CONTAINER$DATABASE_PREFIX"
-        project.findAndSetProperty(prefix, ::port) { it.toInt() }
-        project.findAndSetProperty(prefix, ::name)
-        project.findAndSetProperty(prefix, ::username)
-        project.findAndSetProperty(prefix, ::password)
-        jdbc.applyPropertiesFrom(project, prefix)
+        pluginProperties.findAndSetProperty(prefix, ::port) { it.toInt() }
+        pluginProperties.findAndSetProperty(prefix, ::name)
+        pluginProperties.findAndSetProperty(prefix, ::username)
+        pluginProperties.findAndSetProperty(prefix, ::password)
+        jdbc.applyPropertiesFrom(pluginProperties, prefix)
     }
 
-    private fun Image.applyPropertiesFrom(project: Project) {
+    private fun Image.applyPropertiesFrom(pluginProperties: Map<String, String>) {
         val prefix = "$WITH_CONTAINER$IMAGE_PREFIX"
-        project.findAndSetProperty(prefix, ::name)
-        project.findAndSetProperty(prefix, ::command)
-        project.findAndSetProperty(prefix, ::testQuery)
+        pluginProperties.findAndSetProperty(prefix, ::name)
+        pluginProperties.findAndSetProperty(prefix, ::command)
+        pluginProperties.findAndSetProperty(prefix, ::testQuery)
 
         val envVarsPrefix = "$prefix${::envVars.name}."
-        project.properties.filterKeys { it.startsWith(envVarsPrefix) }.map { (key, value) ->
+        pluginProperties.filterKeys { it.startsWith(envVarsPrefix) }.map { (key, value) ->
             key.removePrefix(envVarsPrefix) to value.toString()
         }.takeIf { it.isNotEmpty() }?.also {
             envVars = it.toMap()
@@ -74,12 +73,12 @@ internal object PropertiesReader {
     }
 
     @Suppress("UNCHECKED_CAST")
-    private fun <T> Project.findAndSetProperty(
+    private fun <T> Map<String, String>.findAndSetProperty(
         prefix: String,
         property: KMutableProperty0<T>,
         mapper: (String) -> T = { it as T }
     ) {
-        (findProperty("$prefix${property.name}") as? String)?.also {
+        get("$prefix${property.name}")?.also {
             property.set(mapper(it))
         }
     }

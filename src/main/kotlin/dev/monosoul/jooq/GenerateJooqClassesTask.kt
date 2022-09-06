@@ -116,15 +116,15 @@ open class GenerateJooqClassesTask @Inject constructor(
 
     private var localPluginSettings: JooqDockerPluginSettings? = null
 
+    private val globalPluginSettings = project.extensions.getByType<JooqExtension>().pluginSettings
+
     /**
      * Local (task-specific) plugin configuration.
      *
      * Avoid changing manually, use [withContainer] or [withoutContainer] instead.
      */
     @Input
-    fun getPluginSettings() = localPluginSettings ?: globalPluginSettings()
-
-    private fun globalPluginSettings() = project.extensions.getByType<JooqExtension>().pluginSettings
+    fun getPluginSettings() = localPluginSettings ?: globalPluginSettings.get()
 
     private val migrationRunner = UniversalMigrationRunner(schemas, inputDirectory, flywayProperties)
 
@@ -141,12 +141,14 @@ open class GenerateJooqClassesTask @Inject constructor(
     }
 
     override fun withContainer(configure: Action<WithContainer>) {
-        localPluginSettings = globalPluginSettings().let { it as? WithContainer }?.copy()?.apply(configure::execute)
+        localPluginSettings = globalPluginSettings.get().let { it as? WithContainer }?.copy()
+            ?.apply(configure::execute)
             ?: WithContainer(configure)
     }
 
     override fun withoutContainer(configure: Action<WithoutContainer>) {
-        localPluginSettings = globalPluginSettings().let { it as? WithoutContainer }?.copy()?.apply(configure::execute)
+        localPluginSettings = globalPluginSettings.get().let { it as? WithoutContainer }?.copy()
+            ?.apply(configure::execute)
             ?: WithoutContainer(configure)
     }
 

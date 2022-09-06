@@ -1,6 +1,7 @@
 package dev.monosoul.jooq.functional
 
 import org.gradle.testkit.runner.TaskOutcome.SUCCESS
+import org.gradle.testkit.runner.TaskOutcome.UP_TO_DATE
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
 import strikt.api.expect
@@ -49,7 +50,7 @@ class ConfigurationCacheJooqDockerPluginFunctionalTest : FunctionalTestBase() {
                 get { output }.contains("Configuration cache entry stored")
             }
             that(resultFromCache).apply {
-                generateJooqClassesTask.outcome isEqualTo SUCCESS
+                generateJooqClassesTask.outcome isEqualTo UP_TO_DATE
                 get { output }.contains("Configuration cache entry reused")
             }
             that(

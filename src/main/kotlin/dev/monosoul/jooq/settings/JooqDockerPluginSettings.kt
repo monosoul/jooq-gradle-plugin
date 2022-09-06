@@ -3,9 +3,10 @@ package dev.monosoul.jooq.settings
 import dev.monosoul.jooq.container.GenericDatabaseContainer
 import dev.monosoul.jooq.util.CodegenClasspathAwareClassLoaders
 import org.gradle.api.Action
-import java.io.Serializable
+import org.testcontainers.shaded.org.apache.commons.lang3.builder.EqualsBuilder.reflectionEquals
+import org.testcontainers.shaded.org.apache.commons.lang3.builder.HashCodeBuilder.reflectionHashCode
 
-sealed class JooqDockerPluginSettings : Serializable {
+sealed class JooqDockerPluginSettings : SettingsElement {
     internal abstract val database: Database
     internal abstract fun runWithDatabaseCredentials(
         classloaders: CodegenClasspathAwareClassLoaders,
@@ -55,6 +56,9 @@ sealed class JooqDockerPluginSettings : Serializable {
 
         override fun db(customizer: Action<Database.Internal>) = customizer.execute(database)
         override fun image(customizer: Action<Image>) = customizer.execute(image)
+
+        override fun equals(other: Any?) = reflectionEquals(this, other)
+        override fun hashCode(): Int = reflectionHashCode(this)
     }
 
     class WithoutContainer private constructor(
@@ -84,5 +88,8 @@ sealed class JooqDockerPluginSettings : Serializable {
         )
 
         override fun db(customizer: Action<Database.External>) = customizer.execute(database)
+
+        override fun equals(other: Any?) = reflectionEquals(this, other)
+        override fun hashCode(): Int = reflectionHashCode(this)
     }
 }

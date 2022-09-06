@@ -1,9 +1,8 @@
 package dev.monosoul.jooq.settings
 
 import org.gradle.api.Action
-import java.io.Serializable
 
-sealed class Database : Serializable, JdbcAware {
+sealed class Database : JdbcAware, SettingsElement {
     abstract var username: String
     abstract var password: String
     abstract var name: String

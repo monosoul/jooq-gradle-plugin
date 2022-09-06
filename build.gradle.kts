@@ -9,6 +9,7 @@ plugins {
     jacoco
     id("com.gradle.plugin-publish") version "1.0.0"
     id("pl.droidsonroids.jacoco.testkit") version "1.0.9"
+    `java-test-fixtures`
 }
 
 repositories {
@@ -90,10 +91,10 @@ dependencies {
     val testcontainersVersion = "1.17.3"
     implementation("org.testcontainers:jdbc:$testcontainersVersion")
 
-    testImplementation("org.testcontainers:postgresql:$testcontainersVersion")
-    testImplementation(enforcedPlatform("org.junit:junit-bom:5.9.0"))
-    testImplementation("org.junit.jupiter:junit-jupiter")
-    testImplementation("io.strikt:strikt-jvm:0.34.1")
-    testImplementation("io.mockk:mockk:1.12.7")
-    testCompileOnly(gradleTestKit())
+    testFixturesApi("org.testcontainers:postgresql:$testcontainersVersion")
+    testFixturesApi(enforcedPlatform("org.junit:junit-bom:5.9.0"))
+    testFixturesApi("org.junit.jupiter:junit-jupiter")
+    testFixturesApi("io.strikt:strikt-jvm:0.34.1")
+    testFixturesApi("io.mockk:mockk:1.12.7")
+    testFixturesApi(gradleTestKit())
 }

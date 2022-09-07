@@ -3,6 +3,7 @@ package dev.monosoul.jooq.settings
 import dev.monosoul.jooq.container.GenericDatabaseContainer
 import dev.monosoul.jooq.util.CodegenClasspathAwareClassLoaders
 import org.gradle.api.Action
+import org.gradle.api.tasks.Nested
 import org.testcontainers.shaded.org.apache.commons.lang3.builder.EqualsBuilder.reflectionEquals
 import org.testcontainers.shaded.org.apache.commons.lang3.builder.HashCodeBuilder.reflectionHashCode
 
@@ -16,7 +17,9 @@ sealed class JooqDockerPluginSettings : SettingsElement {
     internal abstract fun copy(): JooqDockerPluginSettings
 
     class WithContainer private constructor(
+        @get:Nested
         override val database: Database.Internal,
+        @get:Nested
         internal val image: Image,
     ) : JooqDockerPluginSettings(), DbAware<Database.Internal>, ImageAware {
         private constructor(database: Database.Internal) : this(database, Image(database))
@@ -62,6 +65,7 @@ sealed class JooqDockerPluginSettings : SettingsElement {
     }
 
     class WithoutContainer private constructor(
+        @get:Nested
         override val database: Database.External
     ) : JooqDockerPluginSettings(), DbAware<Database.External> {
         constructor(customizer: Action<WithoutContainer> = Action<WithoutContainer> { }) : this(Database.External()) {

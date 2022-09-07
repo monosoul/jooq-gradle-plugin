@@ -3,10 +3,12 @@ package dev.monosoul.jooq.settings
 import dev.monosoul.jooq.container.GenericDatabaseContainer
 import dev.monosoul.jooq.util.CodegenClasspathAwareClassLoaders
 import org.gradle.api.Action
+import org.gradle.api.tasks.Nested
 import org.testcontainers.shaded.org.apache.commons.lang3.builder.EqualsBuilder.reflectionEquals
 import org.testcontainers.shaded.org.apache.commons.lang3.builder.HashCodeBuilder.reflectionHashCode
 
 sealed class JooqDockerPluginSettings : SettingsElement {
+    @get:Nested
     internal abstract val database: Database
     internal abstract fun runWithDatabaseCredentials(
         classloaders: CodegenClasspathAwareClassLoaders,
@@ -17,7 +19,7 @@ sealed class JooqDockerPluginSettings : SettingsElement {
 
     class WithContainer private constructor(
         override val database: Database.Internal,
-        internal val image: Image,
+        @get:Nested internal val image: Image,
     ) : JooqDockerPluginSettings(), DbAware<Database.Internal>, ImageAware {
         private constructor(database: Database.Internal) : this(database, Image(database))
         constructor(customizer: Action<WithContainer> = Action<WithContainer> { }) : this(Database.Internal()) {

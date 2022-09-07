@@ -1,7 +1,9 @@
 package dev.monosoul.jooq.settings
 
+import org.gradle.api.tasks.Input
+
 data class Jdbc(
-    var schema: String = "jdbc:postgresql",
-    var driverClassName: String = "org.postgresql.Driver",
-    var urlQueryParams: String = "",
+    @get:Input var schema: String = "jdbc:postgresql",
+    @get:Input var driverClassName: String = "org.postgresql.Driver",
+    @get:Input var urlQueryParams: String = "",
 ) : SettingsElement

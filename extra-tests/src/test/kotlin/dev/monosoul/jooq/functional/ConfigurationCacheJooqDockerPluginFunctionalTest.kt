@@ -51,7 +51,9 @@ class ConfigurationCacheJooqDockerPluginFunctionalTest : FunctionalTestBase() {
             }
             that(resultFromCache).apply {
                 generateJooqClassesTask.outcome isEqualTo UP_TO_DATE
-                get { output }.contains("Configuration cache entry reused")
+                get { output }.contains("Configuration cache entry reused") not {
+                    contains("Deprecated Gradle features were used in this build")
+                }
             }
             that(
                 projectFile("build/generated-jooq/org/jooq/generated/tables/Foo.java")

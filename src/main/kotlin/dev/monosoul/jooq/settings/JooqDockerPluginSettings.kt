@@ -8,6 +8,7 @@ import org.testcontainers.shaded.org.apache.commons.lang3.builder.EqualsBuilder.
 import org.testcontainers.shaded.org.apache.commons.lang3.builder.HashCodeBuilder.reflectionHashCode
 
 sealed class JooqDockerPluginSettings : SettingsElement {
+    @get:Nested
     internal abstract val database: Database
     internal abstract fun runWithDatabaseCredentials(
         classloaders: CodegenClasspathAwareClassLoaders,
@@ -17,10 +18,8 @@ sealed class JooqDockerPluginSettings : SettingsElement {
     internal abstract fun copy(): JooqDockerPluginSettings
 
     class WithContainer private constructor(
-        @get:Nested
         override val database: Database.Internal,
-        @get:Nested
-        internal val image: Image,
+        @get:Nested internal val image: Image,
     ) : JooqDockerPluginSettings(), DbAware<Database.Internal>, ImageAware {
         private constructor(database: Database.Internal) : this(database, Image(database))
         constructor(customizer: Action<WithContainer> = Action<WithContainer> { }) : this(Database.Internal()) {
@@ -65,7 +64,6 @@ sealed class JooqDockerPluginSettings : SettingsElement {
     }
 
     class WithoutContainer private constructor(
-        @get:Nested
         override val database: Database.External
     ) : JooqDockerPluginSettings(), DbAware<Database.External> {
         constructor(customizer: Action<WithoutContainer> = Action<WithoutContainer> { }) : this(Database.External()) {

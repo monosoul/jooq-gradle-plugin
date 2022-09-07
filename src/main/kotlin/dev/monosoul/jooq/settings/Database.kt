@@ -3,6 +3,7 @@ package dev.monosoul.jooq.settings
 import org.gradle.api.Action
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Nested
+import org.gradle.api.tasks.Internal as GradleInternal
 
 sealed class Database : JdbcAware, SettingsElement {
     abstract var username: String
@@ -20,6 +21,7 @@ sealed class Database : JdbcAware, SettingsElement {
         @get:Input override var port: Int = 5432,
         @get:Nested override val jdbc: Jdbc = Jdbc(),
     ) : Database() {
+        @GradleInternal
         internal fun getJdbcUrl(host: String, port: Int) = "${jdbc.schema}://$host:$port/$name${jdbc.urlQueryParams}"
     }
 
@@ -31,6 +33,7 @@ sealed class Database : JdbcAware, SettingsElement {
         @get:Input override var port: Int = 5432,
         @get:Nested override val jdbc: Jdbc = Jdbc(),
     ) : Database() {
+        @GradleInternal
         internal fun getJdbcUrl() = "${jdbc.schema}://$host:$port/$name${jdbc.urlQueryParams}"
     }
 }

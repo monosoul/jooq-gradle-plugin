@@ -29,6 +29,7 @@ jobs:
         with:
           check_name: JUnit Test Report
           report_paths: '**/build/test-results/**/TEST-*.xml'
+          annotate_notice: false
       - name: Coverage Report
         uses: codecov/codecov-action@v3
       - name: Semantic Release

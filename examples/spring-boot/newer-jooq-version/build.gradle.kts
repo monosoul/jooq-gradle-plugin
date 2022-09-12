@@ -8,7 +8,7 @@ plugins {
     val kotlinVersion = "1.6.21"
     kotlin("jvm") version kotlinVersion
     kotlin("plugin.spring") version kotlinVersion
-    id("dev.monosoul.jooq-docker") version "1.0.1"
+    id("dev.monosoul.jooq-docker") version "1.3.8"
 }
 
 repositories {

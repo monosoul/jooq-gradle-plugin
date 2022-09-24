@@ -100,9 +100,9 @@ dependencies {
     implementation("org.testcontainers:jdbc:$testcontainersVersion")
 
     testFixturesApi("org.testcontainers:postgresql:$testcontainersVersion")
-    testFixturesApi(enforcedPlatform("org.junit:junit-bom:5.9.0"))
+    testFixturesApi(enforcedPlatform("org.junit:junit-bom:5.9.1"))
     testFixturesApi("org.junit.jupiter:junit-jupiter")
     testFixturesApi("io.strikt:strikt-jvm:0.34.1")
-    testFixturesApi("io.mockk:mockk:1.12.8")
+    testFixturesApi("io.mockk:mockk:1.13.1")
     testFixturesApi(gradleTestKit())
 }

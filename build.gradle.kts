@@ -96,7 +96,7 @@ dependencies {
     implementation("org.jooq:jooq-codegen:$jooqVersion")
 
     implementation("org.flywaydb:flyway-core:$flywayVersion")
-    val testcontainersVersion = "1.17.4"
+    val testcontainersVersion = "1.17.5"
     implementation("org.testcontainers:jdbc:$testcontainersVersion")
 
     testFixturesApi("org.testcontainers:postgresql:$testcontainersVersion")

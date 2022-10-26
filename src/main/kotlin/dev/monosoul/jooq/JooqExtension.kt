@@ -7,6 +7,7 @@ import dev.monosoul.jooq.settings.PropertiesReader.applyPropertiesFrom
 import dev.monosoul.jooq.settings.SettingsAware
 import org.gradle.api.Action
 import org.gradle.api.model.ObjectFactory
+import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.kotlin.dsl.property
 import java.io.Serializable
@@ -16,11 +17,12 @@ open class JooqExtension @Inject constructor(
     private val propertiesProvider: Provider<Map<String, String>>,
     objectFactory: ObjectFactory,
 ) : Serializable, SettingsAware {
-    internal val pluginSettings = objectFactory.property<JooqDockerPluginSettings>().convention(
-        propertiesProvider.map {
-            WithContainer().applyPropertiesFrom(it)
-        }
-    )
+    internal val pluginSettings: Property<JooqDockerPluginSettings> = objectFactory.property<JooqDockerPluginSettings>()
+        .convention(
+            propertiesProvider.map {
+                WithContainer().applyPropertiesFrom(it)
+            }
+        )
 
     @Suppress("unused")
     override fun withContainer(configure: Action<WithContainer>) {

@@ -4,11 +4,65 @@ import dev.monosoul.jooq.container.PostgresContainer
 import org.gradle.testkit.runner.TaskOutcome.SUCCESS
 import org.junit.jupiter.api.Test
 import strikt.api.expect
+import strikt.assertions.contains
 import strikt.assertions.isEqualTo
 import strikt.java.exists
 import strikt.java.notExists
 
 class GroovyBuildscriptJooqDockerPluginFunctionalTest : JooqDockerPluginFunctionalTestBase() {
+
+    @Test
+    fun `should respect global configuration regardless of declaration order`() {
+        // given
+        prepareBuildGradleFile("build.gradle") {
+            // language=gradle
+            """
+                plugins {
+                    id "dev.monosoul.jooq-docker"
+                }
+
+                repositories {
+                    mavenCentral()
+                }
+                
+                tasks {
+                    generateJooqClasses {
+                        flywayProperties.put("flyway.placeholderReplacement", "false")
+                    }
+                }
+                
+                jooq {
+                    withContainer {
+                        image {
+                            name = "postgres:13.4-alpine"
+                        }
+                    }
+                }
+
+                dependencies {
+                    jooqCodegen "org.postgresql:postgresql:42.3.6"
+                }
+            """.trimIndent()
+        }
+        copyResource(
+            from = "/V01__init_with_placeholders.sql",
+            to = "src/main/resources/db/migration/V01__init_with_placeholders.sql"
+        )
+
+        // when
+        val result = runGradleWithArguments("generateJooqClasses")
+
+        // then
+        expect {
+            that(result).apply {
+                generateJooqClassesTask.outcome isEqualTo SUCCESS
+                get { output } contains "postgres:13.4-alpine"
+            }
+            that(
+                projectFile("build/generated-jooq/org/jooq/generated/tables/Foo.java")
+            ).exists()
+        }
+    }
 
     @Test
     fun `should work with Groovy buildscript when running with a container`() {

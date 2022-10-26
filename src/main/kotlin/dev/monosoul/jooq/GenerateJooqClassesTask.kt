@@ -18,6 +18,7 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.file.FileSystemOperations
 import org.gradle.api.file.ProjectLayout
 import org.gradle.api.model.ObjectFactory
+import org.gradle.api.provider.Provider
 import org.gradle.api.provider.ProviderFactory
 import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Classpath
@@ -115,7 +116,7 @@ open class GenerateJooqClassesTask @Inject constructor(
         project.configurations.named(JooqDockerPlugin.CONFIGURATION_NAME)
     )
 
-    private var localPluginSettings: JooqDockerPluginSettings? = null
+    private val localPluginSettings = objectFactory.property<JooqDockerPluginSettings>()
 
     private val globalPluginSettings = project.extensions.getByType<JooqExtension>().pluginSettings
 
@@ -125,7 +126,7 @@ open class GenerateJooqClassesTask @Inject constructor(
      * Avoid changing manually, use [withContainer] or [withoutContainer] instead.
      */
     @Nested
-    fun getPluginSettings() = localPluginSettings ?: globalPluginSettings.get()
+    fun getPluginSettings(): Provider<JooqDockerPluginSettings> = localPluginSettings.orElse(globalPluginSettings)
 
     private val migrationRunner = UniversalMigrationRunner(schemas, inputDirectory, flywayProperties)
 
@@ -141,15 +142,17 @@ open class GenerateJooqClassesTask @Inject constructor(
         description = "Generates jOOQ classes from Flyway migrations"
     }
 
-    override fun withContainer(configure: Action<WithContainer>) {
-        localPluginSettings = globalPluginSettings.get().let { it as? WithContainer }?.copy()?.apply(configure::execute)
-            ?: WithContainer(configure)
-    }
+    override fun withContainer(configure: Action<WithContainer>) = localPluginSettings.set(
+        globalPluginSettings.map { settings ->
+            settings.let { it as? WithContainer }?.copy()?.apply(configure::execute) ?: WithContainer(configure)
+        }
+    )
 
-    override fun withoutContainer(configure: Action<WithoutContainer>) {
-        localPluginSettings = globalPluginSettings.get().let { it as? WithoutContainer }?.copy()?.apply(configure::execute)
-            ?: WithoutContainer(configure)
-    }
+    override fun withoutContainer(configure: Action<WithoutContainer>) = localPluginSettings.set(
+        globalPluginSettings.map { settings ->
+            settings.let { it as? WithoutContainer }?.copy()?.apply(configure::execute) ?: WithoutContainer(configure)
+        }
+    )
 
     /**
      * Configure the jOOQ code generator with an XML configuration file.
@@ -196,7 +199,7 @@ open class GenerateJooqClassesTask @Inject constructor(
 
     @TaskAction
     fun generateClasses() {
-        getPluginSettings()
+        getPluginSettings().get()
             .runWithDatabaseCredentials(classLoaders()) { classLoaders, credentials ->
                 val schemaVersion = migrationRunner.migrateDb(classLoaders, credentials)
                 generateJooqClasses(classLoaders, credentials, schemaVersion)

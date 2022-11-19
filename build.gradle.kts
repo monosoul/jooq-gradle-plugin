@@ -1,7 +1,7 @@
+import com.github.jengelman.gradle.plugins.shadow.tasks.ConfigureShadowRelocation
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
-import org.gradle.api.tasks.testing.logging.TestLogEvent.FAILED
-import org.gradle.api.tasks.testing.logging.TestLogEvent.PASSED
-import org.gradle.api.tasks.testing.logging.TestLogEvent.STARTED
+import org.gradle.api.tasks.testing.logging.TestLogEvent.*
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
@@ -9,7 +9,20 @@ plugins {
     jacoco
     id("com.gradle.plugin-publish") version "1.1.0"
     id("pl.droidsonroids.jacoco.testkit") version "1.0.9"
+    id("com.github.johnrengelman.shadow") version "7.1.2"
     `java-test-fixtures`
+}
+
+configurations {
+    implementation {
+        extendsFrom(shadow.get())
+    }
+}
+
+afterEvaluate {
+    with(configurations.shadow.get()) {
+        dependencies.remove(project.dependencies.gradleApi())
+    }
 }
 
 /**
@@ -31,6 +44,37 @@ java {
 }
 
 group = "dev.monosoul.jooq"
+
+val shadowJar by tasks.getting(ShadowJar::class) {
+    archiveClassifier.set("")
+
+    configurations = listOf(project.configurations.shadow.get())
+
+    exclude(
+        "migrations/*",
+        "META-INF/INDEX.LIST",
+        "META-INF/*.SF",
+        "META-INF/*.DSA",
+        "META-INF/*.RSA",
+        "META-INF/NOTICE*",
+        "META-INF/README*",
+        "META-INF/CHANGELOG*",
+        "META-INF/DEPENDENCIES*",
+        "module-info.class")
+
+    mergeServiceFiles()
+}
+
+val relocateShadowJar by tasks.creating(ConfigureShadowRelocation::class) {
+    target = shadowJar
+    prefix = "dev.monosoul.jooq.shadow"
+}
+
+shadowJar.dependsOn(relocateShadowJar)
+
+val jar by tasks.getting(Jar::class) {
+    dependsOn(shadowJar)
+}
 
 gradlePlugin {
     plugins.create("jooqDockerPlugin") {
@@ -93,11 +137,11 @@ tasks.withType<ProcessResources> {
 }
 
 dependencies {
-    implementation("org.jooq:jooq-codegen:$jooqVersion")
+    shadow("org.jooq:jooq-codegen:$jooqVersion")
 
-    implementation("org.flywaydb:flyway-core:$flywayVersion")
+    shadow("org.flywaydb:flyway-core:$flywayVersion")
     val testcontainersVersion = "1.17.6"
-    implementation("org.testcontainers:jdbc:$testcontainersVersion")
+    shadow("org.testcontainers:jdbc:$testcontainersVersion")
 
     testFixturesApi("org.testcontainers:postgresql:$testcontainersVersion")
     testFixturesApi(enforcedPlatform("org.junit:junit-bom:5.9.1"))

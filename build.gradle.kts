@@ -81,7 +81,7 @@ tasks {
 }
 
 val jooqVersion = "3.17.5"
-val flywayVersion = "9.8.1"
+val flywayVersion = "9.8.2"
 
 tasks.withType<ProcessResources> {
     filesMatching("**/dev.monosoul.jooq.dependency.versions") {
@@ -96,7 +96,7 @@ dependencies {
     implementation("org.jooq:jooq-codegen:$jooqVersion")
 
     implementation("org.flywaydb:flyway-core:$flywayVersion")
-    val testcontainersVersion = "1.17.5"
+    val testcontainersVersion = "1.17.6"
     implementation("org.testcontainers:jdbc:$testcontainersVersion")
 
     testFixturesApi("org.testcontainers:postgresql:$testcontainersVersion")

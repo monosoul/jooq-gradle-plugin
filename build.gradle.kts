@@ -125,7 +125,7 @@ tasks {
 }
 
 val jooqVersion = "3.17.5"
-val flywayVersion = "9.8.2"
+val flywayVersion = "9.8.3"
 
 tasks.withType<ProcessResources> {
     filesMatching("**/dev.monosoul.jooq.dependency.versions") {

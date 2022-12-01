@@ -1,7 +1,9 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ConfigureShadowRelocation
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
-import org.gradle.api.tasks.testing.logging.TestLogEvent.*
+import org.gradle.api.tasks.testing.logging.TestLogEvent.FAILED
+import org.gradle.api.tasks.testing.logging.TestLogEvent.PASSED
+import org.gradle.api.tasks.testing.logging.TestLogEvent.STARTED
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {

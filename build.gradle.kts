@@ -138,7 +138,7 @@ dependencies {
         exclude(group = "net.java.dev.jna") // cannot be shadowed
         exclude(group = "org.slf4j") // provided by Gradle
     }
-    shadow("net.java.dev.jna:jna:5.8.0")
+    shadow("net.java.dev.jna:jna:5.12.1")
 
     testFixturesApi("org.testcontainers:postgresql:$testcontainersVersion")
     testFixturesApi(enforcedPlatform("org.junit:junit-bom:5.9.1"))

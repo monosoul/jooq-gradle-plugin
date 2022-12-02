@@ -71,7 +71,7 @@ tasks {
             "LICENSE*",
         )
 
-        // workaround to separate embedded testcontainers configuration
+        // workaround to separate shadowed testcontainers configuration
         relocate("docker.client.strategy", "$group.docker.client.strategy")
 
         dependsOn(relocateShadowJar)
@@ -130,7 +130,7 @@ dependencies {
 
     val testcontainersVersion = "1.17.6"
     implementation("org.testcontainers:jdbc:$testcontainersVersion") {
-        exclude(group = "net.java.dev.jna")
+        exclude(group = "net.java.dev.jna") // cannot be shadowed
         exclude(group = "org.slf4j") // provided by Gradle
     }
     shadow("net.java.dev.jna:jna:5.8.0")

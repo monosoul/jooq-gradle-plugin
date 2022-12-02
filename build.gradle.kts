@@ -96,12 +96,19 @@ tasks {
 val jooqVersion = "3.17.5"
 val flywayVersion = "9.8.3"
 
-tasks.withType<ProcessResources> {
-    filesMatching("**/dev.monosoul.jooq.dependency.versions") {
-        filter {
-            it.replace("@jooq.version@", jooqVersion)
-                .replace("@flyway.version@", flywayVersion)
-        }
+val processTemplates by tasks.registering(Copy::class) {
+    from("src/template/kotlin")
+    into("build/filtered-templates")
+
+    filter {
+        it.replace("@jooq.version@", jooqVersion)
+            .replace("@flyway.version@", flywayVersion)
+    }
+}
+
+sourceSets.main {
+    java {
+        srcDir(processTemplates)
     }
 }
 

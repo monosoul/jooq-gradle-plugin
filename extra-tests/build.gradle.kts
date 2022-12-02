@@ -41,4 +41,8 @@ tasks {
             freeCompilerArgs = listOf("-Xjsr305=strict")
         }
     }
+
+    pluginUnderTestMetadata {
+        pluginClasspath.from(rootProject.configurations.named("shadow"))
+    }
 }

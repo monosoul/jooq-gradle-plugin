@@ -1,5 +1,4 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ConfigureShadowRelocation
-import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
 import org.gradle.api.tasks.testing.logging.TestLogEvent.FAILED
 import org.gradle.api.tasks.testing.logging.TestLogEvent.PASSED
@@ -13,18 +12,6 @@ plugins {
     id("pl.droidsonroids.jacoco.testkit") version "1.0.9"
     id("com.github.johnrengelman.shadow") version "7.1.2"
     `java-test-fixtures`
-}
-
-configurations {
-    implementation {
-        extendsFrom(shadow.get())
-    }
-}
-
-afterEvaluate {
-    with(configurations.shadow.get()) {
-        dependencies.remove(project.dependencies.gradleApi())
-    }
 }
 
 /**
@@ -47,37 +34,6 @@ java {
 
 group = "dev.monosoul.jooq"
 
-val shadowJar by tasks.getting(ShadowJar::class) {
-    archiveClassifier.set("")
-
-    configurations = listOf(project.configurations.shadow.get())
-
-    exclude(
-        "migrations/*",
-        "META-INF/INDEX.LIST",
-        "META-INF/*.SF",
-        "META-INF/*.DSA",
-        "META-INF/*.RSA",
-        "META-INF/NOTICE*",
-        "META-INF/README*",
-        "META-INF/CHANGELOG*",
-        "META-INF/DEPENDENCIES*",
-        "module-info.class")
-
-    mergeServiceFiles()
-}
-
-val relocateShadowJar by tasks.creating(ConfigureShadowRelocation::class) {
-    target = shadowJar
-    prefix = "dev.monosoul.jooq.shadow"
-}
-
-shadowJar.dependsOn(relocateShadowJar)
-
-val jar by tasks.getting(Jar::class) {
-    dependsOn(shadowJar)
-}
-
 gradlePlugin {
     plugins.create("jooqDockerPlugin") {
         id = "dev.monosoul.jooq-docker"
@@ -99,6 +55,36 @@ pluginBundle {
 }
 
 tasks {
+    val relocateShadowJar by registering(ConfigureShadowRelocation::class) {
+        target = shadowJar.get()
+        prefix = "$group.shadow"
+    }
+
+    shadowJar {
+        archiveClassifier.set("")
+        mergeServiceFiles()
+
+        fun inMetaInf(vararg patterns: String) = patterns.map { "META-INF/$it" }.toTypedArray()
+
+        exclude(
+            *inMetaInf("maven/**", "NOTICE*", "README*", "CHANGELOG*", "DEPENDENCIES*", "LICENSE*", "ABOUT*"),
+            "LICENSE*",
+        )
+
+        // workaround to separate embedded testcontainers configuration
+        relocate("docker.client.strategy", "dev.monosoul.jooq.docker.client.strategy")
+
+        dependsOn(relocateShadowJar)
+    }
+
+    assemble {
+        dependsOn(shadowJar)
+    }
+
+    pluginUnderTestMetadata {
+        pluginClasspath.from(configurations.shadow) // provides complete plugin classpath to the Gradle testkit
+    }
+
     withType<Test> {
         useJUnitPlatform()
         testLogging {
@@ -140,10 +126,14 @@ tasks.withType<ProcessResources> {
 
 dependencies {
     shadow("org.jooq:jooq-codegen:$jooqVersion")
-
     shadow("org.flywaydb:flyway-core:$flywayVersion")
+
     val testcontainersVersion = "1.17.6"
-    shadow("org.testcontainers:jdbc:$testcontainersVersion")
+    implementation("org.testcontainers:jdbc:$testcontainersVersion") {
+        exclude(group = "net.java.dev.jna")
+        exclude(group = "org.slf4j") // provided by Gradle
+    }
+    shadow("net.java.dev.jna:jna:5.8.0")
 
     testFixturesApi("org.testcontainers:postgresql:$testcontainersVersion")
     testFixturesApi(enforcedPlatform("org.junit:junit-bom:5.9.1"))

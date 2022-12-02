@@ -32,6 +32,9 @@ jobs:
           annotate_notice: false
       - name: Coverage Report
         uses: codecov/codecov-action@v3
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: true
       - name: Semantic Release
         uses: cycjimmy/semantic-release-action@v3
         with:

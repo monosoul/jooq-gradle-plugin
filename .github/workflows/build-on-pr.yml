@@ -43,6 +43,7 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     environment: snapshot
+    continue-on-error: true
     steps:
       - name: Checkout code
         uses: actions/checkout@v3

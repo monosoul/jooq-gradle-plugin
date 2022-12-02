@@ -57,7 +57,7 @@ pluginBundle {
 tasks {
     val relocateShadowJar by registering(ConfigureShadowRelocation::class) {
         target = shadowJar.get()
-        prefix = "$group.shadow"
+        prefix = "${project.group}.shadow"
     }
 
     shadowJar {
@@ -72,7 +72,7 @@ tasks {
         )
 
         // workaround to separate shadowed testcontainers configuration
-        relocate("docker.client.strategy", "$group.docker.client.strategy")
+        relocate("docker.client.strategy", "${project.group}.docker.client.strategy")
 
         dependsOn(relocateShadowJar)
     }

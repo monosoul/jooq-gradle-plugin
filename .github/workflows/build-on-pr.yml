@@ -35,3 +35,24 @@ jobs:
           annotate_notice: false
       - name: Coverage Report
         uses: codecov/codecov-action@v3
+  publish-snapshot:
+    name: Publish snapshot
+    needs: build
+    runs-on: ubuntu-latest
+    environment: snapshot
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+      - name: Publish plugin
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: |
+            -Pversion=SNAPSHOT-${{ github.sha }}
+            build publish
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

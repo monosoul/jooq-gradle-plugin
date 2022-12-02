@@ -130,6 +130,11 @@ tasks.withType<ProcessResources> {
 }
 
 dependencies {
+    /**
+     * This is counter-intuitive, but dependencies in implementation or api configuration will actually
+     * be shadowed, while dependencies in shadow configuration will be skipped from shadowing and just added as
+     * transitive. This is a quirk of the shadow plugin.
+     */
     shadow("org.jooq:jooq-codegen:$jooqVersion")
     shadow("org.flywaydb:flyway-core:$flywayVersion")
 

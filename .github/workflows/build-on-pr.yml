@@ -56,3 +56,30 @@ jobs:
             assemble publish
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Snapshot coordinates comment
+        uses: thollander/actions-comment-pull-request@v1
+        with:
+          message: |
+            To use the snapshot version of the plugin add this to `settings.gradle.kts`:
+            ```kotlin
+            pluginManagement {
+              repositories {
+                maven {
+                  name = "JooqDockerPluginSnapshotRepo"
+                  url = uri("https://maven.pkg.github.com/monosoul/jooq-gradle-plugin/")
+                  credentials {
+                    username = "<your GitHub username>"
+                    password = "<your GitHub access token with read:packages scope>"
+                  }
+                }
+                gradlePluginPortal()
+              }
+            }
+            ```
+            
+            And this to `build.gradle.kts`:
+            ```kotlin
+            plugins {
+              id("dev.monosoul.jooq-docker") version "SNAPSHOT-${{ github.sha }}"
+            }
+            ```

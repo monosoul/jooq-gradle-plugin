@@ -72,7 +72,7 @@ tasks {
         )
 
         // workaround to separate embedded testcontainers configuration
-        relocate("docker.client.strategy", "dev.monosoul.jooq.docker.client.strategy")
+        relocate("docker.client.strategy", "$group.docker.client.strategy")
 
         dependsOn(relocateShadowJar)
     }

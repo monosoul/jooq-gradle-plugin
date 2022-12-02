@@ -4,6 +4,7 @@ import org.gradle.api.tasks.testing.logging.TestLogEvent.FAILED
 import org.gradle.api.tasks.testing.logging.TestLogEvent.PASSED
 import org.gradle.api.tasks.testing.logging.TestLogEvent.STARTED
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.jetbrains.kotlin.util.capitalizeDecapitalize.toUpperCaseAsciiOnly
 
 plugins {
     `kotlin-dsl`
@@ -73,6 +74,10 @@ tasks {
 
         // workaround to separate shadowed testcontainers configuration
         relocate("docker.client.strategy", "${project.group}.docker.client.strategy")
+        relocate(
+            "TESTCONTAINERS_DOCKER_CLIENT_STRATEGY",
+            "${project.group.toString().toUpperCaseAsciiOnly().replace(".", "_")}_TESTCONTAINERS_DOCKER_CLIENT_STRATEGY"
+        )
 
         dependsOn(relocateShadowJar)
     }

@@ -1,2 +1,0 @@
-JOOQ_VERSION=@jooq.version@
-FLYWAY_VERSION=@flyway.version@

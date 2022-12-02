@@ -35,3 +35,51 @@ jobs:
           annotate_notice: false
       - name: Coverage Report
         uses: codecov/codecov-action@v3
+  publish-snapshot:
+    name: Publish snapshot
+    needs: build
+    runs-on: ubuntu-latest
+    environment: snapshot
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+      - name: Publish plugin
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: |
+            -Pversion=SNAPSHOT-${{ github.sha }}
+            assemble publish
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Snapshot coordinates comment
+        uses: thollander/actions-comment-pull-request@v1
+        with:
+          message: |
+            To use the snapshot version of the plugin add this to `settings.gradle.kts`:
+            ```kotlin
+            pluginManagement {
+              repositories {
+                maven {
+                  name = "JooqDockerPluginSnapshotRepo"
+                  url = uri("https://maven.pkg.github.com/monosoul/jooq-gradle-plugin/")
+                  credentials {
+                    username = "<your GitHub username>"
+                    password = "<your GitHub access token with read:packages scope>"
+                  }
+                }
+                gradlePluginPortal()
+              }
+            }
+            ```
+            
+            And this to `build.gradle.kts`:
+            ```kotlin
+            plugins {
+              id("dev.monosoul.jooq-docker") version "SNAPSHOT-${{ github.sha }}"
+            }
+            ```

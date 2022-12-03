@@ -53,6 +53,7 @@
   ],
   "automerge": true,
   "automergeStrategy": "squash",
+  "platformAutomerge": true,
   "ignoreDeps": [],
   "reviewers": [
     "monosoul"

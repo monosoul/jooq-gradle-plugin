@@ -123,6 +123,6 @@ dependencies {
     testFixturesApi(enforcedPlatform("org.junit:junit-bom:5.9.1"))
     testFixturesApi("org.junit.jupiter:junit-jupiter")
     testFixturesApi("io.strikt:strikt-jvm:0.34.1")
-    testFixturesApi("io.mockk:mockk-jvm:1.13.2")
+    testFixturesApi("io.mockk:mockk-jvm:1.13.3")
     testFixturesApi(gradleTestKit())
 }

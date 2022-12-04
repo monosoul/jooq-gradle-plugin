@@ -51,6 +51,10 @@ publishing {
                 password = System.getenv("GITHUB_TOKEN")
             }
         }
+        maven {
+            name = "localBuild"
+            url = uri("build/local-repository")
+        }
     }
 }
 

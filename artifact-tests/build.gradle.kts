@@ -1,5 +1,3 @@
-import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-
 plugins {
     kotlin("jvm")
     `kotlin-convention`
@@ -17,16 +15,14 @@ dependencies {
 }
 
 tasks {
-    val shadowJar: ShadowJar by rootProject.tasks
+    val publishAllPublicationsToLocalBuildRepository: Task by rootProject.tasks
 
     val copyJar by registering(Copy::class) {
-        inputs.files(shadowJar)
-        from(shadowJar)
-        into("$buildDir/libs")
+        inputs.files(publishAllPublicationsToLocalBuildRepository, files("${rootProject.buildDir}/local-repository"))
+        from(publishAllPublicationsToLocalBuildRepository, files("${rootProject.buildDir}/local-repository"))
+        into("$buildDir/local-repository")
 
-        val newJarName = "plugin.jar"
-        rename("${rootProject.name}(\\.jar|\\-\\d+\\.\\d+\\.\\d+\\.jar)", newJarName)
-        outputs.files("$buildDir/libs/$newJarName")
+        outputs.files("$buildDir/local-repository")
     }
 
     test {
@@ -36,9 +32,7 @@ tasks {
     withType<ProcessResources> {
         filesMatching("**/build.gradle.kts") {
             filter {
-                it.replace("@jooq.version@", libs.versions.jooq.get())
-                    .replace("@flyway.version@",libs.versions.flyway.get())
-                    .replace("@jna.version@", libs.versions.jna.get())
+                it.replace("@plugin.version@", rootProject.version.toString())
             }
         }
     }

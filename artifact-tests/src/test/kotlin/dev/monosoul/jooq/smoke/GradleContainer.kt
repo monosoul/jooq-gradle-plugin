@@ -33,8 +33,8 @@ class GradleContainer : GenericContainer<GradleContainer>("gradle:7.6.0-jdk17-al
         val projectPath = "/home/gradle/project"
         withCopyToContainer(MountableFile.forHostPath("build/resources/test/testproject"), projectPath)
         addFileSystemBind(
-            "build/libs/plugin.jar",
-            "$projectPath/plugin/plugin.jar",
+            "build/local-repository",
+            "$projectPath/local-repository",
             READ_ONLY,
             SHARED
         )

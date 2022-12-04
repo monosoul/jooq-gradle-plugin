@@ -27,16 +27,15 @@ class GradleContainer : GenericContainer<GradleContainer>("gradle:$GRADLE_VERSIO
 
         val projectPath = "/home/gradle/project"
         withCopyToContainer(MountableFile.forHostPath("build/resources/test/testproject"), projectPath)
-        addFileSystemBind(
-            "build/local-repository",
-            "$projectPath/local-repository",
-            READ_ONLY,
-            SHARED
-        )
+        addFsBind("build/local-repository", "$projectPath/local-repository")
+        addFsBind("/var/run/docker.sock", "/var/run/docker.sock")
         withWorkingDirectory(projectPath)
 
         withStartupCheckStrategy(
             IndefiniteWaitOneShotStartupCheckStrategy()
         )
     }
+
+    private fun addFsBind(hostPath: String, containerPath: String) =
+        addFileSystemBind(hostPath, containerPath, READ_ONLY, SHARED)
 }

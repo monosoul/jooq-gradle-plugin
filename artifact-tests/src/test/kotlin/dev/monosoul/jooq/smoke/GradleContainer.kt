@@ -10,6 +10,7 @@ import org.testcontainers.containers.SelinuxContext.SHARED
 import org.testcontainers.containers.output.Slf4jLogConsumer
 import org.testcontainers.containers.wait.strategy.LogMessageWaitStrategy
 import org.testcontainers.utility.MountableFile
+import java.time.Duration
 
 class GradleContainer : GenericContainer<GradleContainer>("gradle:7.6.0-jdk17-alpine") {
 
@@ -37,6 +38,7 @@ class GradleContainer : GenericContainer<GradleContainer>("gradle:7.6.0-jdk17-al
         waitingFor(
             LogMessageWaitStrategy()
                 .withRegEx(".*(BUILD SUCCESSFUL|BUILD FAILED) in .*")
+                .withStartupTimeout(Duration.ofMinutes(10))
         )
     }
 }

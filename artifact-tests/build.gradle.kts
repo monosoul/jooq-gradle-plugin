@@ -28,6 +28,10 @@ tasks {
         outputs.dir(layout.buildDirectory.dir(localRepositoryDirName))
     }
 
+    testClasses {
+        dependsOn(copyArtifacts)
+    }
+
     test {
         inputs.files(copyArtifacts)
     }
@@ -37,6 +41,21 @@ tasks {
             filter {
                 it.replace("@plugin.version@", rootProject.version.toString())
             }
+        }
+    }
+
+    val processTemplates by registering(Copy::class) {
+        from("src/template/kotlin")
+        into("build/filtered-templates")
+
+        filter {
+            it.replace("@gradle.version@", gradle.gradleVersion)
+        }
+    }
+
+    sourceSets.test {
+        java {
+            srcDir(processTemplates)
         }
     }
 }

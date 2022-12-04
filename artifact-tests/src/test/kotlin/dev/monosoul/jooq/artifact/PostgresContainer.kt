@@ -1,4 +1,4 @@
-package dev.monosoul.jooq.smoke
+package dev.monosoul.jooq.artifact
 
 import org.testcontainers.containers.PostgreSQLContainer
 import org.testcontainers.utility.DockerImageName

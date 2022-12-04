@@ -1,4 +1,4 @@
-package dev.monosoul.jooq.smoke
+package dev.monosoul.jooq.artifact
 
 import ch.qos.logback.classic.Logger
 import ch.qos.logback.classic.spi.ILoggingEvent

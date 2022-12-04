@@ -1,4 +1,4 @@
-package dev.monosoul.jooq.smoke
+package dev.monosoul.jooq.artifact
 
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach

@@ -8,7 +8,7 @@ import org.testcontainers.containers.Network.newNetwork
 import strikt.api.expectThat
 import strikt.assertions.contains
 
-class PluginWorksSmokeTest {
+class PluginWorksArtifactTest {
 
     private lateinit var network: Network
     private val dbAlias = "postgresdb"

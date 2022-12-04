@@ -1,7 +1,6 @@
 plugins {
     kotlin("jvm")
     `kotlin-convention`
-    alias(libs.plugins.shadow) apply false
 }
 
 dependencies {

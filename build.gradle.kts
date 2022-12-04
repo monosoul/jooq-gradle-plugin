@@ -44,7 +44,7 @@ pluginBundle {
 publishing {
     repositories {
         maven {
-            name = "GitHubPackages"
+            name = "Snapshot"
             url = uri("https://maven.pkg.github.com/monosoul/jooq-gradle-plugin")
             credentials {
                 username = System.getenv("GITHUB_ACTOR")

@@ -57,7 +57,7 @@ jobs:
         with:
           arguments: |
             -Pversion=SNAPSHOT-${{ github.sha }}
-            assemble publish
+            assemble publishAllPublicationsToSnapshotRepository
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Snapshot coordinates comment

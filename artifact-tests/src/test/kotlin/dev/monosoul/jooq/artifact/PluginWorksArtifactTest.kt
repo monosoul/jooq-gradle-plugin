@@ -1,8 +1,7 @@
 package dev.monosoul.jooq.artifact
 
 import org.junit.jupiter.api.Test
-import strikt.api.expectCatching
-import strikt.api.expectThat
+import strikt.api.expect
 import strikt.assertions.contains
 import strikt.assertions.isSuccess
 
@@ -20,14 +19,15 @@ class PluginWorksArtifactTest {
             "--info",
         )
 
-        // when
-        expectCatching {
-            gradleContainer.start()
-            gradleContainer.stop()
-        }.isSuccess()
+        // when & then
+        expect {
+            catching {
+                gradleContainer.start()
+                gradleContainer.stop()
+            }.isSuccess()
 
-        // then
-        val output = gradleContainer.output.joinToString("\n")
-        expectThat(output).contains("BUILD SUCCESSFUL in ")
+            val output = gradleContainer.output.joinToString("\n")
+            that(output).contains("BUILD SUCCESSFUL in ")
+        }
     }
 }

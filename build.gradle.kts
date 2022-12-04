@@ -51,9 +51,10 @@ publishing {
                 password = System.getenv("GITHUB_TOKEN")
             }
         }
+        val localRepositoryDirName by project.extra { "local-repository" }
         maven {
             name = "localBuild"
-            url = uri("build/local-repository")
+            url = uri("build/$localRepositoryDirName")
         }
     }
 }

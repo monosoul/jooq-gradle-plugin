@@ -17,16 +17,19 @@ dependencies {
 tasks {
     val publishAllPublicationsToLocalBuildRepository: Task by rootProject.tasks
 
-    val copyJar by registering(Copy::class) {
-        inputs.files(publishAllPublicationsToLocalBuildRepository, files("${rootProject.buildDir}/local-repository"))
-        from(publishAllPublicationsToLocalBuildRepository, files("${rootProject.buildDir}/local-repository"))
-        into("$buildDir/local-repository")
+    val copyArtifacts by registering(Copy::class) {
+        val localRepositoryDirName: String by rootProject.extra
 
-        outputs.files("$buildDir/local-repository")
+        dependsOn(publishAllPublicationsToLocalBuildRepository)
+        inputs.dir(rootProject.layout.buildDirectory.dir(localRepositoryDirName))
+        from(rootProject.layout.buildDirectory.dir(localRepositoryDirName))
+
+        into(layout.buildDirectory.dir(localRepositoryDirName))
+        outputs.dir(layout.buildDirectory.dir(localRepositoryDirName))
     }
 
     test {
-        inputs.files(copyJar)
+        inputs.files(copyArtifacts)
     }
 
     withType<ProcessResources> {

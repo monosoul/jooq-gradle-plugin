@@ -7,8 +7,8 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     `kotlin-dsl`
     jacoco
-    id("com.gradle.plugin-publish") version "1.1.0"
-    id("pl.droidsonroids.jacoco.testkit") version "1.0.9"
+    alias(libs.plugins.gradle.plugin.publish)
+    alias(libs.plugins.jacoco.testkit)
     `java-test-fixtures`
 }
 
@@ -93,16 +93,13 @@ tasks {
     }
 }
 
-val jooqVersion = "3.17.5"
-val flywayVersion = "9.8.3"
-
 val processTemplates by tasks.registering(Copy::class) {
     from("src/template/kotlin")
     into("build/filtered-templates")
 
     filter {
-        it.replace("@jooq.version@", jooqVersion)
-            .replace("@flyway.version@", flywayVersion)
+        it.replace("@jooq.version@", libs.versions.jooq.get())
+            .replace("@flyway.version@", libs.versions.flyway.get())
     }
 }
 
@@ -113,16 +110,15 @@ sourceSets.main {
 }
 
 dependencies {
-    implementation("org.jooq:jooq-codegen:$jooqVersion")
+    implementation(libs.jooq.codegen)
 
-    implementation("org.flywaydb:flyway-core:$flywayVersion")
-    val testcontainersVersion = "1.17.6"
-    implementation("org.testcontainers:jdbc:$testcontainersVersion")
+    implementation(libs.flyway.core)
+    implementation(libs.testcontainers.jdbc)
 
-    testFixturesApi("org.testcontainers:postgresql:$testcontainersVersion")
-    testFixturesApi(enforcedPlatform("org.junit:junit-bom:5.9.1"))
-    testFixturesApi("org.junit.jupiter:junit-jupiter")
-    testFixturesApi("io.strikt:strikt-jvm:0.34.1")
-    testFixturesApi("io.mockk:mockk-jvm:1.13.3")
+    testFixturesApi(libs.testcontainers.postgresql)
+    testFixturesApi(enforcedPlatform(libs.junit.bom))
+    testFixturesApi(libs.junit.jupiter)
+    testFixturesApi(libs.strikt)
+    testFixturesApi(libs.mockk)
     testFixturesApi(gradleTestKit())
 }

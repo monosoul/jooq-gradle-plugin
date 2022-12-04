@@ -8,9 +8,8 @@ import org.testcontainers.containers.BindMode.READ_ONLY
 import org.testcontainers.containers.GenericContainer
 import org.testcontainers.containers.SelinuxContext.SHARED
 import org.testcontainers.containers.output.Slf4jLogConsumer
-import org.testcontainers.containers.wait.strategy.LogMessageWaitStrategy
+import org.testcontainers.containers.startupcheck.IndefiniteWaitOneShotStartupCheckStrategy
 import org.testcontainers.utility.MountableFile
-import java.time.Duration
 
 class GradleContainer : GenericContainer<GradleContainer>("gradle:7.6.0-jdk17-alpine") {
 
@@ -35,10 +34,8 @@ class GradleContainer : GenericContainer<GradleContainer>("gradle:7.6.0-jdk17-al
         )
         withWorkingDirectory(projectPath)
 
-        waitingFor(
-            LogMessageWaitStrategy()
-                .withRegEx(".*(BUILD SUCCESSFUL|BUILD FAILED) in .*")
-                .withStartupTimeout(Duration.ofMinutes(10))
+        withStartupCheckStrategy(
+            IndefiniteWaitOneShotStartupCheckStrategy()
         )
     }
 }

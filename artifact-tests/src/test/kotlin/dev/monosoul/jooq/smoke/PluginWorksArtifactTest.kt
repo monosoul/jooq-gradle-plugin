@@ -5,8 +5,10 @@ import org.junit.Before
 import org.junit.Test
 import org.testcontainers.containers.Network
 import org.testcontainers.containers.Network.newNetwork
+import strikt.api.expectCatching
 import strikt.api.expectThat
 import strikt.assertions.contains
+import strikt.assertions.isSuccess
 
 class PluginWorksArtifactTest {
 
@@ -47,7 +49,10 @@ class PluginWorksArtifactTest {
         )
 
         // when
-        gradleContainer.start()
+        expectCatching {
+            gradleContainer.start()
+            gradleContainer.stop()
+        }.isSuccess()
 
         // then
         val output = gradleContainer.output.joinToString("\n")

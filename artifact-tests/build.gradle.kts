@@ -20,11 +20,9 @@ tasks {
         val localRepositoryDirName: String by rootProject.extra
 
         dependsOn(publishAllPublicationsToLocalBuildRepository)
-        inputs.dir(rootProject.layout.buildDirectory.dir(localRepositoryDirName))
-        from(rootProject.layout.buildDirectory.dir(localRepositoryDirName))
 
+        from(rootProject.layout.buildDirectory.dir(localRepositoryDirName))
         into(layout.buildDirectory.dir(localRepositoryDirName))
-        outputs.dir(layout.buildDirectory.dir(localRepositoryDirName))
     }
 
     testClasses {

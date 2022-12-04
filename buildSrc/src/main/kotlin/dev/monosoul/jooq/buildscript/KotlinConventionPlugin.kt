@@ -4,6 +4,7 @@ import org.gradle.api.JavaVersion
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.plugins.JavaPluginExtension
+import org.gradle.api.tasks.Copy
 import org.gradle.api.tasks.testing.Test
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
 import org.gradle.api.tasks.testing.logging.TestLogEvent.FAILED
@@ -11,6 +12,7 @@ import org.gradle.api.tasks.testing.logging.TestLogEvent.PASSED
 import org.gradle.api.tasks.testing.logging.TestLogEvent.STARTED
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.invoke
+import org.gradle.kotlin.dsl.register
 import org.gradle.kotlin.dsl.repositories
 import org.gradle.kotlin.dsl.withType
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
@@ -46,6 +48,11 @@ class KotlinConventionPlugin : Plugin<Project> {
                         jvmTarget = "$targetJava"
                         freeCompilerArgs = listOf("-Xjsr305=strict")
                     }
+                }
+
+                register<Copy>("processTemplates") {
+                    from("src/template/kotlin")
+                    into("build/filtered-templates")
                 }
             }
         }

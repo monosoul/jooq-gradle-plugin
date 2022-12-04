@@ -101,21 +101,18 @@ tasks {
         }
         dependsOn(withType<Test>())
     }
-}
 
-val processTemplates by tasks.registering(Copy::class) {
-    from("src/template/kotlin")
-    into("build/filtered-templates")
-
-    filter {
-        it.replace("@jooq.version@", libs.versions.jooq.get())
-            .replace("@flyway.version@", libs.versions.flyway.get())
+    processTemplates {
+        filter {
+            it.replace("@jooq.version@", libs.versions.jooq.get())
+                .replace("@flyway.version@", libs.versions.flyway.get())
+        }
     }
 }
 
 sourceSets.main {
     java {
-        srcDir(processTemplates)
+        srcDir(tasks.processTemplates)
     }
 }
 

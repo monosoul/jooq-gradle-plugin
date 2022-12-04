@@ -42,18 +42,15 @@ tasks {
         }
     }
 
-    val processTemplates by registering(Copy::class) {
-        from("src/template/kotlin")
-        into("build/filtered-templates")
-
+    processTemplates {
         filter {
             it.replace("@gradle.version@", gradle.gradleVersion)
         }
     }
+}
 
-    sourceSets.test {
-        java {
-            srcDir(processTemplates)
-        }
+sourceSets.test {
+    java {
+        srcDir(tasks.processTemplates)
     }
 }

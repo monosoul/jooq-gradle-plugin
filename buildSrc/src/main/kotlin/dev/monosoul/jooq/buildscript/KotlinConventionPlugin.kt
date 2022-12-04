@@ -21,7 +21,7 @@ class KotlinConventionPlugin : Plugin<Project> {
             mavenCentral()
         }
 
-        target.pluginManager.withPlugin("org.gradle.kotlin.kotlin-dsl") {
+        target.pluginManager.withPlugin("org.jetbrains.kotlin.jvm") {
             val targetJava = JavaVersion.VERSION_1_8
 
             target.extensions.configure<JavaPluginExtension> {

@@ -1,11 +1,6 @@
-import org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
-import org.gradle.api.tasks.testing.logging.TestLogEvent.FAILED
-import org.gradle.api.tasks.testing.logging.TestLogEvent.PASSED
-import org.gradle.api.tasks.testing.logging.TestLogEvent.STARTED
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
 plugins {
     `kotlin-dsl`
+    `kotlin-convention`
     jacoco
     alias(libs.plugins.gradle.plugin.publish)
     alias(libs.plugins.jacoco.testkit)
@@ -19,16 +14,6 @@ plugins {
 val javaComponent = components["java"] as AdhocComponentWithVariants
 javaComponent.withVariantsFromConfiguration(configurations["testFixturesApiElements"]) { skip() }
 javaComponent.withVariantsFromConfiguration(configurations["testFixturesRuntimeElements"]) { skip() }
-
-repositories {
-    mavenCentral()
-}
-
-val targetJava = JavaVersion.VERSION_1_8
-java {
-    sourceCompatibility = targetJava
-    targetCompatibility = targetJava
-}
 
 group = "dev.monosoul.jooq"
 
@@ -66,30 +51,12 @@ publishing {
 }
 
 tasks {
-    withType<Test> {
-        useJUnitPlatform()
-        testLogging {
-            events(STARTED, PASSED, FAILED)
-            showExceptions = true
-            showStackTraces = true
-            showCauses = true
-            exceptionFormat = FULL
-        }
-    }
-
-    withType<KotlinCompile> {
-        kotlinOptions {
-            jvmTarget = "$targetJava"
-            freeCompilerArgs = listOf("-Xjsr305=strict")
-        }
-    }
-
     jacocoTestReport {
         reports {
             xml.required.set(true)
             html.required.set(false)
         }
-        setDependsOn(withType<Test>())
+        dependsOn(withType<Test>())
     }
 }
 

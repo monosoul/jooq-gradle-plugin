@@ -1,0 +1,21 @@
+[versions]
+jooq = "3.17.5"
+flyway = "9.8.3"
+testcontainers = "1.17.6"
+
+[libraries]
+jooq-codegen = { module = "org.jooq:jooq-codegen", version.ref = "jooq" }
+flyway-core = { module = "org.flywaydb:flyway-core", version.ref = "flyway" }
+jna = "net.java.dev.jna:jna:5.12.1"
+testcontainers-jdbc = { module = "org.testcontainers:jdbc", version.ref = "testcontainers" }
+
+testcontainers-postgresql = { module = "org.testcontainers:postgresql", version.ref = "testcontainers" }
+junit-bom = "org.junit:junit-bom:5.9.1"
+junit-jupiter = { module = "org.junit.jupiter:junit-jupiter" }
+strikt = "io.strikt:strikt-jvm:0.34.1"
+mockk = "io.mockk:mockk-jvm:1.13.3"
+
+[plugins]
+gradle-plugin-publish = "com.gradle.plugin-publish:1.1.0"
+jacoco-testkit = "pl.droidsonroids.jacoco.testkit:1.0.9"
+shadow = "com.github.johnrengelman.shadow:7.1.2"

@@ -1,17 +1,13 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ConfigureShadowRelocation
-import org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
-import org.gradle.api.tasks.testing.logging.TestLogEvent.FAILED
-import org.gradle.api.tasks.testing.logging.TestLogEvent.PASSED
-import org.gradle.api.tasks.testing.logging.TestLogEvent.STARTED
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jetbrains.kotlin.util.capitalizeDecapitalize.toUpperCaseAsciiOnly
 
 plugins {
     `kotlin-dsl`
+    `kotlin-convention`
     jacoco
-    id("com.gradle.plugin-publish") version "1.1.0"
-    id("pl.droidsonroids.jacoco.testkit") version "1.0.9"
-    id("com.github.johnrengelman.shadow") version "7.1.2"
+    alias(libs.plugins.gradle.plugin.publish)
+    alias(libs.plugins.jacoco.testkit)
+    alias(libs.plugins.shadow)
     `java-test-fixtures`
 }
 
@@ -22,16 +18,6 @@ plugins {
 val javaComponent = components["java"] as AdhocComponentWithVariants
 javaComponent.withVariantsFromConfiguration(configurations["testFixturesApiElements"]) { skip() }
 javaComponent.withVariantsFromConfiguration(configurations["testFixturesRuntimeElements"]) { skip() }
-
-repositories {
-    mavenCentral()
-}
-
-val targetJava = JavaVersion.VERSION_1_8
-java {
-    sourceCompatibility = targetJava
-    targetCompatibility = targetJava
-}
 
 group = "dev.monosoul.jooq"
 
@@ -103,43 +89,22 @@ tasks {
         pluginClasspath.from(configurations.shadow) // provides complete plugin classpath to the Gradle testkit
     }
 
-    withType<Test> {
-        useJUnitPlatform()
-        testLogging {
-            events(STARTED, PASSED, FAILED)
-            showExceptions = true
-            showStackTraces = true
-            showCauses = true
-            exceptionFormat = FULL
-        }
-    }
-
-    withType<KotlinCompile> {
-        kotlinOptions {
-            jvmTarget = "$targetJava"
-            freeCompilerArgs = listOf("-Xjsr305=strict")
-        }
-    }
-
     jacocoTestReport {
         reports {
             xml.required.set(true)
             html.required.set(false)
         }
-        setDependsOn(withType<Test>())
+        dependsOn(withType<Test>())
     }
 }
-
-val jooqVersion = "3.17.5"
-val flywayVersion = "9.8.3"
 
 val processTemplates by tasks.registering(Copy::class) {
     from("src/template/kotlin")
     into("build/filtered-templates")
 
     filter {
-        it.replace("@jooq.version@", jooqVersion)
-            .replace("@flyway.version@", flywayVersion)
+        it.replace("@jooq.version@", libs.versions.jooq.get())
+            .replace("@flyway.version@", libs.versions.flyway.get())
     }
 }
 
@@ -155,20 +120,19 @@ dependencies {
      * be shadowed, while dependencies in shadow configuration will be skipped from shadowing and just added as
      * transitive. This is a quirk of the shadow plugin.
      */
-    shadow("org.jooq:jooq-codegen:$jooqVersion")
-    shadow("org.flywaydb:flyway-core:$flywayVersion")
+    shadow(libs.jooq.codegen)
+    shadow(libs.flyway.core)
 
-    val testcontainersVersion = "1.17.6"
-    implementation("org.testcontainers:jdbc:$testcontainersVersion") {
-        exclude(group = "net.java.dev.jna") // cannot be shadowed
+    implementation(libs.testcontainers.jdbc) {
+        exclude(group = libs.jna.get().group) // cannot be shadowed
         exclude(group = "org.slf4j") // provided by Gradle
     }
-    shadow("net.java.dev.jna:jna:5.12.1")
+    shadow(libs.jna)
 
-    testFixturesApi("org.testcontainers:postgresql:$testcontainersVersion")
-    testFixturesApi(enforcedPlatform("org.junit:junit-bom:5.9.1"))
-    testFixturesApi("org.junit.jupiter:junit-jupiter")
-    testFixturesApi("io.strikt:strikt-jvm:0.34.1")
-    testFixturesApi("io.mockk:mockk-jvm:1.13.3")
+    testFixturesApi(libs.testcontainers.postgresql)
+    testFixturesApi(enforcedPlatform(libs.junit.bom))
+    testFixturesApi(libs.junit.jupiter)
+    testFixturesApi(libs.strikt)
+    testFixturesApi(libs.mockk)
     testFixturesApi(gradleTestKit())
 }

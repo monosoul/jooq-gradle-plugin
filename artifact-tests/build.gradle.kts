@@ -40,6 +40,7 @@ tasks {
         filesMatching("**/build.gradle.kts") {
             filter {
                 it.replace("@plugin.version@", rootProject.version.toString())
+                    .replace("@testcontainers.version@", libs.versions.testcontainers.get())
             }
         }
     }

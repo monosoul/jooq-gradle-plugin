@@ -17,6 +17,7 @@ class PluginWorksArtifactTest {
             "gradle",
             "classes",
             "--info",
+            "--stacktrace",
         )
 
         // when & then

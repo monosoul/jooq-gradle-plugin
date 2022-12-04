@@ -9,6 +9,13 @@ repositories {
     mavenCentral()
 }
 
+// simulate testcontainers dependency added by another plugin
+buildscript {
+    dependencies {
+        classpath("org.testcontainers:testcontainers:@testcontainers.version@")
+    }
+}
+
 dependencies {
     implementation(platform("org.jetbrains.kotlin:kotlin-bom"))
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")

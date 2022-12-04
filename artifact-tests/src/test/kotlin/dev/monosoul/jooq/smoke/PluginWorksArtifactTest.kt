@@ -1,8 +1,8 @@
 package dev.monosoul.jooq.smoke
 
-import org.junit.After
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import org.testcontainers.containers.Network
 import org.testcontainers.containers.Network.newNetwork
 import strikt.api.expectCatching
@@ -16,7 +16,7 @@ class PluginWorksArtifactTest {
     private val dbAlias = "postgresdb"
     private lateinit var postgresContainer: PostgresContainer
 
-    @Before
+    @BeforeEach
     fun setUp() {
         network = newNetwork()
         postgresContainer = PostgresContainer()
@@ -25,7 +25,7 @@ class PluginWorksArtifactTest {
             .also { it.start() }
     }
 
-    @After
+    @AfterEach
     fun tearDown() {
         postgresContainer.stop()
         network.close()

@@ -1,6 +1,6 @@
 rootProject.name = "jooq-gradle-plugin"
 
-include("extra-tests")
+include("extra-tests", "smoke-tests")
 
 dependencyResolutionManagement {
     versionCatalogs {

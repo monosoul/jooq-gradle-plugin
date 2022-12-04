@@ -9,10 +9,11 @@ plugins {
 dependencies {
     implementation(enforcedPlatform("org.jetbrains.kotlin:kotlin-bom"))
 
-    testImplementation(libs.testcontainers.core)
+    testImplementation(libs.testcontainers.postgresql)
     testImplementation(enforcedPlatform(libs.junit.bom))
     testImplementation(libs.junit.jupiter)
     testImplementation(libs.strikt)
+    testImplementation("ch.qos.logback:logback-classic:1.4.5")
 }
 
 tasks {
@@ -30,5 +31,15 @@ tasks {
 
     test {
         inputs.files(copyJar)
+    }
+
+    withType<ProcessResources> {
+        filesMatching("**/build.gradle.kts") {
+            filter {
+                it.replace("@jooq.version@", libs.versions.jooq.get())
+                    .replace("@flyway.version@",libs.versions.flyway.get())
+                    .replace("@jna.version@", libs.versions.jna.get())
+            }
+        }
     }
 }

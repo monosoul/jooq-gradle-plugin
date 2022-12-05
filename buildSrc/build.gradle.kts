@@ -9,13 +9,8 @@ repositories {
 
 dependencies {
     implementation("org.jetbrains.kotlin:kotlin-gradle-plugin")
+    implementation(libs.gradle.plugin.publish)
+    implementation(libs.shadow)
+    implementation(libs.jacoco.testkit)
 }
 
-gradlePlugin {
-    plugins {
-        register("kotlin-convention") {
-            id = "kotlin-convention"
-            implementationClass = "dev.monosoul.jooq.buildscript.KotlinConventionPlugin"
-        }
-    }
-}

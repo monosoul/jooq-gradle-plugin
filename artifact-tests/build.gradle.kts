@@ -1,5 +1,4 @@
 plugins {
-    kotlin("jvm")
     `kotlin-convention`
 }
 
@@ -42,15 +41,9 @@ tasks {
         }
     }
 
-    processTemplates {
+    processTestTemplates {
         filter {
             it.replace("@gradle.version@", gradle.gradleVersion)
         }
-    }
-}
-
-sourceSets.test {
-    java {
-        srcDir(tasks.processTemplates)
     }
 }

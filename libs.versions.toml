@@ -16,7 +16,8 @@ junit-jupiter = { module = "org.junit.jupiter:junit-jupiter" }
 strikt = "io.strikt:strikt-jvm:0.34.1"
 mockk = "io.mockk:mockk-jvm:1.13.3"
 
-[plugins]
-gradle-plugin-publish = "com.gradle.plugin-publish:1.1.0"
-jacoco-testkit = "pl.droidsonroids.jacoco.testkit:1.0.9"
-shadow = "com.github.johnrengelman.shadow:7.1.2"
+# plugins
+gradle-plugin-publish = "com.gradle.publish:plugin-publish-plugin:1.1.0"
+shadow = "gradle.plugin.com.github.johnrengelman:shadow:7.1.2"
+jacoco-testkit = "gradle.plugin.pl.droidsonroids.gradle.jacoco:jacoco-gradle-testkit-plugin:1.0.9"
+

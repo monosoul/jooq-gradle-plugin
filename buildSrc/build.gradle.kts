@@ -10,5 +10,6 @@ repositories {
 dependencies {
     implementation("org.jetbrains.kotlin:kotlin-gradle-plugin")
     implementation(libs.gradle.plugin.publish)
+    implementation(libs.shadow)
 }
 

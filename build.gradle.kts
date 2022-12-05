@@ -1,13 +1,10 @@
-import com.github.jengelman.gradle.plugins.shadow.tasks.ConfigureShadowRelocation
-import org.jetbrains.kotlin.util.capitalizeDecapitalize.toUpperCaseAsciiOnly
-
 plugins {
     `kotlin-dsl`
     `kotlin-convention`
     jacoco
     `publishing-convention`
     alias(libs.plugins.jacoco.testkit)
-    alias(libs.plugins.shadow)
+    `shadow-convention`
     `java-test-fixtures`
 }
 
@@ -22,30 +19,14 @@ javaComponent.withVariantsFromConfiguration(configurations["testFixturesRuntimeE
 group = "dev.monosoul.jooq"
 
 tasks {
-    val relocateShadowJar by registering(ConfigureShadowRelocation::class) {
-        target = shadowJar.get()
-        prefix = "${project.group}.shadow"
-    }
-
     shadowJar {
         archiveClassifier.set("")
-        mergeServiceFiles()
-
-        fun inMetaInf(vararg patterns: String) = patterns.map { "META-INF/$it" }.toTypedArray()
-
-        exclude(
-            *inMetaInf("maven/**", "NOTICE*", "README*", "CHANGELOG*", "DEPENDENCIES*", "LICENSE*", "ABOUT*"),
-            "LICENSE*",
-        )
-
         // workaround to separate shadowed testcontainers configuration
         relocate("docker.client.strategy", "${project.group}.docker.client.strategy")
         relocate(
             "TESTCONTAINERS_DOCKER_CLIENT_STRATEGY",
-            "${project.group.toString().toUpperCaseAsciiOnly().replace(".", "_")}_TESTCONTAINERS_DOCKER_CLIENT_STRATEGY"
+            "${project.group.toString().toUpperCase().replace(".", "_")}_TESTCONTAINERS_DOCKER_CLIENT_STRATEGY"
         )
-
-        dependsOn(relocateShadowJar)
     }
 
     assemble {

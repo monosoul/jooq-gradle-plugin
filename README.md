@@ -28,6 +28,24 @@ Plugin registers task `generateJooqClasses` that does following steps:
 * runs migrations using Flyway
 * generates jOOQ classes
 
+---
+
+The plugin uses [testcontainers library](https://www.testcontainers.org) to spin up the DB container. 
+To avoid conflicts with other plugins using docker java library or testcontainers, the plugin shades testcontainers
+library and it's dependencies into `dev.monosoul.jooq.shadow` package.
+
+Due to that in case you'd like to 
+[customize docker client strategy](https://www.testcontainers.org/features/configuration/#customizing-docker-host-detection), 
+the class names will have to be prefixed with `dev.monosoul.jooq.shadow`, while the property name will be 
+`dev.monosoul.jooq.docker.client.strategy` instead of `docker.client.strategy`. E.g.:
+
+```properties
+dev.monosoul.jooq.docker.client.strategy=dev.monosoul.jooq.shadow.org.testcontainers.dockerclient.EnvironmentAndSystemPropertyClientProviderStrategy
+```
+
+Also, instead of `TESTCONTAINERS_DOCKER_CLIENT_STRATEGY` environment variable, you should use
+`DEV_MONOSOUL_JOOQ_TESTCONTAINERS_DOCKER_CLIENT_STRATEGY`.
+
 # Examples
 
 Detailed examples are available in the [examples directory](examples) of this repository.
@@ -276,8 +294,7 @@ dependencies {
 
 ### Remote docker setup
 
-The plugin uses [testcontainers library](https://www.testcontainers.org) to spin up the DB
-container. If you want to use the plugin with remote docker instance, refer to the
+If you want to use the plugin with remote docker instance, refer to the
 [testcontainers documentation](https://www.testcontainers.org/features/configuration/#customizing-docker-host-detection)
 .
 

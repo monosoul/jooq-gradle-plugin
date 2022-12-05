@@ -14,3 +14,9 @@ dependencies {
     implementation(rootProject)
     testImplementation(testFixtures(rootProject))
 }
+
+tasks {
+    pluginUnderTestMetadata {
+        pluginClasspath.from(rootProject.configurations.named("shadow"))
+    }
+}

@@ -1,9 +1,13 @@
+import com.github.jengelman.gradle.plugins.shadow.tasks.ConfigureShadowRelocation
+import org.jetbrains.kotlin.util.capitalizeDecapitalize.toUpperCaseAsciiOnly
+
 plugins {
     `kotlin-dsl`
     `kotlin-convention`
     jacoco
     alias(libs.plugins.gradle.plugin.publish)
     alias(libs.plugins.jacoco.testkit)
+    alias(libs.plugins.shadow)
     `java-test-fixtures`
 }
 
@@ -40,17 +44,56 @@ pluginBundle {
 publishing {
     repositories {
         maven {
-            name = "GitHubPackages"
+            name = "Snapshot"
             url = uri("https://maven.pkg.github.com/monosoul/jooq-gradle-plugin")
             credentials {
                 username = System.getenv("GITHUB_ACTOR")
                 password = System.getenv("GITHUB_TOKEN")
             }
         }
+        val localRepositoryDirName by project.extra { "local-repository" }
+        maven {
+            name = "localBuild"
+            url = uri("build/$localRepositoryDirName")
+        }
     }
 }
 
 tasks {
+    val relocateShadowJar by registering(ConfigureShadowRelocation::class) {
+        target = shadowJar.get()
+        prefix = "${project.group}.shadow"
+    }
+
+    shadowJar {
+        archiveClassifier.set("")
+        mergeServiceFiles()
+
+        fun inMetaInf(vararg patterns: String) = patterns.map { "META-INF/$it" }.toTypedArray()
+
+        exclude(
+            *inMetaInf("maven/**", "NOTICE*", "README*", "CHANGELOG*", "DEPENDENCIES*", "LICENSE*", "ABOUT*"),
+            "LICENSE*",
+        )
+
+        // workaround to separate shadowed testcontainers configuration
+        relocate("docker.client.strategy", "${project.group}.docker.client.strategy")
+        relocate(
+            "TESTCONTAINERS_DOCKER_CLIENT_STRATEGY",
+            "${project.group.toString().toUpperCaseAsciiOnly().replace(".", "_")}_TESTCONTAINERS_DOCKER_CLIENT_STRATEGY"
+        )
+
+        dependsOn(relocateShadowJar)
+    }
+
+    assemble {
+        dependsOn(shadowJar)
+    }
+
+    pluginUnderTestMetadata {
+        pluginClasspath.from(configurations.shadow) // provides complete plugin classpath to the Gradle testkit
+    }
+
     jacocoTestReport {
         reports {
             xml.required.set(true)
@@ -58,29 +101,35 @@ tasks {
         }
         dependsOn(withType<Test>())
     }
-}
 
-val processTemplates by tasks.registering(Copy::class) {
-    from("src/template/kotlin")
-    into("build/filtered-templates")
-
-    filter {
-        it.replace("@jooq.version@", libs.versions.jooq.get())
-            .replace("@flyway.version@", libs.versions.flyway.get())
+    processTemplates {
+        filter {
+            it.replace("@jooq.version@", libs.versions.jooq.get())
+                .replace("@flyway.version@", libs.versions.flyway.get())
+        }
     }
 }
 
 sourceSets.main {
     java {
-        srcDir(processTemplates)
+        srcDir(tasks.processTemplates)
     }
 }
 
 dependencies {
-    implementation(libs.jooq.codegen)
+    /**
+     * This is counter-intuitive, but dependencies in implementation or api configuration will actually
+     * be shadowed, while dependencies in shadow configuration will be skipped from shadowing and just added as
+     * transitive. This is a quirk of the shadow plugin.
+     */
+    shadow(libs.jooq.codegen)
+    shadow(libs.flyway.core)
 
-    implementation(libs.flyway.core)
-    implementation(libs.testcontainers.jdbc)
+    implementation(libs.testcontainers.jdbc) {
+        exclude(group = libs.jna.get().group) // cannot be shadowed
+        exclude(group = "org.slf4j") // provided by Gradle
+    }
+    shadow(libs.jna)
 
     testFixturesApi(libs.testcontainers.postgresql)
     testFixturesApi(enforcedPlatform(libs.junit.bom))

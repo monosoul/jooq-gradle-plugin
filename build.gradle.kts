@@ -1,9 +1,8 @@
 plugins {
     `kotlin-dsl`
     `kotlin-convention`
-    jacoco
     `publishing-convention`
-    alias(libs.plugins.jacoco.testkit)
+    `coverage-convention`
     `shadow-convention`
     `java-test-fixtures`
 }
@@ -35,14 +34,6 @@ tasks {
 
     pluginUnderTestMetadata {
         pluginClasspath.from(configurations.shadow) // provides complete plugin classpath to the Gradle testkit
-    }
-
-    jacocoTestReport {
-        reports {
-            xml.required.set(true)
-            html.required.set(false)
-        }
-        dependsOn(withType<Test>())
     }
 
     processTemplates {

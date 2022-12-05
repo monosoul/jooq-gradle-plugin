@@ -19,6 +19,5 @@ mockk = "io.mockk:mockk-jvm:1.13.3"
 # plugins
 gradle-plugin-publish = "com.gradle.publish:plugin-publish-plugin:1.1.0"
 shadow = "gradle.plugin.com.github.johnrengelman:shadow:7.1.2"
+jacoco-testkit = "gradle.plugin.pl.droidsonroids.gradle.jacoco:jacoco-gradle-testkit-plugin:1.0.9"
 
-[plugins]
-jacoco-testkit = "pl.droidsonroids.jacoco.testkit:1.0.9"

@@ -10,7 +10,6 @@ import org.testcontainers.containers.GenericContainer
 import org.testcontainers.containers.SelinuxContext.SHARED
 import org.testcontainers.containers.output.Slf4jLogConsumer
 import org.testcontainers.containers.startupcheck.IndefiniteWaitOneShotStartupCheckStrategy
-import org.testcontainers.utility.MountableFile.forHostPath
 
 class GradleContainer : GenericContainer<GradleContainer>("gradle:$GRADLE_VERSION-jdk17-alpine") {
 
@@ -19,17 +18,11 @@ class GradleContainer : GenericContainer<GradleContainer>("gradle:$GRADLE_VERSIO
         it.addAppender(listAppender)
     }
     val output: List<String> get() = ArrayList(listAppender.list).map { it.formattedMessage }
+    val projectPath = "/home/gradle/project"
 
     init {
         withLogConsumer(
             Slf4jLogConsumer(logger)
-        )
-
-        val projectPath = "/home/gradle/project"
-        withCopyToContainer(forHostPath("build/resources/test/testproject"), projectPath)
-        withCopyToContainer(
-            forHostPath("build/resources/test/.testcontainers.properties.template"),
-            "/root/.testcontainers.properties"
         )
         addFsBind("build/local-repository", "$projectPath/local-repository")
         addFsBind("/var/run/docker.sock", "/var/run/docker.sock")

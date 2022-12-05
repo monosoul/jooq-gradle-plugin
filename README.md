@@ -43,6 +43,9 @@ the class names will have to be prefixed with `dev.monosoul.jooq.shadow`, while 
 dev.monosoul.jooq.docker.client.strategy=dev.monosoul.jooq.shadow.org.testcontainers.dockerclient.EnvironmentAndSystemPropertyClientProviderStrategy
 ```
 
+Also, instead of `TESTCONTAINERS_DOCKER_CLIENT_STRATEGY` environment variable, you should use
+`DEV_MONOSOUL_JOOQ_TESTCONTAINERS_DOCKER_CLIENT_STRATEGY`.
+
 # Examples
 
 Detailed examples are available in the [examples directory](examples) of this repository.

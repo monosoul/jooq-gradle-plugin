@@ -31,9 +31,9 @@
       "separateMajorMinor": false,
       "commitMessagePrefix": "chore: ",
       "matchPackageNames": [
-        "com.gradle.plugin-publish",
-        "pl.droidsonroids.jacoco.testkit",
-        "com.github.johnrengelman.shadow"
+        "com.gradle.publish:plugin-publish-plugin",
+        "gradle.plugin.com.github.johnrengelman:shadow",
+        "gradle.plugin.pl.droidsonroids.gradle.jacoco:jacoco-gradle-testkit-plugin"
       ]
     },
     {

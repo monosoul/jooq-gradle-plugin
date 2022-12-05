@@ -110,12 +110,6 @@ tasks {
     }
 }
 
-sourceSets.main {
-    java {
-        srcDir(tasks.processTemplates)
-    }
-}
-
 dependencies {
     /**
      * This is counter-intuitive, but dependencies in implementation or api configuration will actually

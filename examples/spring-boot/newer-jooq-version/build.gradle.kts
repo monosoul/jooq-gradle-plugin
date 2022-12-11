@@ -3,12 +3,12 @@
  */
 
 plugins {
-    id("org.springframework.boot") version "2.7.0"
+    id("org.springframework.boot") version "3.0.0"
     id("io.spring.dependency-management") version "1.0.11.RELEASE"
-    val kotlinVersion = "1.6.21"
+    val kotlinVersion = "1.7.22"
     kotlin("jvm") version kotlinVersion
     kotlin("plugin.spring") version kotlinVersion
-    id("dev.monosoul.jooq-docker") version "1.3.8"
+    id("dev.monosoul.jooq-docker") version "2.0.0"
 }
 
 repositories {
@@ -21,7 +21,7 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
 
-    project.extra["jooq.version"] = "3.16.6"
+    project.extra["jooq.version"] = "3.17.6"
     // Codegen
     jooqCodegen("org.postgresql:postgresql")
     jooqCodegen("org.jooq:jooq-codegen")

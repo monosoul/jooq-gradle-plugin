@@ -220,7 +220,7 @@ class GroovyBuildscriptJooqDockerPluginFunctionalTest : JooqDockerPluginFunction
                 tasks {
                     generateJooqClasses {
                         flywayProperties.put("flyway.placeholderReplacement", "false")
-                        usingXmlConfig(project.file("src/main/resources/db/jooq.xml")) {
+                        usingXmlConfig(project.layout.projectDirectory.file("src/main/resources/db/jooq.xml")) {
                             database.withExcludes("BAR")
                         }
                     }

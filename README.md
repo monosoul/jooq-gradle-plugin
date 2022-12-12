@@ -244,8 +244,7 @@ dependencies {
     jooqCodegen("org.postgresql:postgresql:42.3.6")
 }
 ```
-
-where `src/main/resources/db/jooq.xml` looks as following:
+by default the path to the XML config is `src/main/resources/db/jooq.xml`, where it's content looks as following:
 
 ```xml
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
@@ -264,6 +263,26 @@ where `src/main/resources/db/jooq.xml` looks as following:
         </database>
     </generator>
 </configuration>
+```
+
+To customize the XML config path:
+```kotlin
+tasks {
+    generateJooqClasses {
+        usingXmlConfig(project.layout.projectDirectory.file("src/main/resources/db/other-jooq-config.xml"))
+    }
+}
+```
+
+To customize the loaded XML config:
+```kotlin
+tasks {
+    generateJooqClasses {
+        usingXmlConfig {
+            database.withExcludes("BAR")
+        }
+    }
+}
 ```
 
 To exclude flyway schema history table from generated classes:

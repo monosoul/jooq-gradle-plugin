@@ -17,6 +17,7 @@ import org.gradle.api.Action
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.FileSystemOperations
 import org.gradle.api.file.ProjectLayout
+import org.gradle.api.file.RegularFile
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Provider
 import org.gradle.api.provider.ProviderFactory
@@ -36,7 +37,6 @@ import org.gradle.kotlin.dsl.property
 import org.gradle.kotlin.dsl.setProperty
 import org.jooq.meta.jaxb.Configuration
 import org.jooq.meta.jaxb.Generator
-import java.io.File
 import javax.inject.Inject
 
 @CacheableTask
@@ -159,14 +159,12 @@ open class GenerateJooqClassesTask @Inject constructor(
      */
     @Suppress("unused")
     fun usingXmlConfig(
-        file: File = projectLayout.projectDirectory.file("src/main/resources/db/jooq.xml").asFile,
+        file: RegularFile = projectLayout.projectDirectory.file("src/main/resources/db/jooq.xml"),
         customizer: Action<Generator> = Action<Generator> { }
     ) {
         generatorConfig.set(
-            providerFactory.provider {
-                configurationProvider.fromXml(file).also {
-                    it.generator.apply(customizer::execute)
-                }
+            configurationProvider.fromXml(providerFactory.fileContents(file)).map { config ->
+                config.also { customizer.execute(it.generator) }
             }
         )
     }
@@ -175,7 +173,7 @@ open class GenerateJooqClassesTask @Inject constructor(
      * Configure the jOOQ code generator with an XML configuration file.
      */
     @Suppress("unused")
-    fun usingXmlConfig(file: File, closure: Closure<Generator>) = usingXmlConfig(file, closure::callWith)
+    fun usingXmlConfig(file: RegularFile, closure: Closure<Generator>) = usingXmlConfig(file, closure::callWith)
 
     /**
      * Configure the jOOQ code generator programmatically with [Generator].

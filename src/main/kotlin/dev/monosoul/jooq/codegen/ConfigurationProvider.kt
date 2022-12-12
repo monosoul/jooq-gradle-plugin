@@ -3,6 +3,7 @@ package dev.monosoul.jooq.codegen
 import dev.monosoul.jooq.migration.SchemaVersion
 import dev.monosoul.jooq.settings.DatabaseCredentials
 import org.gradle.api.file.DirectoryProperty
+import org.gradle.api.file.FileContents
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
@@ -23,7 +24,6 @@ import org.jooq.meta.jaxb.MatchersSchemaType
 import org.jooq.meta.jaxb.SchemaMappingType
 import org.jooq.meta.jaxb.Strategy
 import org.jooq.meta.jaxb.Target
-import java.io.File
 import java.io.InputStream
 
 internal class ConfigurationProvider(
@@ -34,7 +34,7 @@ internal class ConfigurationProvider(
     private val schemas: ListProperty<String>,
 ) {
 
-    fun fromXml(file: File) = file.inputStream().use(::load).applyCommonConfiguration()
+    fun fromXml(file: FileContents) = file.asBytes.map { it.inputStream().use(::load).applyCommonConfiguration() }
 
     fun defaultConfiguration() = Generator()
         .withName(JavaGenerator::class.qualifiedName)

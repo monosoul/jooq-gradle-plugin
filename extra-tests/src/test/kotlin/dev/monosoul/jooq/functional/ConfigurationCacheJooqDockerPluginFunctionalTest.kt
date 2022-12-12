@@ -8,6 +8,7 @@ import strikt.api.expect
 import strikt.assertions.contains
 import strikt.assertions.isEqualTo
 import strikt.java.exists
+import strikt.java.notExists
 import java.io.File
 
 class ConfigurationCacheJooqDockerPluginFunctionalTest : FunctionalTestBase() {
@@ -57,6 +58,75 @@ class ConfigurationCacheJooqDockerPluginFunctionalTest : FunctionalTestBase() {
             }
             that(
                 projectFile("build/generated-jooq/org/jooq/generated/tables/Foo.java")
+            ).exists()
+        }
+    }
+
+    @Test
+    fun `should respect changes to codegen xml config with configuration cache enabled`() {
+        // given
+        configureLocalGradleCache()
+        prepareBuildGradleFile {
+            """
+                plugins {
+                    id("dev.monosoul.jooq-docker")
+                }
+
+                repositories {
+                    mavenCentral()
+                }
+                
+                tasks {
+                    generateJooqClasses {
+                        schemas.set(listOf("public", "other"))
+                        usingXmlConfig()
+                    }
+                }
+
+                dependencies {
+                    jooqCodegen("org.postgresql:postgresql:42.3.6")
+                }
+            """.trimIndent()
+        }
+        copyResource(
+            from = "/V01__init_multiple_schemas.sql",
+            to = "src/main/resources/db/migration/V01__init_multiple_schemas.sql"
+        )
+        copyResource(from = "/jooq-generator.xml", to = "src/main/resources/db/jooq.xml")
+
+        // when
+        // first run saves configuration cache
+        val result = runGradleWithArguments("generateJooqClasses", "--configuration-cache")
+
+        // then
+        expect {
+            that(result).apply {
+                generateJooqClassesTask.outcome isEqualTo SUCCESS
+                get { output }.contains("Configuration cache entry stored")
+            }
+            that(
+                projectFile("build/generated-jooq/org/jooq/generated/public_/tables/Foo.java")
+            ).exists()
+            that(
+                projectFile("build/generated-jooq/org/jooq/generated/other/tables/Bar.java")
+            ).notExists()
+        }
+
+        // when second run uses configuration cache
+        copyResource(from = "/jooq-generator-without-excludes.xml", to = "src/main/resources/db/jooq.xml")
+        val resultFromCache = runGradleWithArguments("generateJooqClasses", "--configuration-cache")
+
+        // then
+        expect {
+            that(resultFromCache).apply {
+                generateJooqClassesTask.outcome isEqualTo SUCCESS
+                get { output }.contains("Configuration cache entry reused")
+            }
+            that(
+                projectFile("build/generated-jooq/org/jooq/generated/public_/tables/Foo.java")
+            ).exists()
+            that(
+                projectFile("build/generated-jooq/org/jooq/generated/other/tables/Bar.java")
             ).exists()
         }
     }

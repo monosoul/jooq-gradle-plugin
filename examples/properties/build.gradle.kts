@@ -6,7 +6,7 @@ import dev.monosoul.jooq.RecommendedVersions
 
 plugins {
     kotlin("jvm") version "1.7.22"
-    id("dev.monosoul.jooq-docker") version "2.0.1"
+    id("dev.monosoul.jooq-docker") version "3.0.0"
 }
 
 repositories {

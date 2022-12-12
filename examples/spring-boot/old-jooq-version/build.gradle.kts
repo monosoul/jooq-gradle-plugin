@@ -10,7 +10,7 @@ plugins {
     val kotlinVersion = "1.7.22"
     kotlin("jvm") version kotlinVersion
     kotlin("plugin.spring") version kotlinVersion
-    id("dev.monosoul.jooq-docker") version "2.0.1"
+    id("dev.monosoul.jooq-docker") version "3.0.0"
 }
 
 buildscript {

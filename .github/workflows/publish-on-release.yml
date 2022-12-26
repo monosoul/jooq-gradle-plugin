@@ -29,9 +29,9 @@ jobs:
             -PsigningKeyId=${{ secrets.OSSRH_GPG_SECRET_KEY_ID }}
             -PsigningKey=${{ secrets.OSSRH_GPG_SECRET_KEY }}
             -PsigningPassword=${{ secrets.OSSRH_GPG_SECRET_KEY_PASSWORD }}
-            -PmavenCentralUsername=${{ secrets.OSSRH_USERNAME }}
-            -PmavenCentralPassword=${{ secrets.OSSRH_PASSWORD }}
-            build publishPlugins publishAllPublicationsToMavenCentralRepository
+            -PsonatypeUsername=${{ secrets.OSSRH_USERNAME }}
+            -PsonatypePassword=${{ secrets.OSSRH_PASSWORD }}
+            build publishPlugins publishToSonatype closeAndReleaseSonatypeStagingRepository
       - name: Attach artifacts to the release
         uses: svenstaro/upload-release-action@v2
         with:

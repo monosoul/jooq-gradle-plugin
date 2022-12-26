@@ -20,4 +20,4 @@ mockk = "io.mockk:mockk-jvm:1.13.3"
 gradle-plugin-publish = "com.gradle.publish:plugin-publish-plugin:1.1.0"
 shadow = "gradle.plugin.com.github.johnrengelman:shadow:7.1.2"
 jacoco-testkit = "gradle.plugin.pl.droidsonroids.gradle.jacoco:jacoco-gradle-testkit-plugin:1.0.9"
-
+nexus-publish = "io.github.gradle-nexus:publish-plugin:1.1.0"

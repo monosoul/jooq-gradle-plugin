@@ -12,5 +12,6 @@ dependencies {
     implementation(libs.gradle.plugin.publish)
     implementation(libs.shadow)
     implementation(libs.jacoco.testkit)
+    implementation(libs.nexus.publish)
 }
 

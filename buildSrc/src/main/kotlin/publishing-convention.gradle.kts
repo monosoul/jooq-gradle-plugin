@@ -1,6 +1,7 @@
 plugins {
     id("com.gradle.plugin-publish")
     signing
+    id("io.github.gradle-nexus.publish-plugin")
 }
 
 val siteUrl = "https://github.com/monosoul/jooq-gradle-plugin"
@@ -18,6 +19,15 @@ signing {
     setRequired({
         gradle.taskGraph.hasTask("publish") && true == withSigning
     })
+}
+
+nexusPublishing {
+    repositories {
+        sonatype {
+            nexusUrl.set(uri("https://s01.oss.sonatype.org/service/local/"))
+            snapshotRepositoryUrl.set(uri("https://s01.oss.sonatype.org/content/repositories/snapshots/"))
+        }
+    }
 }
 
 gradlePlugin {
@@ -80,11 +90,6 @@ publishing {
         maven {
             name = "localBuild"
             url = uri("build/$localRepositoryDirName")
-        }
-        maven {
-            name = "mavenCentral"
-            url = uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
-            credentials(PasswordCredentials::class)
         }
     }
 }

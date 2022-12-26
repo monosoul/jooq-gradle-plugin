@@ -1,5 +1,6 @@
 plugins {
     id("com.gradle.plugin-publish")
+    signing
 }
 
 val siteUrl = "https://github.com/monosoul/jooq-gradle-plugin"
@@ -7,6 +8,17 @@ val githubUrl = "https://github.com/monosoul/jooq-gradle-plugin"
 
 val pluginName = "jOOQ Docker Plugin"
 val pluginDescription = "Generates jOOQ classes using dockerized database"
+
+signing {
+    val signingKeyId: String? by project
+    val signingKey: String? by project
+    val signingPassword: String? by project
+    val withSigning: Boolean? by project
+    useInMemoryPgpKeys(signingKeyId, signingKey, signingPassword)
+    setRequired({
+        gradle.taskGraph.hasTask("publish") && true == withSigning
+    })
+}
 
 gradlePlugin {
     website.set(siteUrl)
@@ -68,6 +80,11 @@ publishing {
         maven {
             name = "localBuild"
             url = uri("build/$localRepositoryDirName")
+        }
+        maven {
+            name = "mavenCentral"
+            url = uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
+            credentials(PasswordCredentials::class)
         }
     }
 }

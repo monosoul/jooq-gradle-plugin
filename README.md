@@ -3,7 +3,7 @@
 [![Build Status](https://github.com/monosoul/jooq-gradle-plugin/actions/workflows/build-on-push-to-main.yml/badge.svg?branch=main)](https://github.com/monosoul/jooq-gradle-plugin/actions/workflows/build-on-push-to-main.yml?query=branch%3Amain)
 [![codecov](https://codecov.io/gh/monosoul/jooq-gradle-plugin/branch/main/graph/badge.svg?token=7SWSOTIBMX)](https://codecov.io/gh/monosoul/jooq-gradle-plugin)
 [![Gradle Plugins Release](https://img.shields.io/maven-metadata/v/https/plugins.gradle.org/m2/dev/monosoul/jooq-docker/dev.monosoul.jooq-docker.gradle.plugin/maven-metadata.xml.svg?label=Gradle%20Plugin%20Portal)](https://plugins.gradle.org/plugin/dev.monosoul.jooq-docker)
-![Maven Central Release](https://img.shields.io/maven-metadata/v/https/repo1.maven.org/maven2/dev/monosoul/jooq-docker/dev.monosoul.jooq-docker.gradle.plugin/maven-metadata.xml.svg?label=Maven%20Central)
+[![Maven Central Release](https://img.shields.io/maven-metadata/v/https/repo1.maven.org/maven2/dev/monosoul/jooq-docker/dev.monosoul.jooq-docker.gradle.plugin/maven-metadata.xml.svg?label=Maven%20Central)](https://mvnrepository.com/artifact/dev.monosoul.jooq/jooq-gradle-plugin)
 [![license](https://img.shields.io/github/license/monosoul/jooq-gradle-plugin.svg)](LICENSE)
 [![Semantic Release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg)](https://github.com/semantic-release/semantic-release)
 

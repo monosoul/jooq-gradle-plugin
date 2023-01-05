@@ -21,11 +21,15 @@ jobs:
       - name: Run tests
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: check jacocoTestReport
+          arguments: |
+            --stacktrace
+            check jacocoTestReport
       - name: Test publishing
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: publishToMavenLocal
+          arguments: |
+            --stacktrace
+            publishToMavenLocal
       - name: Publish Test Report
         uses: mikepenz/action-junit-report@v3
         if: always() # always run even if the previous step fails

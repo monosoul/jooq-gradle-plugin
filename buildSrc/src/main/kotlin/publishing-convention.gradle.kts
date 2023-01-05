@@ -14,10 +14,10 @@ signing {
     val signingKeyId: String? by project
     val signingKey: String? by project
     val signingPassword: String? by project
-    val withSigning: Boolean? by project
+    val withSigning: String? by project
     useInMemoryPgpKeys(signingKeyId, signingKey, signingPassword)
     setRequired({
-        gradle.taskGraph.hasTask("publish") && true == withSigning
+        withSigning.toBoolean() && gradle.taskGraph.hasTask("publish")
     })
 }
 

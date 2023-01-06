@@ -18,6 +18,19 @@ jobs:
           java-version: '17'
       - name: Get the version
         run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
+      - name: Run tests
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: |
+            --stacktrace
+            check
+      - name: Publish Test Report
+        uses: mikepenz/action-junit-report@v3
+        if: always() # always run even if the previous step fails
+        with:
+          check_name: JUnit Test Report
+          report_paths: '**/build/test-results/**/TEST-*.xml'
+          annotate_notice: false
       - name: Publish plugin
         uses: gradle/gradle-build-action@v2
         env:

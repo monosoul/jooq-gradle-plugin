@@ -1,8 +1,8 @@
 [versions]
-jooq = "3.17.6"
-flyway = "9.11.0"
+jooq = "3.17.7"
+flyway = "9.12.0"
 testcontainers = "1.17.6"
-jna = "5.12.1"
+jna = "5.13.0"
 
 [libraries]
 jooq-codegen = { module = "org.jooq:jooq-codegen", version.ref = "jooq" }

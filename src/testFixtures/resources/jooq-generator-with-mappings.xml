@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<configuration xmlns="http://www.jooq.org/xsd/jooq-codegen-3.17.0.xsd">
+    <generator>
+        <database>
+            <schemata>
+                <schema>
+                    <inputSchema>public</inputSchema>
+                </schema>
+                <schema>
+                    <inputSchema>other</inputSchema>
+                </schema>
+            </schemata>
+            <includes>.*</includes>
+        </database>
+        <strategy>
+            <matchers>
+                <tables>
+                    <table>
+                        <tableIdentifier>
+                            <expression>PREFIXED_$0</expression>
+                            <transform>UPPER</transform>
+                        </tableIdentifier>
+                        <tableClass>
+                            <expression>prefixed_$0</expression>
+                            <transform>PASCAL</transform>
+                        </tableClass>
+                        <recordClass>
+                            <expression>prefixed_$0_record</expression>
+                            <transform>PASCAL</transform>
+                        </recordClass>
+                    </table>
+                </tables>
+            </matchers>
+        </strategy>
+    </generator>
+</configuration>

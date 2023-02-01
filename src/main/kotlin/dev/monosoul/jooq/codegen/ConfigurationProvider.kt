@@ -54,13 +54,12 @@ internal class ConfigurationProvider(
         config.generator.apply {
             withLogging(Logging.DEBUG)
             withTarget(codeGenTarget())
-            schemaToPackageMapping.get().toMatchersStrategy()?.also { matchers ->
-                withStrategy(
-                    Strategy().withMatchers(matchers)
-                )
-            }
+            nonNullStrategy.nonNullMatchers.apply(schemaToPackageMapping.get().toMappingApplier())
         }
     }
+
+    private val Generator.nonNullStrategy get() = strategy ?: Strategy().also(::withStrategy)
+    private val Strategy.nonNullMatchers get() = matchers ?: Matchers().also(::withMatchers)
 
     private fun codeGenTarget() = Target()
         .withPackageName(basePackageName.get())
@@ -74,14 +73,12 @@ internal class ConfigurationProvider(
             .withOutputSchemaToDefault(outputSchemaToDefault.get().contains(schemaName))
     }
 
-    private fun Map<String, String>.toMatchersStrategy() = takeIf { it.isNotEmpty() }?.let {
-        Matchers()
-            .withSchemas(
-                *it.toSchemasMatchers()
-            )
-            .withCatalogs(
-                *it.toCatalogMatchers()
-            )
+    private fun Map<String, String>.toMappingApplier(): (Matchers) -> Unit = { matchers ->
+        if (isNotEmpty()) {
+            matchers
+                .withSchemas(*toSchemasMatchers())
+                .withCatalogs(*toCatalogMatchers())
+        }
     }
 
     private fun Map<String, String>.toSchemasMatchers() = map { (schema, pkg) ->

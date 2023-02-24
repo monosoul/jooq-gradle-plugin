@@ -33,7 +33,8 @@
       "matchPackageNames": [
         "com.gradle.publish:plugin-publish-plugin",
         "gradle.plugin.com.github.johnrengelman:shadow",
-        "gradle.plugin.pl.droidsonroids.gradle.jacoco:jacoco-gradle-testkit-plugin"
+        "gradle.plugin.pl.droidsonroids.gradle.jacoco:jacoco-gradle-testkit-plugin",
+        "io.github.gradle-nexus:publish-plugin"
       ]
     },
     {

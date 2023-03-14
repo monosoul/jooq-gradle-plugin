@@ -2,6 +2,7 @@ package dev.monosoul.jooq.codegen
 
 import org.jooq.codegen.GenerationTool
 import org.jooq.meta.jaxb.Configuration
+import org.jooq.meta.jaxb.Strategy
 import org.jooq.util.jaxb.tools.MiniJAXB
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
@@ -42,9 +43,19 @@ internal class ReflectiveJooqCodegenRunner(
          * @see GenerationTool.run
          */
         fun run(configuration: Configuration) {
-            val preparedConfiguration = load(configuration.toXmlByteArray())
+            val preparedConfiguration = load(configuration.sanitize().toXmlByteArray())
             val runMethod = toolClass.getMethod(GenerationTool::run.name, configurationClass)
             runMethod.invoke(tool, preparedConfiguration)
+        }
+
+        private fun Configuration.sanitize() = apply {
+            // [#100] MiniJAXB class provided by jOOQ doesn't respect default value of XmlElement
+            // It serializes the value even if it's the same as the default value
+            generator?.strategy?.also {
+                if (it.name == defaultGeneratorStrategyName) {
+                    it.name = null
+                }
+            }
         }
 
         private fun Configuration.toXmlByteArray() = ByteArrayOutputStream().also { stream ->
@@ -63,6 +74,10 @@ internal class ReflectiveJooqCodegenRunner(
             return ByteArrayInputStream(xmlByteArray).use {
                 loadMethod.invoke(null, it)
             }
+        }
+
+        private companion object {
+            val defaultGeneratorStrategyName: String? = Strategy().name
         }
     }
 }

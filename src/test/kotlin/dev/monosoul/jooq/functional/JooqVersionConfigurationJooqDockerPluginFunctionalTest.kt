@@ -8,6 +8,7 @@ import strikt.api.expect
 import strikt.assertions.contains
 import strikt.assertions.isEqualTo
 import strikt.java.exists
+import strikt.java.notExists
 
 class JooqVersionConfigurationJooqDockerPluginFunctionalTest : JooqDockerPluginFunctionalTestBase() {
 
@@ -52,12 +53,26 @@ class JooqVersionConfigurationJooqDockerPluginFunctionalTest : JooqDockerPluginF
         // given
         prepareBuildGradleFile {
             """
+                import org.jooq.meta.jaxb.Strategy
+                
                 plugins {
                     id("dev.monosoul.jooq-docker")
                 }
 
                 repositories {
                     mavenCentral()
+                }
+                
+                tasks {
+                    generateJooqClasses {
+                        schemas.set(listOf("public", "other"))
+                        usingJavaConfig {
+                            database.withExcludes("BAR")
+                            withStrategy(
+                                Strategy().withName("org.jooq.codegen.KeepNamesGeneratorStrategy")
+                            )
+                        }
+                    }
                 }
 
                 dependencies {
@@ -66,7 +81,10 @@ class JooqVersionConfigurationJooqDockerPluginFunctionalTest : JooqDockerPluginF
                 }
             """.trimIndent()
         }
-        copyResource(from = "/V01__init.sql", to = "src/main/resources/db/migration/V01__init.sql")
+        copyResource(
+            from = "/V01__init_multiple_schemas.sql",
+            to = "src/main/resources/db/migration/V01__init_multiple_schemas.sql"
+        )
 
         // when
         val result = runGradleWithArguments("generateJooqClasses")
@@ -78,10 +96,13 @@ class JooqVersionConfigurationJooqDockerPluginFunctionalTest : JooqDockerPluginF
                 get { output } contains "Thank you for using jOOQ $jooqVersion"
             }
             that(
-                projectFile("build/generated-jooq/org/jooq/generated/tables/Foo.java")
+                projectFile("build/generated-jooq/org/jooq/generated/public_/tables/foo.java")
             ).exists().and {
                 get { readText() } contains "jOOQ version:$jooqVersion"
             }
+            that(
+                projectFile("build/generated-jooq/org/jooq/generated/other/tables/bar.java")
+            ).notExists()
         }
     }
 }

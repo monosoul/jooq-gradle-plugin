@@ -16,7 +16,7 @@ tasks {
         relocate("docker.client.strategy", "${project.group}.docker.client.strategy")
         relocate(
             "TESTCONTAINERS_DOCKER_CLIENT_STRATEGY",
-            "${project.group.toString().toUpperCase().replace(".", "_")}_TESTCONTAINERS_DOCKER_CLIENT_STRATEGY"
+            "${project.group.toString().uppercase().replace(".", "_")}_TESTCONTAINERS_DOCKER_CLIENT_STRATEGY"
         )
     }
 

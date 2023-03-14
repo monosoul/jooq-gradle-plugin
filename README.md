@@ -77,6 +77,7 @@ Configuring schema names and other parameters of the task:
 
 ```kotlin
 import dev.monosoul.jooq.RecommendedVersions
+import org.jooq.meta.jaxb.Logging
 
 plugins {
     id("dev.monosoul.jooq-docker")
@@ -96,6 +97,7 @@ tasks {
         includeFlywayTable.set(true)
         outputSchemaToDefault.add("public")
         schemaToPackageMapping.put("public", "fancy_name")
+        codegenLogLevel.set(Logging.ERROR)
         usingJavaConfig {
             /* "this" here is the org.jooq.meta.jaxb.Generator configure it as you please */
         }
@@ -308,6 +310,18 @@ tasks {
 dependencies {
     implementation("org.jooq:jooq:3.16.5")
     jooqCodegen("org.postgresql:postgresql:42.3.6")
+}
+```
+
+To configure jOOQ codegen logging level:
+
+```kotlin
+import org.jooq.meta.jaxb.Logging
+
+tasks {
+  generateJooqClasses {
+    codegenLogLevel.set(Logging.DEBUG)
+  }
 }
 ```
 

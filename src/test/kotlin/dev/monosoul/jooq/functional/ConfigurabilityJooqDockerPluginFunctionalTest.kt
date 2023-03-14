@@ -3,7 +3,6 @@ package dev.monosoul.jooq.functional
 import org.gradle.testkit.runner.TaskOutcome.SUCCESS
 import org.junit.jupiter.api.Test
 import strikt.api.expect
-import strikt.assertions.contains
 import strikt.assertions.isEqualTo
 import strikt.java.exists
 
@@ -217,57 +216,6 @@ class ConfigurabilityJooqDockerPluginFunctionalTest : JooqDockerPluginFunctional
             that(result).generateJooqClassesTask.outcome isEqualTo SUCCESS
             that(
                 projectFile("build/gen/org/jooq/generated/tables/Foo.java")
-            ).exists()
-        }
-    }
-
-    @Test
-    fun `should respect codegenLogLevel task property`() {
-        // given
-        prepareBuildGradleFile {
-            """
-                import org.jooq.meta.jaxb.Logging
-                
-                plugins {
-                    id("dev.monosoul.jooq-docker")
-                }
-
-                repositories {
-                    mavenCentral()
-                }
-
-                tasks {
-                    generateJooqClasses {
-                        codegenLogLevel.set(Logging.DEBUG)
-                        withContainer {
-                            image {
-                                name = "postgres:14.4-alpine"
-                            }
-                        }
-                    }
-                }
-
-                dependencies {
-                    jooqCodegen("org.postgresql:postgresql:42.3.6")
-                }
-            """.trimIndent()
-        }
-        copyResource(
-            from = "/V01__init_multiple_schemas.sql",
-            to = "src/main/resources/db/migration/V01__init_multiple_schemas.sql"
-        )
-
-        // when
-        val result = runGradleWithArguments("generateJooqClasses")
-
-        // then
-        expect {
-            that(result) {
-                generateJooqClassesTask.outcome isEqualTo SUCCESS
-                get { output } contains "Database version is older than what dialect POSTGRES supports"
-            }
-            that(
-                projectFile("build/generated-jooq/org/jooq/generated/tables/Foo.java")
             ).exists()
         }
     }

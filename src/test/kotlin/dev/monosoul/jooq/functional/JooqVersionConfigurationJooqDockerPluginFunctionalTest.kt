@@ -66,7 +66,6 @@ class JooqVersionConfigurationJooqDockerPluginFunctionalTest : JooqDockerPluginF
                 
                 tasks {
                     generateJooqClasses {
-                        codegenLogLevel.set(Logging.DEBUG)
                         schemas.set(listOf("public", "other"))
                         usingJavaConfig {
                             database.withExcludes("BAR")

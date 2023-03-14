@@ -6,6 +6,7 @@ on:
 
 jobs:
   build:
+    name: Build
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -39,6 +40,13 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           fail_ci_if_error: true
+  trigger-release:
+    name: Trigger release
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
       - name: Semantic Release
         uses: cycjimmy/semantic-release-action@v3
         with:

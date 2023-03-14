@@ -53,6 +53,7 @@ class JooqVersionConfigurationJooqDockerPluginFunctionalTest : JooqDockerPluginF
         // given
         prepareBuildGradleFile {
             """
+                import org.jooq.meta.jaxb.Logging
                 import org.jooq.meta.jaxb.Strategy
                 
                 plugins {
@@ -65,6 +66,7 @@ class JooqVersionConfigurationJooqDockerPluginFunctionalTest : JooqDockerPluginF
                 
                 tasks {
                     generateJooqClasses {
+                        codegenLogLevel.set(Logging.DEBUG)
                         schemas.set(listOf("public", "other"))
                         usingJavaConfig {
                             database.withExcludes("BAR")

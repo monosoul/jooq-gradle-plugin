@@ -12,6 +12,7 @@ import dev.monosoul.jooq.settings.JooqDockerPluginSettings.WithoutContainer
 import dev.monosoul.jooq.settings.SettingsAware
 import dev.monosoul.jooq.util.CodegenClasspathAwareClassLoaders
 import dev.monosoul.jooq.util.callWith
+import dev.monosoul.jooq.util.getCodegenLogging
 import groovy.lang.Closure
 import org.gradle.api.Action
 import org.gradle.api.DefaultTask
@@ -25,7 +26,6 @@ import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Classpath
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
-import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Nested
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.PathSensitive
@@ -38,7 +38,6 @@ import org.gradle.kotlin.dsl.property
 import org.gradle.kotlin.dsl.setProperty
 import org.jooq.meta.jaxb.Configuration
 import org.jooq.meta.jaxb.Generator
-import org.jooq.meta.jaxb.Logging
 import javax.inject.Inject
 
 @CacheableTask
@@ -96,9 +95,6 @@ open class GenerateJooqClassesTask @Inject constructor(
         }
     )
 
-    @Internal
-    val codegenLogLevel = objectFactory.property<Logging>().convention(Logging.ERROR)
-
     /**
      * Location of Flyway migrations to use for code generation.
      */
@@ -143,7 +139,7 @@ open class GenerateJooqClassesTask @Inject constructor(
         outputSchemaToDefault = outputSchemaToDefault,
         schemaToPackageMapping = schemaToPackageMapping,
         schemas = schemas,
-        logLevel = codegenLogLevel
+        logLevel = logger.getCodegenLogging(),
     )
 
     private fun classLoaders() = CodegenClasspathAwareClassLoaders.from(codegenClasspath)

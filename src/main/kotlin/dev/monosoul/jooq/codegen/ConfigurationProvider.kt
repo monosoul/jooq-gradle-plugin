@@ -54,7 +54,7 @@ internal class ConfigurationProvider(
         config.generator.apply {
             withLogging(Logging.DEBUG)
             withTarget(codeGenTarget())
-            nonNullStrategy.nonNullMatchers.apply(schemaToPackageMapping.get().toMappingApplier())
+            nonNullStrategy.apply(schemaToPackageMapping.get().toMappingApplier())
         }
     }
 
@@ -73,9 +73,10 @@ internal class ConfigurationProvider(
             .withOutputSchemaToDefault(outputSchemaToDefault.get().contains(schemaName))
     }
 
-    private fun Map<String, String>.toMappingApplier(): (Matchers) -> Unit = { matchers ->
+    private fun Map<String, String>.toMappingApplier(): (Strategy) -> Unit = { strategy ->
         if (isNotEmpty()) {
-            matchers
+            strategy
+                .nonNullMatchers
                 .withSchemas(*toSchemasMatchers())
                 .withCatalogs(*toCatalogMatchers())
         }

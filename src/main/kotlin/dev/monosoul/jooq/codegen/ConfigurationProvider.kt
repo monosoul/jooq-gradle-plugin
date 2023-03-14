@@ -32,6 +32,7 @@ internal class ConfigurationProvider(
     private val outputSchemaToDefault: SetProperty<String>,
     private val schemaToPackageMapping: MapProperty<String, String>,
     private val schemas: ListProperty<String>,
+    private val logLevel: Property<Logging>,
 ) {
 
     fun fromXml(file: FileContents) = file.asBytes.map { it.inputStream().use(::load).applyCommonConfiguration() }
@@ -51,7 +52,7 @@ internal class ConfigurationProvider(
         .applyCommonConfiguration()
 
     private fun Configuration.applyCommonConfiguration() = also { config ->
-        config.withLogging(Logging.DEBUG)
+        config.withLogging(logLevel.get())
         config.generator.apply {
             withTarget(codeGenTarget())
             nonNullStrategy.apply(schemaToPackageMapping.get().toMappingApplier())

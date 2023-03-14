@@ -14,6 +14,8 @@ class JavaBasedConfigJooqDockerPluginFunctionalTest : JooqDockerPluginFunctional
         // given
         prepareBuildGradleFile {
             """
+                import org.jooq.meta.jaxb.Strategy
+                
                 plugins {
                     id("dev.monosoul.jooq-docker")
                 }
@@ -27,6 +29,9 @@ class JavaBasedConfigJooqDockerPluginFunctionalTest : JooqDockerPluginFunctional
                         schemas.set(listOf("public", "other"))
                         usingJavaConfig {
                             database.withExcludes("BAR")
+                            withStrategy(
+                                Strategy().withName("org.jooq.codegen.KeepNamesGeneratorStrategy")
+                            )
                         }
                     }
                 }
@@ -48,10 +53,10 @@ class JavaBasedConfigJooqDockerPluginFunctionalTest : JooqDockerPluginFunctional
         expect {
             that(result).generateJooqClassesTask.outcome isEqualTo SUCCESS
             that(
-                projectFile("build/generated-jooq/org/jooq/generated/public_/tables/Foo.java")
+                projectFile("build/generated-jooq/org/jooq/generated/public_/tables/foo.java")
             ).exists()
             that(
-                projectFile("build/generated-jooq/org/jooq/generated/other/tables/Bar.java")
+                projectFile("build/generated-jooq/org/jooq/generated/other/tables/bar.java")
             ).notExists()
         }
     }

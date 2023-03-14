@@ -51,8 +51,8 @@ internal class ConfigurationProvider(
         .applyCommonConfiguration()
 
     private fun Configuration.applyCommonConfiguration() = also { config ->
+        config.withLogging(Logging.DEBUG)
         config.generator.apply {
-            withLogging(Logging.DEBUG)
             withTarget(codeGenTarget())
             nonNullStrategy.apply(schemaToPackageMapping.get().toMappingApplier())
         }

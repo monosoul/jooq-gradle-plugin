@@ -44,6 +44,7 @@ tasks {
     processTestTemplates {
         filter {
             it.replace("@gradle.version@", gradle.gradleVersion)
+                .replace("@plugin.version@", rootProject.version.toString())
         }
     }
 }

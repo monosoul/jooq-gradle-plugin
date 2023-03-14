@@ -12,6 +12,7 @@ import dev.monosoul.jooq.settings.JooqDockerPluginSettings.WithoutContainer
 import dev.monosoul.jooq.settings.SettingsAware
 import dev.monosoul.jooq.util.CodegenClasspathAwareClassLoaders
 import dev.monosoul.jooq.util.callWith
+import dev.monosoul.jooq.util.getCodegenLogging
 import groovy.lang.Closure
 import org.gradle.api.Action
 import org.gradle.api.DefaultTask
@@ -132,8 +133,14 @@ open class GenerateJooqClassesTask @Inject constructor(
 
     private val codegenRunner = UniversalJooqCodegenRunner()
 
-    private val configurationProvider =
-        ConfigurationProvider(basePackageName, outputDirectory, outputSchemaToDefault, schemaToPackageMapping, schemas)
+    private val configurationProvider = ConfigurationProvider(
+        basePackageName = basePackageName,
+        outputDirectory = outputDirectory,
+        outputSchemaToDefault = outputSchemaToDefault,
+        schemaToPackageMapping = schemaToPackageMapping,
+        schemas = schemas,
+        logLevel = logger.getCodegenLogging(),
+    )
 
     private fun classLoaders() = CodegenClasspathAwareClassLoaders.from(codegenClasspath)
 

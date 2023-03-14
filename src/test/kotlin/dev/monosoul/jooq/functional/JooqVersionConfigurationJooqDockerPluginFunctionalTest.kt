@@ -53,6 +53,7 @@ class JooqVersionConfigurationJooqDockerPluginFunctionalTest : JooqDockerPluginF
         // given
         prepareBuildGradleFile {
             """
+                import org.jooq.meta.jaxb.Logging
                 import org.jooq.meta.jaxb.Strategy
                 
                 plugins {

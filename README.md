@@ -7,6 +7,8 @@
 [![license](https://img.shields.io/github/license/monosoul/jooq-gradle-plugin.svg)](LICENSE)
 [![Semantic Release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg)](https://github.com/semantic-release/semantic-release)
 
+Originally a fork of [revolut-engineering/jooq-plugin](https://github.com/revolut-engineering/jooq-plugin)
+
 Copyright 2021 [Adrian Skrobacz](https://github.com/adrianskrobaczrevolut)
 
 Copyright 2021 Revolut Ltd

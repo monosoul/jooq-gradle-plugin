@@ -2,12 +2,10 @@
 
 [![Build Status](https://github.com/monosoul/jooq-gradle-plugin/actions/workflows/build-on-push-to-main.yml/badge.svg?branch=main)](https://github.com/monosoul/jooq-gradle-plugin/actions/workflows/build-on-push-to-main.yml?query=branch%3Amain)
 [![codecov](https://codecov.io/gh/monosoul/jooq-gradle-plugin/branch/main/graph/badge.svg?token=7SWSOTIBMX)](https://codecov.io/gh/monosoul/jooq-gradle-plugin)
-[![Gradle Plugins Release](https://img.shields.io/maven-metadata/v/https/plugins.gradle.org/m2/dev/monosoul/jooq-docker/dev.monosoul.jooq-docker.gradle.plugin/maven-metadata.xml.svg?label=Gradle%20Plugin%20Portal)](https://plugins.gradle.org/plugin/dev.monosoul.jooq-docker)
+[![Gradle Plugins Release](https://img.shields.io/maven-metadata/v/https/repo1.maven.org/maven2/dev/monosoul/jooq-docker/dev.monosoul.jooq-docker.gradle.plugin/maven-metadata.xml.svg?label=Gradle%20Plugin%20Portal)](https://plugins.gradle.org/plugin/dev.monosoul.jooq-docker)
 [![Maven Central Release](https://img.shields.io/maven-metadata/v/https/repo1.maven.org/maven2/dev/monosoul/jooq-docker/dev.monosoul.jooq-docker.gradle.plugin/maven-metadata.xml.svg?label=Maven%20Central)](https://mvnrepository.com/artifact/dev.monosoul.jooq/jooq-gradle-plugin)
 [![license](https://img.shields.io/github/license/monosoul/jooq-gradle-plugin.svg)](LICENSE)
 [![Semantic Release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg)](https://github.com/semantic-release/semantic-release)
-
-Originally a fork of [revolut-engineering/jooq-plugin](https://github.com/revolut-engineering/jooq-plugin)
 
 Copyright 2021 [Adrian Skrobacz](https://github.com/adrianskrobaczrevolut)
 
@@ -17,7 +15,7 @@ Copyright 2022 - 2023 [Andrei Nevedomskii](https://github.com/monosoul)
 
 ---
 
-Notice: this plugin was originally developed [here](https://github.com/revolut-engineering/jooq-plugin), but since
+Notice: this plugin was originally developed at [revolut-engineering/jooq-plugin](https://github.com/revolut-engineering/jooq-plugin), but since
 I can't publish it under the same group, I had to change the group from `com.revolut` to `dev.monosoul`.
 
 ---

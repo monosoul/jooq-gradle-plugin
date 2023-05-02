@@ -32,8 +32,8 @@
       "commitMessagePrefix": "chore: ",
       "matchPackageNames": [
         "com.gradle.publish:plugin-publish-plugin",
-        "gradle.plugin.com.github.johnrengelman:shadow",
-        "gradle.plugin.pl.droidsonroids.gradle.jacoco:jacoco-gradle-testkit-plugin",
+        "com.github.johnrengelman:shadow",
+        "pl.droidsonroids.gradle.jacoco:pl.droidsonroids.gradle.jacoco",
         "io.github.gradle-nexus:publish-plugin"
       ]
     },

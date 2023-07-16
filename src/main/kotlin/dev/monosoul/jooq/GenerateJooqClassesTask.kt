@@ -84,15 +84,13 @@ open class GenerateJooqClassesTask @Inject constructor(
     val includeFlywayTable = objectFactory.property<Boolean>().convention(false)
 
     /**
-     * Code generator configuration.
-     *
-     * Avoid changing manually, use [usingJavaConfig] or [usingXmlConfig] instead.
+     * Use [usingJavaConfig] or [usingXmlConfig] to provide configuration.
      */
     @Input
-    val generatorConfig = objectFactory.property<Configuration>().convention(
+    val generatorConfig = objectFactory.property<ValueHolder<Configuration>>().convention(
         providerFactory.provider {
             configurationProvider.defaultConfiguration()
-        }
+        }.map(::PrivateValueHolder)
     )
 
     /**
@@ -122,12 +120,11 @@ open class GenerateJooqClassesTask @Inject constructor(
     private val globalPluginSettings = project.extensions.getByType<JooqExtension>().pluginSettings
 
     /**
-     * Local (task-specific) plugin configuration.
-     *
-     * Avoid changing manually, use [withContainer] or [withoutContainer] instead.
+     * Use [withContainer] or [withoutContainer] to provide configuration.
      */
     @Nested
-    fun getPluginSettings(): Provider<JooqDockerPluginSettings> = localPluginSettings.orElse(globalPluginSettings)
+    fun getPluginSettings(): Provider<ValueHolder<JooqDockerPluginSettings>> =
+        localPluginSettings.orElse(globalPluginSettings).map(::PrivateValueHolder)
 
     private val migrationRunner = UniversalMigrationRunner(schemas, inputDirectory, flywayProperties)
 
@@ -172,7 +169,7 @@ open class GenerateJooqClassesTask @Inject constructor(
         generatorConfig.set(
             configurationProvider.fromXml(providerFactory.fileContents(file)).map { config ->
                 config.also { customizer.execute(it.generator) }
-            }
+            }.map(::PrivateValueHolder)
         )
     }
 
@@ -192,7 +189,7 @@ open class GenerateJooqClassesTask @Inject constructor(
                 configurationProvider.defaultConfiguration().also {
                     customizer.execute(it.generator)
                 }
-            }
+            }.map(::PrivateValueHolder)
         )
     }
 
@@ -204,7 +201,7 @@ open class GenerateJooqClassesTask @Inject constructor(
 
     @TaskAction
     fun generateClasses() {
-        getPluginSettings().get()
+        getPluginSettings().get().value
             .runWithDatabaseCredentials(classLoaders()) { classLoaders, credentials ->
                 val schemaVersion = migrationRunner.migrateDb(classLoaders, credentials)
                 generateJooqClasses(classLoaders, credentials, schemaVersion)
@@ -221,7 +218,7 @@ open class GenerateJooqClassesTask @Inject constructor(
         }
         codegenRunner.generateJooqClasses(
             codegenAwareClassLoader = jdbcAwareClassLoader,
-            configuration = generatorConfig.get().postProcess(
+            configuration = generatorConfig.get().value.postProcess(
                 schemaVersion = schemaVersion,
                 credentials = credentials,
                 extraTableExclusions = listOfNotNull(
@@ -231,3 +228,7 @@ open class GenerateJooqClassesTask @Inject constructor(
         )
     }
 }
+
+private data class PrivateValueHolder<T>(@get:Input val value: T) : ValueHolder<T>()
+
+private val <T> ValueHolder<T>.value: T get() = (this as PrivateValueHolder<T>).value

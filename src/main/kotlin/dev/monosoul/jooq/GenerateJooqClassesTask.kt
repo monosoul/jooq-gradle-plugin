@@ -236,4 +236,4 @@ open class GenerateJooqClassesTask @Inject constructor(
     }
 }
 
-private data class PrivateValueHolder<T>(@get:Input val value: T) : ValueHolder<T>()
+private data class PrivateValueHolder<T>(@get:Nested val value: T) : ValueHolder<T>()

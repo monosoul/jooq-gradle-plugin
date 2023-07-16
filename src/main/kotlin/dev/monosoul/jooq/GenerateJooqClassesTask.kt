@@ -20,6 +20,7 @@ import org.gradle.api.file.FileSystemOperations
 import org.gradle.api.file.ProjectLayout
 import org.gradle.api.file.RegularFile
 import org.gradle.api.model.ObjectFactory
+import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.provider.ProviderFactory
 import org.gradle.api.tasks.CacheableTask
@@ -83,15 +84,18 @@ open class GenerateJooqClassesTask @Inject constructor(
     @Input
     val includeFlywayTable = objectFactory.property<Boolean>().convention(false)
 
-    /**
-     * Use [usingJavaConfig] or [usingXmlConfig] to provide configuration.
-     */
-    @Input
-    val generatorConfig = objectFactory.property<ValueHolder<Configuration>>().convention(
+    private val _generatorConfig = objectFactory.property<PrivateValueHolder<Configuration>>().convention(
         providerFactory.provider {
             configurationProvider.defaultConfiguration()
         }.map(::PrivateValueHolder)
     )
+
+    /**
+     * Use [usingJavaConfig] or [usingXmlConfig] to provide configuration.
+     */
+    @get:Input
+    @Suppress("unused")
+    val generatorConfig: Property<out ValueHolder<Configuration>> get() = _generatorConfig
 
     /**
      * Location of Flyway migrations to use for code generation.
@@ -119,12 +123,15 @@ open class GenerateJooqClassesTask @Inject constructor(
 
     private val globalPluginSettings = project.extensions.getByType<JooqExtension>().pluginSettings
 
+    private val _pluginSettings: Provider<PrivateValueHolder<JooqDockerPluginSettings>> get() =
+        localPluginSettings.orElse(globalPluginSettings).map(::PrivateValueHolder)
+
     /**
      * Use [withContainer] or [withoutContainer] to provide configuration.
      */
     @Nested
-    fun getPluginSettings(): Provider<ValueHolder<JooqDockerPluginSettings>> =
-        localPluginSettings.orElse(globalPluginSettings).map(::PrivateValueHolder)
+    @Suppress("unused")
+    fun getPluginSettings(): Provider<out ValueHolder<JooqDockerPluginSettings>> = _pluginSettings
 
     private val migrationRunner = UniversalMigrationRunner(schemas, inputDirectory, flywayProperties)
 
@@ -166,7 +173,7 @@ open class GenerateJooqClassesTask @Inject constructor(
         file: RegularFile = projectLayout.projectDirectory.file("src/main/resources/db/jooq.xml"),
         customizer: Action<Generator> = Action<Generator> { }
     ) {
-        generatorConfig.set(
+        _generatorConfig.set(
             configurationProvider.fromXml(providerFactory.fileContents(file)).map { config ->
                 config.also { customizer.execute(it.generator) }
             }.map(::PrivateValueHolder)
@@ -184,7 +191,7 @@ open class GenerateJooqClassesTask @Inject constructor(
      */
     @Suppress("unused")
     fun usingJavaConfig(customizer: Action<Generator>) {
-        generatorConfig.set(
+        _generatorConfig.set(
             providerFactory.provider {
                 configurationProvider.defaultConfiguration().also {
                     customizer.execute(it.generator)
@@ -201,7 +208,7 @@ open class GenerateJooqClassesTask @Inject constructor(
 
     @TaskAction
     fun generateClasses() {
-        getPluginSettings().get().value
+        _pluginSettings.get().value
             .runWithDatabaseCredentials(classLoaders()) { classLoaders, credentials ->
                 val schemaVersion = migrationRunner.migrateDb(classLoaders, credentials)
                 generateJooqClasses(classLoaders, credentials, schemaVersion)
@@ -218,7 +225,7 @@ open class GenerateJooqClassesTask @Inject constructor(
         }
         codegenRunner.generateJooqClasses(
             codegenAwareClassLoader = jdbcAwareClassLoader,
-            configuration = generatorConfig.get().value.postProcess(
+            configuration = _generatorConfig.get().value.postProcess(
                 schemaVersion = schemaVersion,
                 credentials = credentials,
                 extraTableExclusions = listOfNotNull(
@@ -230,5 +237,3 @@ open class GenerateJooqClassesTask @Inject constructor(
 }
 
 private data class PrivateValueHolder<T>(@get:Input val value: T) : ValueHolder<T>()
-
-private val <T> ValueHolder<T>.value: T get() = (this as PrivateValueHolder<T>).value

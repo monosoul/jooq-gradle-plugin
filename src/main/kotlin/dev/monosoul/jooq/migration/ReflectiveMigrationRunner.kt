@@ -163,9 +163,9 @@ internal class ReflectiveMigrationRunner(codegenAwareClassLoader: ClassLoader) :
             val migrateResult = migrateMethod.invoke(flywayInstance)
 
             val targetSchemaVersionProperty = migrateResultClass.getField(MigrateResult::targetSchemaVersion.name)
-            val targetSchemaVersion = targetSchemaVersionProperty.get(migrateResult) as String
+            val targetSchemaVersion = targetSchemaVersionProperty.get(migrateResult) as String?
 
-            return SchemaVersion(targetSchemaVersion)
+            return SchemaVersion(targetSchemaVersion.toString())
         }
     }
 }

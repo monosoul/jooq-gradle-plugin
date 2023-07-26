@@ -24,5 +24,5 @@ internal class BuiltInMigrationRunner(codegenAwareClassLoader: ClassLoader) : Mi
         .load()
         .migrate()
         .targetSchemaVersion
-        .let(::SchemaVersion)
+        .let { SchemaVersion(it ?: "null") }
 }

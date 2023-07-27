@@ -305,6 +305,7 @@ open class GenerateJooqClassesTask @Inject constructor(
      * @see migrationLocations
      * @see MigrationLocation
      * @see Project.files
+     * @see Project.project
      * @see FileCollection
      */
     fun ListProperty<MigrationLocation>.setFromClasspath(
@@ -313,23 +314,30 @@ open class GenerateJooqClassesTask @Inject constructor(
     ) = set(MigrationLocation.Classpath(path, location))
 
     /**
-     * Add location of Java-based or SQL migrations to Flyway classpath from a directory or a JAR file
+     * Add location of Java-based or SQL migrations to Flyway classpath from the specified provider
      *
      * Examples:
      *
-     * Using directory with compiled Java-based migrations:
+     * Using compiled Java-based migrations from a Gradle submodule:
      *
      * ```
-     * migrationLocations.setFromClasspath(
-     *    project(":migrations").sourceSets.main.map { it.output }
-     * )
+     * tasks.generateJooqClasses {
+     *    migrationLocations.setFromClasspath(
+     *       project(":migrations").sourceSets.main.map { it.output }
+     *    )
+     * }
      * ```
      *
-     * Or using a JAR task output (keep in mind that caching of `generateJooqClasses` task wouldn't work in this case):
+     * Similarly, if you use some extra dependencies in your migrations module, you can do this:
+     *
+     *
      * ```
-     * migrationLocations.setFromClasspath(
-     *    project(":migrations").tasks.jar
-     * )
+     * tasks.generateJooqClasses {
+     *    migrationLocations.setFromClasspath(
+     *       // notice extra + it.runtimeClasspath
+     *       project(":migrations").sourceSets.main.map { it.output + it.runtimeClasspath }
+     *    )
+     * }
      * ```
      *
      * @see migrationLocations
@@ -350,7 +358,7 @@ open class GenerateJooqClassesTask @Inject constructor(
      * val migrationClasspath by configurations.creating
      *
      * dependencies {
-     *    migrationClasspath(project(":migrations"))
+     *    migrationClasspath("third.party:some.artifact:some.version")
      * }
      *
      * tasks.generateJooqClasses {

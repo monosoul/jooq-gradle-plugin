@@ -67,43 +67,37 @@ sealed class MigrationLocation {
      *
      * E.g.:
      *
-     * Using directory with compiled Java-based migrations:
+     * Using Java-based migrations from a Gradle submodule:
      *
      * ```
      * MigrationLocation.Classpath(
-     *    path = project(":migrations").sourceSets.main.map { it.output },
+     *    path = project.files(
+     *       project(":migrations").sourceSets.main.map { it.output },
+     *       // the line below only needed if you use some extra dependencies in your migrations
+     *       project(":migrations").sourceSets.main.map { it.runtimeClasspath },
+     *    ),
      *    classpathLocation = "/db/migrations"
      * )
      * ```
      *
-     * Or using a JAR task output (keep in mind that caching of `generateJooqClasses` task wouldn't work in this case):
-     *
-     * ```
-     * MigrationLocation.Classpath(
-     *    path = project(":migrations").tasks.jar,
-     *    classpathLocation = "/db/migrations"
-     * )
-     * ```
-     *
-     * Or if you need to add a submodule with a few dependencies (keep in mind that caching of `generateJooqClasses` task wouldn't work in this case):
+     * Or if you need to run migrations from a third party JAR file:
      *
      * ```
      * val migrationClasspath by configurations.creating
      *
      * dependencies {
-     *    migrationClasspath(project(":migrations"))
+     *    migrationClasspath("third.party:some.artifact:some.version")
      * }
      *
      * tasks.generateJooqClasses {
      *    migrationLocations.set(
      *       MigrationLocation.Classpath(
      *          path = project.files(migrationClasspath),
-     *          classpathLocation = "/db/migrations"
+     *          classpathLocation = "/third/party/package/migrations"
      *       )
      *    )
      * }
      * ```
-     * ^ same applies to using a 3rd party JAR from external repositories. When using a 3rd party JAR caching should work.
      *
      * @property path Path to the directory with compiled Java-based migrations or to the JAR file with Java-based migrations. This is the path that will be added to Flyway classpath.
      * @property classpathLocations Location(s) of Java-based migrations within the [path]. For example, the package with migrations.

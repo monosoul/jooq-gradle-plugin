@@ -506,7 +506,7 @@ repositories {
 tasks {
   generateJooqClasses {
     migrationLocations.setFromClasspath(
-      migrationsProject.sourceSets.main.map { it.output },
+      project(":migrations").sourceSets.main.map { it.output },
       "package/with/migrations"
     )
   }

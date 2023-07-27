@@ -16,6 +16,7 @@ class MultipleDatabasesJooqDockerPluginFunctionalTest : JooqDockerPluginFunction
             """
                 import dev.monosoul.jooq.GenerateJooqClassesTask
                 import dev.monosoul.jooq.RecommendedVersions
+                import dev.monosoul.jooq.migration.MigrationLocation
                 
                 plugins {
                     kotlin("jvm") version "1.6.21"
@@ -29,13 +30,13 @@ class MultipleDatabasesJooqDockerPluginFunctionalTest : JooqDockerPluginFunction
                 tasks {
                     generateJooqClasses {
                         basePackageName.set("org.jooq.generated.postgres")
-                        inputDirectory.setFrom("src/main/resources/postgres/migration")
+                        migrationLocations.setFromFilesystem("src/main/resources/postgres/migration")
                         outputDirectory.set(project.layout.buildDirectory.dir("postgres"))
                     }
                     
                     register<GenerateJooqClassesTask>("generateJooqClassesForMySql") {
                         basePackageName.set("org.jooq.generated.mysql")
-                        inputDirectory.setFrom("src/main/resources/mysql/migration")
+                        migrationLocations.setFromFilesystem("src/main/resources/mysql/migration")
                         outputDirectory.set(project.layout.buildDirectory.dir("mysql"))
                         includeFlywayTable.set(true)
                     

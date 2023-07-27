@@ -1,0 +1,20 @@
+package some.pkg
+
+import org.flywaydb.core.api.migration.BaseJavaMigration
+import org.flywaydb.core.api.migration.Context
+
+class V02__add_bar : BaseJavaMigration() {
+    override fun migrate(context: Context) {
+        context.connection.createStatement().use { insert ->
+            insert.execute(
+                """
+                    create table bar
+                    (
+                        id   UUID primary key,
+                        data JSONB not null
+                    );
+                """.trimIndent()
+            )
+        }
+    }
+}

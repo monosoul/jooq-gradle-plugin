@@ -18,6 +18,7 @@ import groovy.lang.Closure
 import org.gradle.api.Action
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project
+import org.gradle.api.file.FileCollection
 import org.gradle.api.file.FileSystemOperations
 import org.gradle.api.file.ProjectLayout
 import org.gradle.api.file.RegularFile
@@ -265,15 +266,51 @@ open class GenerateJooqClassesTask @Inject constructor(
      * Example:
      *
      * ```
+     * migrationLocations.setFromFilesystem(project.files("src/main/resources/db/migration"))
+     * ```
+     *
+     * @see migrationLocations
+     * @see MigrationLocation
+     * @see Project.files
+     */
+    fun ListProperty<MigrationLocation>.setFromFilesystem(files: FileCollection) = set(
+        MigrationLocation.Filesystem(files)
+    )
+
+    /**
+     * Set location of SQL migrations on the file system to use for code generation
+     *
+     * Example:
+     *
+     * ```
      * migrationLocations.setFromFilesystem("src/main/resources/db/migration")
      * ```
      *
      * @see migrationLocations
      * @see MigrationLocation
      */
-    fun ListProperty<MigrationLocation>.setFromFilesystem(path: String) = set(
-        MigrationLocation.Filesystem(project.files(path))
-    )
+    fun ListProperty<MigrationLocation>.setFromFilesystem(path: String) = setFromFilesystem(project.files(path))
+
+    /**
+     * Add location of Java-based or SQL migrations to Flyway classpath from the specified path
+     *
+     * Example:
+     *
+     * ```
+     * tasks.generateJooqClasses {
+     *     migrationLocations.setFromClasspath(project.files("build/libs/some.jar"))
+     * }
+     * ```
+     *
+     * @see migrationLocations
+     * @see MigrationLocation
+     * @see Project.files
+     * @see FileCollection
+     */
+    fun ListProperty<MigrationLocation>.setFromClasspath(
+        path: FileCollection,
+        location: String = "/db/migration"
+    ) = set(MigrationLocation.Classpath(path, location))
 
     /**
      * Add location of Java-based or SQL migrations to Flyway classpath from a directory or a JAR file
@@ -302,7 +339,7 @@ open class GenerateJooqClassesTask @Inject constructor(
     fun <T> ListProperty<MigrationLocation>.setFromClasspath(
         pathProvider: Provider<T>,
         location: String = "/db/migration"
-    ) = set(MigrationLocation.Classpath(project.files(pathProvider), location))
+    ) = setFromClasspath(project.files(pathProvider), location)
 
     /**
      * Add location of Java-based or SQL migrations to Flyway classpath from a configuration
@@ -329,7 +366,7 @@ open class GenerateJooqClassesTask @Inject constructor(
     fun ListProperty<MigrationLocation>.setFromClasspath(
         configuration: GradleConfiguration,
         location: String = "/db/migration"
-    ) = set(MigrationLocation.Classpath(project.files(configuration), location))
+    ) = setFromClasspath(project.files(configuration), location)
 }
 
 private data class PrivateValueHolder<T>(@get:Nested val value: T) : ValueHolder<T>()

@@ -70,7 +70,7 @@ class JavaBasedMigrationsFunctionalTest : JooqDockerPluginFunctionalTestBase() {
                 
                 tasks {
                     generateJooqClasses {
-                        migrationLocations.setFromClasspath(provider { "java-based-migrations/" })
+                        migrationLocations.setFromClasspath(project.files("java-based-migrations/"))
                     }
                 }
 

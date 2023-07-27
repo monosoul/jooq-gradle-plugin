@@ -36,7 +36,7 @@ class MultipleDatabasesJooqDockerPluginFunctionalTest : JooqDockerPluginFunction
                     
                     register<GenerateJooqClassesTask>("generateJooqClassesForMySql") {
                         basePackageName.set("org.jooq.generated.mysql")
-                        migrationLocations.setFromFilesystem("src/main/resources/mysql/migration")
+                        migrationLocations.setFromFilesystem(project.files("src/main/resources/mysql/migration"))
                         outputDirectory.set(project.layout.buildDirectory.dir("mysql"))
                         includeFlywayTable.set(true)
                     

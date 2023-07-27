@@ -174,6 +174,78 @@ class JavaBasedMigrationsFunctionalTest : JooqDockerPluginFunctionalTestBase() {
     }
 
     @Test
+    fun `should be able to use a Gradle configuration with third party JAR with Java-based migrations for code gen`() {
+        // given
+        writeProjectFile("settings.gradle.kts") {
+            """
+                include("migrations")
+            """.trimIndent()
+        }
+        writeProjectFile("migrations/build.gradle.kts") {
+            """
+                import dev.monosoul.jooq.RecommendedVersions.FLYWAY_VERSION
+                
+                plugins {
+                    kotlin("jvm")
+                    id("dev.monosoul.jooq-docker") apply false
+                }
+                
+                repositories {
+                    mavenCentral()
+                }
+                
+                dependencies {
+                    implementation("org.flywaydb:flyway-core:${'$'}FLYWAY_VERSION")
+                }
+            """.trimIndent()
+        }
+        prepareBuildGradleFile {
+            """
+                plugins {
+                    kotlin("jvm") version "1.6.21"
+                    id("dev.monosoul.jooq-docker")
+                }
+
+                repositories {
+                    mavenCentral()
+                }
+                
+                val migrationClasspath by configurations.creating
+                
+                dependencies {
+                    jooqCodegen("org.postgresql:postgresql:42.3.6")
+                    migrationClasspath(files("java-based-migrations/migrations.jar"))
+                }
+                
+                tasks {
+                    generateJooqClasses {
+                        migrationLocations.setFromClasspath(migrationClasspath)
+                    }
+                }
+            """.trimIndent()
+        }
+        copyResource(from = "/jars/migrations.jar", to = "java-based-migrations/migrations.jar")
+
+        // when
+        val result = runGradleWithArguments("generateJooqClasses")
+
+        // then
+        expect {
+            that(result).generateJooqClassesTask.outcome isEqualTo SUCCESS
+            that(
+                projectFile("build/generated-jooq/org/jooq/generated/tables/Foo.java")
+            ).exists().and {
+                get { readText() } contains "schema version:02"
+            }
+            that(
+                projectFile("build/generated-jooq/org/jooq/generated/tables/Bar.java")
+            ).exists().and {
+                get { readText() } contains "schema version:02"
+            }
+        }
+    }
+
+    @Test
     fun `should be able to use a module source set output with Java-based migrations for code gen`() {
         // given
         writeProjectFile("settings.gradle.kts") {

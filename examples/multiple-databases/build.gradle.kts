@@ -7,7 +7,7 @@ import dev.monosoul.jooq.RecommendedVersions
 
 plugins {
     kotlin("jvm") version "1.8.10"
-    id("dev.monosoul.jooq-docker") version "3.0.12"
+    id("dev.monosoul.jooq-docker") version "5.0.0"
 }
 
 repositories {
@@ -17,13 +17,13 @@ repositories {
 tasks {
     generateJooqClasses {
         basePackageName.set("org.jooq.generated.postgres")
-        inputDirectory.setFrom("src/main/resources/postgres/migration")
+        migrationLocations.setFromFilesystem("src/main/resources/postgres/migration")
         outputDirectory.set(project.layout.buildDirectory.dir("postgres"))
     }
 
     register<GenerateJooqClassesTask>("generateJooqClassesForMySql") {
         basePackageName.set("org.jooq.generated.mysql")
-        inputDirectory.setFrom("src/main/resources/mysql/migration")
+        migrationLocations.setFromFilesystem("src/main/resources/mysql/migration")
         outputDirectory.set(project.layout.buildDirectory.dir("mysql"))
         includeFlywayTable.set(true)
 

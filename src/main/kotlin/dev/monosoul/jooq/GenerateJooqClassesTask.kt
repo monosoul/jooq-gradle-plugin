@@ -3,6 +3,7 @@ package dev.monosoul.jooq
 import dev.monosoul.jooq.codegen.ConfigurationProvider
 import dev.monosoul.jooq.codegen.ConfigurationProvider.Companion.postProcess
 import dev.monosoul.jooq.codegen.UniversalJooqCodegenRunner
+import dev.monosoul.jooq.migration.MigrationLocation
 import dev.monosoul.jooq.migration.SchemaVersion
 import dev.monosoul.jooq.migration.UniversalMigrationRunner
 import dev.monosoul.jooq.settings.DatabaseCredentials
@@ -16,21 +17,21 @@ import dev.monosoul.jooq.util.getCodegenLogging
 import groovy.lang.Closure
 import org.gradle.api.Action
 import org.gradle.api.DefaultTask
+import org.gradle.api.Project
+import org.gradle.api.file.FileCollection
 import org.gradle.api.file.FileSystemOperations
 import org.gradle.api.file.ProjectLayout
 import org.gradle.api.file.RegularFile
 import org.gradle.api.model.ObjectFactory
+import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.provider.ProviderFactory
 import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Classpath
 import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.Nested
 import org.gradle.api.tasks.OutputDirectory
-import org.gradle.api.tasks.PathSensitive
-import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
 import org.gradle.kotlin.dsl.getByType
 import org.gradle.kotlin.dsl.listProperty
@@ -40,6 +41,7 @@ import org.gradle.kotlin.dsl.setProperty
 import org.jooq.meta.jaxb.Configuration
 import org.jooq.meta.jaxb.Generator
 import javax.inject.Inject
+import org.gradle.api.artifacts.Configuration as GradleConfiguration
 
 @CacheableTask
 open class GenerateJooqClassesTask @Inject constructor(
@@ -99,10 +101,25 @@ open class GenerateJooqClassesTask @Inject constructor(
 
     /**
      * Location of Flyway migrations to use for code generation.
+     *
+     * Can be:
+     * - [MigrationLocation.Filesystem]:
+     *    - directory with SQL migrations
+     * - [MigrationLocation.Classpath]:
+     *    - directory with Java-based migrations (compiled classes)
+     *    - directory with JAR files having Java-based or SQL migrations
+     *    - path to a single JAR file having Java-based or SQL migrations
+     *
+     * Default: "src/main/resources/db/migration" directory of current project.
+     *
+     * @see MigrationLocation
      */
-    @InputFiles
-    @PathSensitive(PathSensitivity.RELATIVE)
-    val inputDirectory = objectFactory.fileCollection().from("src/main/resources/db/migration")
+    @Nested
+    val migrationLocations = objectFactory.listProperty<MigrationLocation>().convention(
+        listOf(
+            MigrationLocation.Filesystem(objectFactory.fileCollection().from("src/main/resources/db/migration"))
+        )
+    )
 
     /**
      * Location of generated classes.
@@ -123,8 +140,8 @@ open class GenerateJooqClassesTask @Inject constructor(
 
     private val globalPluginSettings = project.extensions.getByType<JooqExtension>().pluginSettings
 
-    private val _pluginSettings: Provider<PrivateValueHolder<JooqDockerPluginSettings>> get() =
-        localPluginSettings.orElse(globalPluginSettings).map(::PrivateValueHolder)
+    private val _pluginSettings: Provider<PrivateValueHolder<JooqDockerPluginSettings>>
+        get() = localPluginSettings.orElse(globalPluginSettings).map(::PrivateValueHolder)
 
     /**
      * Use [withContainer] or [withoutContainer] to provide configuration.
@@ -133,7 +150,7 @@ open class GenerateJooqClassesTask @Inject constructor(
     @Suppress("unused")
     fun getPluginSettings(): Provider<out ValueHolder<JooqDockerPluginSettings>> = _pluginSettings
 
-    private val migrationRunner = UniversalMigrationRunner(schemas, inputDirectory, flywayProperties)
+    private val migrationRunner = UniversalMigrationRunner(schemas, migrationLocations, flywayProperties)
 
     private val codegenRunner = UniversalJooqCodegenRunner()
 
@@ -234,6 +251,122 @@ open class GenerateJooqClassesTask @Inject constructor(
             )
         )
     }
+
+    /**
+     * Set location of Flyway migrations to use for code generation
+     *
+     * @see migrationLocations
+     * @see MigrationLocation
+     */
+    fun ListProperty<MigrationLocation>.set(migrationLocation: MigrationLocation) = set(listOf(migrationLocation))
+
+    /**
+     * Set location of SQL migrations on the file system to use for code generation
+     *
+     * Example:
+     *
+     * ```
+     * migrationLocations.setFromFilesystem(project.files("src/main/resources/db/migration"))
+     * ```
+     *
+     * @see migrationLocations
+     * @see MigrationLocation
+     * @see Project.files
+     */
+    fun ListProperty<MigrationLocation>.setFromFilesystem(files: FileCollection) = set(
+        MigrationLocation.Filesystem(files)
+    )
+
+    /**
+     * Set location of SQL migrations on the file system to use for code generation
+     *
+     * Example:
+     *
+     * ```
+     * migrationLocations.setFromFilesystem("src/main/resources/db/migration")
+     * ```
+     *
+     * @see migrationLocations
+     * @see MigrationLocation
+     */
+    fun ListProperty<MigrationLocation>.setFromFilesystem(path: String) = setFromFilesystem(project.files(path))
+
+    /**
+     * Add location of Java-based or SQL migrations to Flyway classpath from the specified path
+     *
+     * Example:
+     *
+     * ```
+     * tasks.generateJooqClasses {
+     *     migrationLocations.setFromClasspath(project.files("build/libs/some.jar"))
+     * }
+     * ```
+     *
+     * @see migrationLocations
+     * @see MigrationLocation
+     * @see Project.files
+     * @see FileCollection
+     */
+    fun ListProperty<MigrationLocation>.setFromClasspath(
+        path: FileCollection,
+        location: String = "/db/migration"
+    ) = set(MigrationLocation.Classpath(path, location))
+
+    /**
+     * Add location of Java-based or SQL migrations to Flyway classpath from a directory or a JAR file
+     *
+     * Examples:
+     *
+     * Using directory with compiled Java-based migrations:
+     *
+     * ```
+     * migrationLocations.setFromClasspath(
+     *    project(":migrations").sourceSets.main.map { it.output }
+     * )
+     * ```
+     *
+     * Or using a JAR task output (keep in mind that caching of `generateJooqClasses` task wouldn't work in this case):
+     * ```
+     * migrationLocations.setFromClasspath(
+     *    project(":migrations").tasks.jar
+     * )
+     * ```
+     *
+     * @see migrationLocations
+     * @see MigrationLocation
+     * @see Project.project
+     */
+    fun <T> ListProperty<MigrationLocation>.setFromClasspath(
+        pathProvider: Provider<T>,
+        location: String = "/db/migration"
+    ) = setFromClasspath(project.files(pathProvider), location)
+
+    /**
+     * Add location of Java-based or SQL migrations to Flyway classpath from a configuration
+     *
+     * Example:
+     *
+     * ```
+     * val migrationClasspath by configurations.creating
+     *
+     * dependencies {
+     *    migrationClasspath(project(":migrations"))
+     * }
+     *
+     * tasks.generateJooqClasses {
+     *     migrationLocations.setFromClasspath(migrationClasspath)
+     * }
+     * ```
+     *
+     * @see migrationLocations
+     * @see MigrationLocation
+     * @see Project.getConfigurations
+     * @see GradleConfiguration
+     */
+    fun ListProperty<MigrationLocation>.setFromClasspath(
+        configuration: GradleConfiguration,
+        location: String = "/db/migration"
+    ) = setFromClasspath(project.files(configuration), location)
 }
 
 private data class PrivateValueHolder<T>(@get:Nested val value: T) : ValueHolder<T>()

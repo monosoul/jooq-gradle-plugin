@@ -90,7 +90,7 @@ tasks {
     generateJooqClasses {
         schemas.set(listOf("public", "other_schema"))
         basePackageName.set("org.jooq.generated")
-        inputDirectory.setFrom(project.files("src/main/resources/db/migration"))
+        migrationLocations.setFromFilesystem("src/main/resources/db/migration")
         outputDirectory.set(project.layout.buildDirectory.dir("generated-jooq"))
         flywayProperties.put("flyway.placeholderReplacement", "false")
         includeFlywayTable.set(true)
@@ -374,13 +374,13 @@ repositories {
 tasks {
     generateJooqClasses {
         basePackageName.set("org.jooq.generated.postgres")
-        inputDirectory.setFrom("src/main/resources/postgres/migration")
+        migrationLocations.setFromFilesystem("src/main/resources/postgres/migration")
         outputDirectory.set(project.layout.buildDirectory.dir("postgres"))
     }
 
     register<GenerateJooqClassesTask>("generateJooqClassesForMySql") {
         basePackageName.set("org.jooq.generated.mysql")
-        inputDirectory.setFrom("src/main/resources/mysql/migration")
+        migrationLocations.setFromFilesystem("src/main/resources/mysql/migration")
         outputDirectory.set(project.layout.buildDirectory.dir("mysql"))
 
         withContainer {
@@ -483,3 +483,67 @@ And here's an example how to customize the plugin configuration from command lin
 #### ❗ NOTE: `withoutContainer` properties have higher priority than `withContainer` properties.
 
 #### ❗ NOTE: properties only affect global (or project-wide) configuration.
+
+### Java-based migrations
+
+The plugin
+supports [Java-based Flyway migrations](https://documentation.red-gate.com/fd/tutorial-java-based-migrations-184127624.html).
+
+If you have Java-based migrations as a part of your project in a Gradle submodule, you can use the following
+configuration:
+
+```kotlin
+import dev.monosoul.jooq.RecommendedVersions
+
+plugins {
+  id("dev.monosoul.jooq-docker")
+}
+
+repositories {
+  mavenCentral()
+}
+
+tasks {
+  generateJooqClasses {
+    migrationLocations.setFromClasspath(
+      migrationsProject.sourceSets.main.map { it.output },
+      "package/with/migrations"
+    )
+  }
+}
+
+dependencies {
+  implementation("org.jooq:jooq:${RecommendedVersions.JOOQ_VERSION}")
+  jooqCodegen("org.postgresql:postgresql:42.3.6")
+}
+```
+
+If you want to run migrations provided in a JAR file by some third party:
+```kotlin
+import dev.monosoul.jooq.RecommendedVersions
+
+plugins {
+  id("dev.monosoul.jooq-docker")
+}
+
+repositories {
+  mavenCentral()
+}
+
+val migrationClasspath by configurations.creating
+
+tasks {
+  generateJooqClasses {
+    migrationLocations.setFromClasspath(
+      migrationClasspath,
+      "package/with/migrations"
+    )
+  }
+}
+
+dependencies {
+  implementation("org.jooq:jooq:${RecommendedVersions.JOOQ_VERSION}")
+  migrationClasspath("third.party:library:version")
+  jooqCodegen("org.postgresql:postgresql:42.3.6")
+}
+```

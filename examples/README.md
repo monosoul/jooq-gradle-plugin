@@ -7,3 +7,4 @@ This directory contains different examples of plugin configuration
 - [Generating jOOQ classes for databases other than PostgreSQL (MySQL)](mysql)
 - [Using Gradle properties to configure the plugin](properties)
 - [Configuring jOOQ and Flyway versions with Spring Boot](spring-boot)
+- [Using Java-based Flyway migrations](java-based-migrations)

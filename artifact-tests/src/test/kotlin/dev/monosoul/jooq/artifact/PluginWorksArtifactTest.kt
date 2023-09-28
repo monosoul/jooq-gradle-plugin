@@ -18,11 +18,6 @@ class PluginWorksArtifactTest {
         // given
         val gradleContainer = GradleContainer().apply {
             withCopyToContainer(forClasspathResource("/testproject"), projectPath)
-            withCopyToContainer(
-                forClasspathResource("/.testcontainers.properties.template"),
-                "/root/.testcontainers.properties"
-            )
-            withEnv("TESTCONTAINERS_DOCKER_CLIENT_STRATEGY", "org.testcontainers.dockerclient.UnixSocketClientProviderStrategy")
             withCommand(
                 "gradle",
                 "classes",

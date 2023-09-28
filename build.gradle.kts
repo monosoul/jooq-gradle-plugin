@@ -12,12 +12,6 @@ group = "dev.monosoul.jooq"
 tasks {
     shadowJar {
         archiveClassifier.set("")
-        // workaround to separate shadowed testcontainers configuration
-        relocate("docker.client.strategy", "${project.group}.docker.client.strategy")
-        relocate(
-            "TESTCONTAINERS_DOCKER_CLIENT_STRATEGY",
-            "${project.group.toString().uppercase().replace(".", "_")}_TESTCONTAINERS_DOCKER_CLIENT_STRATEGY"
-        )
     }
 
     assemble {

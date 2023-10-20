@@ -6,16 +6,26 @@ import org.slf4j.LoggerFactory
 import org.testcontainers.containers.JdbcDatabaseContainer
 import org.testcontainers.containers.output.Slf4jLogConsumer
 import org.testcontainers.containers.wait.strategy.HostPortWaitStrategy
+import org.testcontainers.dockerclient.DockerClientProviderStrategy
 import org.testcontainers.utility.DockerImageName
 import java.sql.Driver
+import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
+import kotlin.reflect.KCallable
+import kotlin.reflect.full.declaredMembers
+import kotlin.reflect.jvm.isAccessible
 
 class GenericDatabaseContainer(
-    private val image: Image,
-    private val database: Database.Internal,
-    private val jdbcAwareClassLoader: ClassLoader,
-) : JdbcDatabaseContainer<GenericDatabaseContainer>(DockerImageName.parse(image.name)) {
+        private val image: Image,
+        private val database: Database.Internal,
+        private val jdbcAwareClassLoader: ClassLoader,
+) : JdbcDatabaseContainer<GenericDatabaseContainer>(
+        image.let {
+            failFastAlways.set(false)
+            DockerImageName.parse(it.name)
+        }
+) {
 
     private val driverLoadLock = ReentrantLock()
     private var driver: Driver? = null
@@ -66,5 +76,19 @@ class GenericDatabaseContainer(
             }
             else -> throw e
         }
+    }
+
+    private companion object {
+        /**
+         * Workaround for https://github.com/testcontainers/testcontainers-java/issues/6441
+         */
+        val failFastAlways = DockerClientProviderStrategy::class.declaredMembers
+                .single { it.name == "FAIL_FAST_ALWAYS" }
+                .apply { isAccessible = true }
+                .let {
+                    @Suppress("UNCHECKED_CAST")
+                    it as KCallable<AtomicBoolean>
+                }
+                .call()
     }
 }

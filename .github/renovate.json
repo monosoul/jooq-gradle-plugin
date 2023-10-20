@@ -52,6 +52,18 @@
         "io.mockk:",
         "ch.qos.logback:"
       ]
+    },
+    {
+      "groupName": "Build dependencies",
+      "groupSlug": "build-dependencies",
+      "matchLanguages": [ "java" ],
+      "labels": [ "gradle-build-dependencies" ],
+      "schedule": [ "before 9am on Saturday every 1 week" ],
+      "separateMajorMinor": false,
+      "commitMessagePrefix": "build: ",
+      "matchPackagePrefixes": [
+        "gradle"
+      ]
     }
   ],
   "automerge": true,

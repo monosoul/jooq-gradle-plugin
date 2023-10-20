@@ -38,8 +38,7 @@ class PluginWorksArtifactTest {
                 gradleContainer.stop()
             }.isSuccess()
 
-            val output = gradleContainer.output.joinToString("\n")
-            that(output).contains("BUILD SUCCESSFUL in ")
+            that(gradleContainer.output).contains("BUILD SUCCESSFUL in ")
         }
     }
 }

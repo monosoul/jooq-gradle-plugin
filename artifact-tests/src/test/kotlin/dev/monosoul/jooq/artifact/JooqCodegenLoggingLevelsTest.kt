@@ -31,8 +31,7 @@ class JooqCodegenLoggingLevelsTest {
                 gradleContainer.stop()
             }.isSuccess()
 
-            val output = gradleContainer.output.joinToString("\n")
-            that(output).apply {
+            that(gradleContainer.output).apply {
                 not().contains("Database version is older than what dialect POSTGRES supports")
             }
         }
@@ -54,8 +53,7 @@ class JooqCodegenLoggingLevelsTest {
                 gradleContainer.stop()
             }.isSuccess()
 
-            val output = gradleContainer.output.joinToString("\n")
-            that(output).apply {
+            that(gradleContainer.output).apply {
                 contains("Database version is older than what dialect POSTGRES supports")
             }
         }

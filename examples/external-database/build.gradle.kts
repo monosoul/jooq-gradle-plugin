@@ -8,7 +8,7 @@ import dev.monosoul.jooq.RecommendedVersions
 
 plugins {
     kotlin("jvm") version "1.8.10"
-    id("dev.monosoul.jooq-docker") version "5.0.0"
+    id("dev.monosoul.jooq-docker") version "6.0.0"
     id("com.avast.gradle.docker-compose") version "0.16.11"
 }
 
@@ -40,6 +40,5 @@ jooq {
 
 dependencies {
     jooqCodegen("org.postgresql:postgresql:42.5.4")
-    jooqCodegen("org.flywaydb:flyway-mysql:${RecommendedVersions.FLYWAY_VERSION}")
     implementation("org.jooq:jooq:${RecommendedVersions.JOOQ_VERSION}")
 }

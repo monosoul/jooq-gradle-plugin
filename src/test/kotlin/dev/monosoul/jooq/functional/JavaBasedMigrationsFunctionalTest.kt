@@ -122,7 +122,7 @@ class JavaBasedMigrationsFunctionalTest : JooqDockerPluginFunctionalTestBase() {
                 }
                 
                 dependencies {
-                    implementation("org.flywaydb:flyway-core:${'$'}FLYWAY_VERSION")
+                    compileOnly("org.flywaydb:flyway-core:${'$'}FLYWAY_VERSION")
                 }
             """.trimIndent()
         }

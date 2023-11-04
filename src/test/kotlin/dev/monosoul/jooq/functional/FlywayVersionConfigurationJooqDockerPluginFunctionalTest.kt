@@ -28,6 +28,7 @@ class FlywayVersionConfigurationJooqDockerPluginFunctionalTest : JooqDockerPlugi
 
                 dependencies {
                     jooqCodegen("org.flywaydb:flyway-core:${'$'}{RecommendedVersions.FLYWAY_VERSION}")
+                    jooqCodegen("org.flywaydb:flyway-database-postgresql:${'$'}{RecommendedVersions.FLYWAY_VERSION}")
                     jooqCodegen("org.postgresql:postgresql:42.3.6")
                 }
             """.trimIndent()

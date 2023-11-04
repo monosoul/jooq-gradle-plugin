@@ -125,6 +125,7 @@ dependencies {
     implementation("org.jooq:jooq:${RecommendedVersions.JOOQ_VERSION}")
     jooqCodegen("org.postgresql:postgresql:42.3.6")
     jooqCodegen("org.flywaydb.enterprise:flyway-core:${RecommendedVersions.FLYWAY_VERSION}")
+    jooqCodegen("org.flywaydb:flyway-database-postgresql:${RecommendedVersions.FLYWAY_VERSION}")
 }
 ```
 

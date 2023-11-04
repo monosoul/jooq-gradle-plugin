@@ -28,6 +28,7 @@ class FlywayVersionConfigurationJooqDockerPluginFunctionalTest : JooqDockerPlugi
 
                 dependencies {
                     jooqCodegen("org.flywaydb:flyway-core:${'$'}{RecommendedVersions.FLYWAY_VERSION}")
+                    jooqCodegen("org.flywaydb:flyway-database-postgresql:${'$'}{RecommendedVersions.FLYWAY_VERSION}")
                     jooqCodegen("org.postgresql:postgresql:42.3.6")
                 }
             """.trimIndent()
@@ -47,7 +48,7 @@ class FlywayVersionConfigurationJooqDockerPluginFunctionalTest : JooqDockerPlugi
     }
 
     @ParameterizedTest
-    @ValueSource(strings = ["8.5.12", "8.4.4", "8.0.5", "7.15.0"])
+    @ValueSource(strings = ["9.22.3", "8.5.12", "8.4.4", "8.0.5", "7.15.0"])
     fun `should be possible to specify Flyway version to use`(flywayVersion: String) {
         // given
         prepareBuildGradleFile {

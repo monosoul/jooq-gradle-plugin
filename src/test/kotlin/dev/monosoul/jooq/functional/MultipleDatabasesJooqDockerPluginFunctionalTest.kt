@@ -68,6 +68,7 @@ class MultipleDatabasesJooqDockerPluginFunctionalTest : JooqDockerPluginFunction
                     jooqCodegen("org.postgresql:postgresql:42.3.6")
                     jooqCodegen("mysql:mysql-connector-java:8.0.29")
                     jooqCodegen("org.flywaydb:flyway-mysql:${'$'}{RecommendedVersions.FLYWAY_VERSION}")
+                    jooqCodegen("org.flywaydb:flyway-database-postgresql:${'$'}{RecommendedVersions.FLYWAY_VERSION}")
                     implementation("org.jooq:jooq:${'$'}{RecommendedVersions.JOOQ_VERSION}")
                 }
             """.trimIndent()

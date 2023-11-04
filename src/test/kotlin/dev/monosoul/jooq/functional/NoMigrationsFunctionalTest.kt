@@ -52,6 +52,7 @@ class NoMigrationsFunctionalTest : JooqDockerPluginFunctionalTestBase() {
 
                 dependencies {
                     jooqCodegen("org.flywaydb:flyway-core:${'$'}FLYWAY_VERSION")
+                    jooqCodegen("org.flywaydb:flyway-database-postgresql:${'$'}FLYWAY_VERSION")
                     jooqCodegen("org.postgresql:postgresql:42.3.6")
                 }
             """.trimIndent()

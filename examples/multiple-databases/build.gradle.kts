@@ -6,8 +6,8 @@ import dev.monosoul.jooq.GenerateJooqClassesTask
 import dev.monosoul.jooq.RecommendedVersions
 
 plugins {
-    kotlin("jvm") version "1.8.10"
-    id("dev.monosoul.jooq-docker") version "5.0.0"
+    kotlin("jvm") version "1.9.20"
+    id("dev.monosoul.jooq-docker") version "6.0.0"
 }
 
 repositories {
@@ -54,5 +54,6 @@ dependencies {
     jooqCodegen("org.postgresql:postgresql:42.5.4")
     jooqCodegen("mysql:mysql-connector-java:8.0.29")
     jooqCodegen("org.flywaydb:flyway-mysql:${RecommendedVersions.FLYWAY_VERSION}")
+    jooqCodegen("org.flywaydb:flyway-database-postgresql:${RecommendedVersions.FLYWAY_VERSION}")
     implementation("org.jooq:jooq:${RecommendedVersions.JOOQ_VERSION}")
 }

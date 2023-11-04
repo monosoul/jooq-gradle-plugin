@@ -43,7 +43,7 @@ dependencies {
      * transitive. This is a quirk of the shadow plugin.
      */
     shadow(libs.jooq.codegen)
-    shadow(libs.flyway.core)
+    shadow(libs.bundles.flyway)
 
     implementation(libs.testcontainers.jdbc) {
         exclude(group = libs.jna.get().group) // cannot be shadowed

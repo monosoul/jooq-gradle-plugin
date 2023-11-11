@@ -9,16 +9,15 @@ import org.testcontainers.containers.output.ToStringConsumer
 import org.testcontainers.containers.startupcheck.IndefiniteWaitOneShotStartupCheckStrategy
 
 class GradleContainer(
-        dockerSocketPath: String = "/var/run/docker.sock",
+    dockerSocketPath: String = "/var/run/docker.sock",
 ) : GenericContainer<GradleContainer>("gradle:jdk17-alpine") {
-
     private val toStringLogConsumer = ToStringConsumer()
     val output: String get() = toStringLogConsumer.toUtf8String()
     val projectPath = "/home/gradle/project"
 
     init {
         withLogConsumer(
-            Slf4jLogConsumer(LoggerFactory.getLogger("GradleContainer[$dockerImageName]"))
+            Slf4jLogConsumer(LoggerFactory.getLogger("GradleContainer[$dockerImageName]")),
         )
         withLogConsumer(toStringLogConsumer)
         addFsBind("build/local-repository", "$projectPath/local-repository")
@@ -26,10 +25,12 @@ class GradleContainer(
         withWorkingDirectory(projectPath)
 
         withStartupCheckStrategy(
-            IndefiniteWaitOneShotStartupCheckStrategy()
+            IndefiniteWaitOneShotStartupCheckStrategy(),
         )
     }
 
-    private fun addFsBind(hostPath: String, containerPath: String) =
-        addFileSystemBind(hostPath, containerPath, READ_ONLY, SHARED)
+    private fun addFsBind(
+        hostPath: String,
+        containerPath: String,
+    ) = addFileSystemBind(hostPath, containerPath, READ_ONLY, SHARED)
 }

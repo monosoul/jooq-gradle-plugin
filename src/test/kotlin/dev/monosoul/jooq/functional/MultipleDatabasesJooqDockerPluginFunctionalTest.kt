@@ -8,69 +8,68 @@ import strikt.assertions.isEqualTo
 import strikt.java.exists
 
 class MultipleDatabasesJooqDockerPluginFunctionalTest : JooqDockerPluginFunctionalTestBase() {
-
     @Test
     fun `should generate jooq classes for PostgreSQL and MySQL`() {
         // given
         prepareBuildGradleFile {
             """
-                import dev.monosoul.jooq.GenerateJooqClassesTask
-                import dev.monosoul.jooq.RecommendedVersions
-                import dev.monosoul.jooq.migration.MigrationLocation
-                
-                plugins {
-                    kotlin("jvm") version "1.6.21"
-                    id("dev.monosoul.jooq-docker")
-                }
+            import dev.monosoul.jooq.GenerateJooqClassesTask
+            import dev.monosoul.jooq.RecommendedVersions
+            import dev.monosoul.jooq.migration.MigrationLocation
+            
+            plugins {
+                kotlin("jvm") version "1.6.21"
+                id("dev.monosoul.jooq-docker")
+            }
 
-                repositories {
-                    mavenCentral()
+            repositories {
+                mavenCentral()
+            }
+            
+            tasks {
+                generateJooqClasses {
+                    basePackageName.set("org.jooq.generated.postgres")
+                    migrationLocations.setFromFilesystem("src/main/resources/postgres/migration")
+                    outputDirectory.set(project.layout.buildDirectory.dir("postgres"))
                 }
                 
-                tasks {
-                    generateJooqClasses {
-                        basePackageName.set("org.jooq.generated.postgres")
-                        migrationLocations.setFromFilesystem("src/main/resources/postgres/migration")
-                        outputDirectory.set(project.layout.buildDirectory.dir("postgres"))
-                    }
-                    
-                    register<GenerateJooqClassesTask>("generateJooqClassesForMySql") {
-                        basePackageName.set("org.jooq.generated.mysql")
-                        migrationLocations.setFromFilesystem(project.files("src/main/resources/mysql/migration"))
-                        outputDirectory.set(project.layout.buildDirectory.dir("mysql"))
-                        includeFlywayTable.set(true)
-                    
-                        withContainer {
-                            image {
-                                name = "mysql:8.0.29"
-                                envVars = mapOf(
-                                    "MYSQL_ROOT_PASSWORD" to "mysql",
-                                    "MYSQL_DATABASE" to "mysql"
-                                )
-                            }
-                            db {
-                                username = "root"
-                                password = "mysql"
-                                name = "mysql"
-                                port = 3306
-                            
-                                jdbc {
-                                    schema = "jdbc:mysql"
-                                    driverClassName = "com.mysql.cj.jdbc.Driver"
-                                }
+                register<GenerateJooqClassesTask>("generateJooqClassesForMySql") {
+                    basePackageName.set("org.jooq.generated.mysql")
+                    migrationLocations.setFromFilesystem(project.files("src/main/resources/mysql/migration"))
+                    outputDirectory.set(project.layout.buildDirectory.dir("mysql"))
+                    includeFlywayTable.set(true)
+                
+                    withContainer {
+                        image {
+                            name = "mysql:8.0.29"
+                            envVars = mapOf(
+                                "MYSQL_ROOT_PASSWORD" to "mysql",
+                                "MYSQL_DATABASE" to "mysql"
+                            )
+                        }
+                        db {
+                            username = "root"
+                            password = "mysql"
+                            name = "mysql"
+                            port = 3306
+                        
+                            jdbc {
+                                schema = "jdbc:mysql"
+                                driverClassName = "com.mysql.cj.jdbc.Driver"
                             }
                         }
                     }
                 }
+            }
 
-                dependencies {
-                    implementation(kotlin("stdlib"))
-                    jooqCodegen("org.postgresql:postgresql:42.3.6")
-                    jooqCodegen("mysql:mysql-connector-java:8.0.29")
-                    jooqCodegen("org.flywaydb:flyway-mysql:${'$'}{RecommendedVersions.FLYWAY_VERSION}")
-                    jooqCodegen("org.flywaydb:flyway-database-postgresql:${'$'}{RecommendedVersions.FLYWAY_VERSION}")
-                    implementation("org.jooq:jooq:${'$'}{RecommendedVersions.JOOQ_VERSION}")
-                }
+            dependencies {
+                implementation(kotlin("stdlib"))
+                jooqCodegen("org.postgresql:postgresql:42.3.6")
+                jooqCodegen("mysql:mysql-connector-java:8.0.29")
+                jooqCodegen("org.flywaydb:flyway-mysql:${'$'}{RecommendedVersions.FLYWAY_VERSION}")
+                jooqCodegen("org.flywaydb:flyway-database-postgresql:${'$'}{RecommendedVersions.FLYWAY_VERSION}")
+                implementation("org.jooq:jooq:${'$'}{RecommendedVersions.JOOQ_VERSION}")
+            }
             """.trimIndent()
         }
         copyResource(from = "/V01__init.sql", to = "src/main/resources/postgres/migration/V01__init.sql")
@@ -83,13 +82,13 @@ class MultipleDatabasesJooqDockerPluginFunctionalTest : JooqDockerPluginFunction
         expect {
             that(result).generateJooqClassesTask.outcome isEqualTo SUCCESS
             that(
-                projectFile("build/classes/java/main/org/jooq/generated/postgres/tables/Foo.class")
+                projectFile("build/classes/java/main/org/jooq/generated/postgres/tables/Foo.class"),
             ).exists()
             that(
-                projectFile("build/classes/java/main/org/jooq/generated/mysql/tables/Foo.class")
+                projectFile("build/classes/java/main/org/jooq/generated/mysql/tables/Foo.class"),
             ).exists()
             that(
-                projectFile("build/classes/java/main/org/jooq/generated/mysql/tables/FlywaySchemaHistory.class")
+                projectFile("build/classes/java/main/org/jooq/generated/mysql/tables/FlywaySchemaHistory.class"),
             ).exists()
         }
     }
@@ -99,55 +98,55 @@ class MultipleDatabasesJooqDockerPluginFunctionalTest : JooqDockerPluginFunction
         // given
         prepareBuildGradleFile {
             """
-                import dev.monosoul.jooq.RecommendedVersions
-                
-                plugins {
-                    id("dev.monosoul.jooq-docker")
-                }
+            import dev.monosoul.jooq.RecommendedVersions
+            
+            plugins {
+                id("dev.monosoul.jooq-docker")
+            }
 
-                repositories {
-                    mavenCentral()
-                }
+            repositories {
+                mavenCentral()
+            }
 
-                jooq {
+            jooq {
+                withContainer {
+                    image {
+                        name = "mysql:8.0.29"
+                        envVars = mapOf(
+                            "MYSQL_ROOT_PASSWORD" to "mysql",
+                            "MYSQL_DATABASE" to "mysql",
+                        )
+                    }
+                    db {
+                        username = "root"
+                        password = "mysql"
+                        name = "mysql"
+                        port = 6666
+                        
+                        jdbc {
+                            schema = "jdbc:mysql"
+                            driverClassName = "com.mysql.cj.jdbc.Driver"
+                        }
+                    }
+                }
+            }
+            
+            tasks {
+                generateJooqClasses {
                     withContainer {
                         image {
-                            name = "mysql:8.0.29"
-                            envVars = mapOf(
-                                "MYSQL_ROOT_PASSWORD" to "mysql",
-                                "MYSQL_DATABASE" to "mysql",
+                            envVars = envVars + mapOf(
+                                "MYSQL_TCP_PORT" to "6666"
                             )
                         }
-                        db {
-                            username = "root"
-                            password = "mysql"
-                            name = "mysql"
-                            port = 6666
-                            
-                            jdbc {
-                                schema = "jdbc:mysql"
-                                driverClassName = "com.mysql.cj.jdbc.Driver"
-                            }
-                        }
                     }
                 }
-                
-                tasks {
-                    generateJooqClasses {
-                        withContainer {
-                            image {
-                                envVars = envVars + mapOf(
-                                    "MYSQL_TCP_PORT" to "6666"
-                                )
-                            }
-                        }
-                    }
-                }
+            }
 
-                dependencies {
-                    jooqCodegen("mysql:mysql-connector-java:8.0.29")
-                    jooqCodegen("org.flywaydb:flyway-mysql:${'$'}{RecommendedVersions.FLYWAY_VERSION}")
-                }
+            dependencies {
+                jooqCodegen("mysql:mysql-connector-java:8.0.29")
+                jooqCodegen("org.flywaydb:flyway-mysql:${'$'}{RecommendedVersions.FLYWAY_VERSION}")
+            }
             """.trimIndent()
         }
         copyResource(from = "/V01__init_mysql.sql", to = "src/main/resources/db/migration/V01__init_mysql.sql")
@@ -159,7 +158,7 @@ class MultipleDatabasesJooqDockerPluginFunctionalTest : JooqDockerPluginFunction
         expect {
             that(result).generateJooqClassesTask.outcome isEqualTo SUCCESS
             that(
-                projectFile("build/generated-jooq/org/jooq/generated/tables/Foo.java")
+                projectFile("build/generated-jooq/org/jooq/generated/tables/Foo.java"),
             ).exists()
         }
     }
@@ -170,39 +169,39 @@ class MultipleDatabasesJooqDockerPluginFunctionalTest : JooqDockerPluginFunction
         val postgresContainer = PostgresContainer().also { it.start() }
         prepareBuildGradleFile {
             """
-                plugins {
-                    id("dev.monosoul.jooq-docker")
-                }
+            plugins {
+                id("dev.monosoul.jooq-docker")
+            }
 
-                repositories {
-                    mavenCentral()
-                }
+            repositories {
+                mavenCentral()
+            }
 
-                jooq {
+            jooq {
+                withoutContainer {
+                    db {
+                        username = "${postgresContainer.username}"
+                        password = "${postgresContainer.password}"
+                        name = "${postgresContainer.databaseName}"
+                        host = "${postgresContainer.host}"
+                        port = 6666
+                    }
+                }
+            }
+            
+            tasks {
+                generateJooqClasses {
                     withoutContainer {
                         db {
-                            username = "${postgresContainer.username}"
-                            password = "${postgresContainer.password}"
-                            name = "${postgresContainer.databaseName}"
-                            host = "${postgresContainer.host}"
-                            port = 6666
+                            port = ${postgresContainer.firstMappedPort}
                         }
                     }
                 }
-                
-                tasks {
-                    generateJooqClasses {
-                        withoutContainer {
-                            db {
-                                port = ${postgresContainer.firstMappedPort}
-                            }
-                        }
-                    }
-                }
+            }
 
-                dependencies {
-                    jooqCodegen("org.postgresql:postgresql:42.3.6")
-                }
+            dependencies {
+                jooqCodegen("org.postgresql:postgresql:42.3.6")
+            }
             """.trimIndent()
         }
         copyResource(from = "/V01__init_mysql.sql", to = "src/main/resources/db/migration/V01__init_mysql.sql")
@@ -215,7 +214,7 @@ class MultipleDatabasesJooqDockerPluginFunctionalTest : JooqDockerPluginFunction
         expect {
             that(result).generateJooqClassesTask.outcome isEqualTo SUCCESS
             that(
-                projectFile("build/generated-jooq/org/jooq/generated/tables/Foo.java")
+                projectFile("build/generated-jooq/org/jooq/generated/tables/Foo.java"),
             ).exists()
         }
     }
@@ -226,46 +225,46 @@ class MultipleDatabasesJooqDockerPluginFunctionalTest : JooqDockerPluginFunction
         val postgresContainer = PostgresContainer().also { it.start() }
         prepareBuildGradleFile {
             """
-                import dev.monosoul.jooq.GenerateJooqClassesTask
-                import dev.monosoul.jooq.RecommendedVersions
-                
-                plugins {
-                    kotlin("jvm") version "1.6.21"
-                    id("dev.monosoul.jooq-docker")
-                }
+            import dev.monosoul.jooq.GenerateJooqClassesTask
+            import dev.monosoul.jooq.RecommendedVersions
+            
+            plugins {
+                kotlin("jvm") version "1.6.21"
+                id("dev.monosoul.jooq-docker")
+            }
 
-                repositories {
-                    mavenCentral()
+            repositories {
+                mavenCentral()
+            }
+            
+            tasks {
+                generateJooqClasses {
+                    basePackageName.set("org.jooq.generated.local")
+                    outputDirectory.set(project.layout.buildDirectory.dir("local"))
                 }
                 
-                tasks {
-                    generateJooqClasses {
-                        basePackageName.set("org.jooq.generated.local")
-                        outputDirectory.set(project.layout.buildDirectory.dir("local"))
-                    }
-                    
-                    register<GenerateJooqClassesTask>("generateJooqClassesForExternal") {
-                        basePackageName.set("org.jooq.generated.remote")
-                        outputDirectory.set(project.layout.buildDirectory.dir("remote"))
-                        includeFlywayTable.set(true)
-                    
-                        withoutContainer {
-                            db {
-                                username = "${postgresContainer.username}"
-                                password = "${postgresContainer.password}"
-                                name = "${postgresContainer.databaseName}"
-                                host = "${postgresContainer.host}"
-                                port = ${postgresContainer.firstMappedPort}
-                            }
+                register<GenerateJooqClassesTask>("generateJooqClassesForExternal") {
+                    basePackageName.set("org.jooq.generated.remote")
+                    outputDirectory.set(project.layout.buildDirectory.dir("remote"))
+                    includeFlywayTable.set(true)
+                
+                    withoutContainer {
+                        db {
+                            username = "${postgresContainer.username}"
+                            password = "${postgresContainer.password}"
+                            name = "${postgresContainer.databaseName}"
+                            host = "${postgresContainer.host}"
+                            port = ${postgresContainer.firstMappedPort}
                         }
                     }
                 }
+            }
 
-                dependencies {
-                    implementation(kotlin("stdlib"))
-                    jooqCodegen("org.postgresql:postgresql:42.3.6")
-                    implementation("org.jooq:jooq:${'$'}{RecommendedVersions.JOOQ_VERSION}")
-                }
+            dependencies {
+                implementation(kotlin("stdlib"))
+                jooqCodegen("org.postgresql:postgresql:42.3.6")
+                implementation("org.jooq:jooq:${'$'}{RecommendedVersions.JOOQ_VERSION}")
+            }
             """.trimIndent()
         }
         copyResource(from = "/V01__init.sql", to = "src/main/resources/db/migration/V01__init.sql")
@@ -278,13 +277,13 @@ class MultipleDatabasesJooqDockerPluginFunctionalTest : JooqDockerPluginFunction
         expect {
             that(result).generateJooqClassesTask.outcome isEqualTo SUCCESS
             that(
-                projectFile("build/classes/java/main/org/jooq/generated/local/tables/Foo.class")
+                projectFile("build/classes/java/main/org/jooq/generated/local/tables/Foo.class"),
             ).exists()
             that(
-                projectFile("build/classes/java/main/org/jooq/generated/remote/tables/Foo.class")
+                projectFile("build/classes/java/main/org/jooq/generated/remote/tables/Foo.class"),
             ).exists()
             that(
-                projectFile("build/classes/java/main/org/jooq/generated/remote/tables/FlywaySchemaHistory.class")
+                projectFile("build/classes/java/main/org/jooq/generated/remote/tables/FlywaySchemaHistory.class"),
             ).exists()
         }
     }

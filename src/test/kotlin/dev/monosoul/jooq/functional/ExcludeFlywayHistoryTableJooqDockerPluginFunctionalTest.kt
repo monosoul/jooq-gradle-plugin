@@ -8,23 +8,22 @@ import strikt.java.exists
 import strikt.java.notExists
 
 class ExcludeFlywayHistoryTableJooqDockerPluginFunctionalTest : JooqDockerPluginFunctionalTestBase() {
-
     @Test
     fun `should exclude flyway schema history by default`() {
         // given
         prepareBuildGradleFile {
             """
-                plugins {
-                    id("dev.monosoul.jooq-docker")
-                }
+            plugins {
+                id("dev.monosoul.jooq-docker")
+            }
 
-                repositories {
-                    mavenCentral()
-                }
+            repositories {
+                mavenCentral()
+            }
 
-                dependencies {
-                    jooqCodegen("org.postgresql:postgresql:42.3.6")
-                }
+            dependencies {
+                jooqCodegen("org.postgresql:postgresql:42.3.6")
+            }
             """.trimIndent()
         }
         copyResource(from = "/V01__init.sql", to = "src/main/resources/db/migration/V01__init.sql")
@@ -36,10 +35,10 @@ class ExcludeFlywayHistoryTableJooqDockerPluginFunctionalTest : JooqDockerPlugin
         expect {
             that(result).generateJooqClassesTask.outcome isEqualTo SUCCESS
             that(
-                projectFile("build/generated-jooq/org/jooq/generated/tables/Foo.java")
+                projectFile("build/generated-jooq/org/jooq/generated/tables/Foo.java"),
             ).exists()
             that(
-                projectFile("build/generated-jooq/org/jooq/generated/tables/FlywaySchemaHistory.java")
+                projectFile("build/generated-jooq/org/jooq/generated/tables/FlywaySchemaHistory.java"),
             ).notExists()
         }
     }
@@ -49,23 +48,23 @@ class ExcludeFlywayHistoryTableJooqDockerPluginFunctionalTest : JooqDockerPlugin
         // given
         prepareBuildGradleFile {
             """
-                plugins {
-                    id("dev.monosoul.jooq-docker")
-                }
+            plugins {
+                id("dev.monosoul.jooq-docker")
+            }
 
-                repositories {
-                    mavenCentral()
-                }
+            repositories {
+                mavenCentral()
+            }
 
-                tasks {
-                    generateJooqClasses {
-                        includeFlywayTable.set(true)
-                    }
+            tasks {
+                generateJooqClasses {
+                    includeFlywayTable.set(true)
                 }
+            }
 
-                dependencies {
-                    jooqCodegen("org.postgresql:postgresql:42.3.6")
-                }
+            dependencies {
+                jooqCodegen("org.postgresql:postgresql:42.3.6")
+            }
             """.trimIndent()
         }
         copyResource(from = "/V01__init.sql", to = "src/main/resources/db/migration/V01__init.sql")
@@ -77,10 +76,10 @@ class ExcludeFlywayHistoryTableJooqDockerPluginFunctionalTest : JooqDockerPlugin
         expect {
             that(result).generateJooqClassesTask.outcome isEqualTo SUCCESS
             that(
-                projectFile("build/generated-jooq/org/jooq/generated/tables/Foo.java")
+                projectFile("build/generated-jooq/org/jooq/generated/tables/Foo.java"),
             ).exists()
             that(
-                projectFile("build/generated-jooq/org/jooq/generated/tables/FlywaySchemaHistory.java")
+                projectFile("build/generated-jooq/org/jooq/generated/tables/FlywaySchemaHistory.java"),
             ).exists()
         }
     }
@@ -90,23 +89,23 @@ class ExcludeFlywayHistoryTableJooqDockerPluginFunctionalTest : JooqDockerPlugin
         // given
         prepareBuildGradleFile {
             """
-                plugins {
-                    id("dev.monosoul.jooq-docker")
-                }
+            plugins {
+                id("dev.monosoul.jooq-docker")
+            }
 
-                repositories {
-                    mavenCentral()
-                }
+            repositories {
+                mavenCentral()
+            }
 
-                tasks {
-                    generateJooqClasses {
-                        flywayProperties.put("flyway.table", "some_schema_table")
-                    }
+            tasks {
+                generateJooqClasses {
+                    flywayProperties.put("flyway.table", "some_schema_table")
                 }
+            }
 
-                dependencies {
-                    jooqCodegen("org.postgresql:postgresql:42.3.6")
-                }
+            dependencies {
+                jooqCodegen("org.postgresql:postgresql:42.3.6")
+            }
             """.trimIndent()
         }
         copyResource(from = "/V01__init.sql", to = "src/main/resources/db/migration/V01__init.sql")
@@ -118,10 +117,10 @@ class ExcludeFlywayHistoryTableJooqDockerPluginFunctionalTest : JooqDockerPlugin
         expect {
             that(result).generateJooqClassesTask.outcome isEqualTo SUCCESS
             that(
-                projectFile("build/generated-jooq/org/jooq/generated/tables/Foo.java")
+                projectFile("build/generated-jooq/org/jooq/generated/tables/Foo.java"),
             ).exists()
             that(
-                projectFile("build/generated-jooq/org/jooq/generated/tables/SomeSchemaTable.java")
+                projectFile("build/generated-jooq/org/jooq/generated/tables/SomeSchemaTable.java"),
             ).notExists()
         }
     }
@@ -131,31 +130,31 @@ class ExcludeFlywayHistoryTableJooqDockerPluginFunctionalTest : JooqDockerPlugin
         // given
         prepareBuildGradleFile {
             """
-                plugins {
-                    id("dev.monosoul.jooq-docker")
-                }
+            plugins {
+                id("dev.monosoul.jooq-docker")
+            }
 
-                repositories {
-                    mavenCentral()
-                }
+            repositories {
+                mavenCentral()
+            }
 
-                tasks {
-                    generateJooqClasses {
-                        schemas.set(listOf("public", "other"))
-                        usingJavaConfig {
-                            database.withExcludes("BAR")
-                        }
+            tasks {
+                generateJooqClasses {
+                    schemas.set(listOf("public", "other"))
+                    usingJavaConfig {
+                        database.withExcludes("BAR")
                     }
                 }
+            }
 
-                dependencies {
-                    jooqCodegen("org.postgresql:postgresql:42.3.6")
-                }
+            dependencies {
+                jooqCodegen("org.postgresql:postgresql:42.3.6")
+            }
             """.trimIndent()
         }
         copyResource(
             from = "/V01__init_multiple_schemas.sql",
-            to = "src/main/resources/db/migration/V01__init_multiple_schemas.sql"
+            to = "src/main/resources/db/migration/V01__init_multiple_schemas.sql",
         )
 
         // when
@@ -165,13 +164,13 @@ class ExcludeFlywayHistoryTableJooqDockerPluginFunctionalTest : JooqDockerPlugin
         expect {
             that(result).generateJooqClassesTask.outcome isEqualTo SUCCESS
             that(
-                projectFile("build/generated-jooq/org/jooq/generated/public_/tables/Foo.java")
+                projectFile("build/generated-jooq/org/jooq/generated/public_/tables/Foo.java"),
             ).exists()
             that(
-                projectFile("build/generated-jooq/org/jooq/generated/other/tables/Bar.java")
+                projectFile("build/generated-jooq/org/jooq/generated/other/tables/Bar.java"),
             ).notExists()
             that(
-                projectFile("build/generated-jooq/org/jooq/generated/public_/tables/FlywaySchemaHistory.java")
+                projectFile("build/generated-jooq/org/jooq/generated/public_/tables/FlywaySchemaHistory.java"),
             ).notExists()
         }
     }

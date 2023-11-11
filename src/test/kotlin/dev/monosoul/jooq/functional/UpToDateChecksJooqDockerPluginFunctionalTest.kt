@@ -10,23 +10,22 @@ import strikt.java.exists
 import strikt.java.notExists
 
 class UpToDateChecksJooqDockerPluginFunctionalTest : JooqDockerPluginFunctionalTestBase() {
-
     @Test
     fun `up to date check should work for output dir`() {
         // given
         prepareBuildGradleFile {
             """
-                plugins {
-                    id("dev.monosoul.jooq-docker")
-                }
+            plugins {
+                id("dev.monosoul.jooq-docker")
+            }
 
-                repositories {
-                    mavenCentral()
-                }
+            repositories {
+                mavenCentral()
+            }
 
-                dependencies {
-                    jooqCodegen("org.postgresql:postgresql:42.3.6")
-                }
+            dependencies {
+                jooqCodegen("org.postgresql:postgresql:42.3.6")
+            }
             """.trimIndent()
         }
         copyResource(from = "/V01__init.sql", to = "src/main/resources/db/migration/V01__init.sql")
@@ -51,17 +50,17 @@ class UpToDateChecksJooqDockerPluginFunctionalTest : JooqDockerPluginFunctionalT
         // given
         prepareBuildGradleFile {
             """
-                plugins {
-                    id("dev.monosoul.jooq-docker")
-                }
+            plugins {
+                id("dev.monosoul.jooq-docker")
+            }
 
-                repositories {
-                    mavenCentral()
-                }
+            repositories {
+                mavenCentral()
+            }
 
-                dependencies {
-                    jooqCodegen("org.postgresql:postgresql:42.3.6")
-                }
+            dependencies {
+                jooqCodegen("org.postgresql:postgresql:42.3.6")
+            }
             """.trimIndent()
         }
         copyResource(from = "/V01__init.sql", to = "src/main/resources/db/migration/V01__init.sql")
@@ -84,7 +83,8 @@ class UpToDateChecksJooqDockerPluginFunctionalTest : JooqDockerPluginFunctionalT
     @Test
     fun `up to date check should work for extension changes`() {
         // given
-        val initialBuildScript = """
+        val initialBuildScript =
+            """
             plugins {
                 id("dev.monosoul.jooq-docker")
             }
@@ -104,9 +104,10 @@ class UpToDateChecksJooqDockerPluginFunctionalTest : JooqDockerPluginFunctionalT
             dependencies {
                 jooqCodegen("org.postgresql:postgresql:42.3.6")
             }
-        """.trimIndent()
+            """.trimIndent()
 
-        val extensionValueChangedBuildScript = """
+        val extensionValueChangedBuildScript =
+            """
             plugins {
                 id("dev.monosoul.jooq-docker")
             }
@@ -126,7 +127,7 @@ class UpToDateChecksJooqDockerPluginFunctionalTest : JooqDockerPluginFunctionalT
             dependencies {
                 jooqCodegen("org.postgresql:postgresql:42.3.6")
             }
-        """.trimIndent()
+            """.trimIndent()
 
         prepareBuildGradleFile { initialBuildScript }
         copyResource(from = "/V01__init.sql", to = "src/main/resources/db/migration/V01__init.sql")
@@ -150,7 +151,8 @@ class UpToDateChecksJooqDockerPluginFunctionalTest : JooqDockerPluginFunctionalT
     @Test
     fun `up to date check should work for generator customizations`() {
         // given
-        val initialBuildScript = """
+        val initialBuildScript =
+            """
             plugins {
                 id("dev.monosoul.jooq-docker")
             }
@@ -171,9 +173,10 @@ class UpToDateChecksJooqDockerPluginFunctionalTest : JooqDockerPluginFunctionalT
             dependencies {
                 jooqCodegen("org.postgresql:postgresql:42.3.6")
             }
-        """.trimIndent()
+            """.trimIndent()
 
-        val updatedBuildScript = """
+        val updatedBuildScript =
+            """
             plugins {
                 id("dev.monosoul.jooq-docker")
             }
@@ -194,12 +197,12 @@ class UpToDateChecksJooqDockerPluginFunctionalTest : JooqDockerPluginFunctionalT
             dependencies {
                 jooqCodegen("org.postgresql:postgresql:42.3.6")
             }
-        """.trimIndent()
+            """.trimIndent()
 
         prepareBuildGradleFile { initialBuildScript }
         copyResource(
             from = "/V01__init_multiple_schemas.sql",
-            to = "src/main/resources/db/migration/V01__init_multiple_schemas.sql"
+            to = "src/main/resources/db/migration/V01__init_multiple_schemas.sql",
         )
 
         // when
@@ -217,10 +220,10 @@ class UpToDateChecksJooqDockerPluginFunctionalTest : JooqDockerPluginFunctionalT
             that(finalResultNoChanges).generateJooqClassesTask.outcome isEqualTo UP_TO_DATE
 
             that(
-                projectFile("build/generated-jooq/org/jooq/generated/public_/tables/Foo.java")
+                projectFile("build/generated-jooq/org/jooq/generated/public_/tables/Foo.java"),
             ).notExists()
             that(
-                projectFile("build/generated-jooq/org/jooq/generated/other/tables/Bar.java")
+                projectFile("build/generated-jooq/org/jooq/generated/other/tables/Bar.java"),
             ).notExists()
         }
     }
@@ -228,7 +231,8 @@ class UpToDateChecksJooqDockerPluginFunctionalTest : JooqDockerPluginFunctionalT
     @Test
     fun `should regenerate jooq classes when out of date even if output directory already has classes generated`() {
         // given
-        val initialBuildScript = """
+        val initialBuildScript =
+            """
             import org.jooq.meta.jaxb.ForcedType
 
             plugins {
@@ -253,9 +257,10 @@ class UpToDateChecksJooqDockerPluginFunctionalTest : JooqDockerPluginFunctionalT
             dependencies {
                 jooqCodegen("org.postgresql:postgresql:42.3.6")
             }
-        """.trimIndent()
+            """.trimIndent()
 
-        val updatedBuildScript = """
+        val updatedBuildScript =
+            """
             import org.jooq.meta.jaxb.ForcedType
 
             plugins {
@@ -280,7 +285,7 @@ class UpToDateChecksJooqDockerPluginFunctionalTest : JooqDockerPluginFunctionalT
             dependencies {
                 jooqCodegen("org.postgresql:postgresql:42.3.6")
             }
-        """.trimIndent()
+            """.trimIndent()
 
         prepareBuildGradleFile { initialBuildScript }
         copyResource(from = "/V01__init.sql", to = "src/main/resources/db/migration/V01__init.sql")
@@ -292,7 +297,7 @@ class UpToDateChecksJooqDockerPluginFunctionalTest : JooqDockerPluginFunctionalT
         expect {
             that(initialResult).generateJooqClassesTask.outcome isEqualTo SUCCESS
             that(
-                projectFile("build/generated-jooq/org/jooq/generated/tables/Foo.java")
+                projectFile("build/generated-jooq/org/jooq/generated/tables/Foo.java"),
             ).exists().get { readText() }.contains("com.example.UniqueClassForFirstGeneration")
         }
 
@@ -304,7 +309,7 @@ class UpToDateChecksJooqDockerPluginFunctionalTest : JooqDockerPluginFunctionalT
         expect {
             that(resultAfterUpdate).generateJooqClassesTask.outcome isEqualTo SUCCESS
             that(
-                projectFile("build/generated-jooq/org/jooq/generated/tables/Foo.java")
+                projectFile("build/generated-jooq/org/jooq/generated/tables/Foo.java"),
             ).exists().get { readText() }.contains("com.example.UniqueClassForSecondGeneration")
         }
     }
@@ -312,7 +317,8 @@ class UpToDateChecksJooqDockerPluginFunctionalTest : JooqDockerPluginFunctionalT
     @Test
     fun `up to date check should work for dependency version changes`() {
         // given
-        val initialBuildScript = """
+        val initialBuildScript =
+            """
             plugins {
                 id("dev.monosoul.jooq-docker")
             }
@@ -324,9 +330,10 @@ class UpToDateChecksJooqDockerPluginFunctionalTest : JooqDockerPluginFunctionalT
             dependencies {
                 jooqCodegen("org.postgresql:postgresql:42.3.0")
             }
-        """.trimIndent()
+            """.trimIndent()
 
-        val extensionValueChangedBuildScript = """
+        val extensionValueChangedBuildScript =
+            """
             plugins {
                 id("dev.monosoul.jooq-docker")
             }
@@ -338,7 +345,7 @@ class UpToDateChecksJooqDockerPluginFunctionalTest : JooqDockerPluginFunctionalT
             dependencies {
                 jooqCodegen("org.postgresql:postgresql:42.3.6")
             }
-        """.trimIndent()
+            """.trimIndent()
 
         prepareBuildGradleFile { initialBuildScript }
         copyResource(from = "/V01__init.sql", to = "src/main/resources/db/migration/V01__init.sql")

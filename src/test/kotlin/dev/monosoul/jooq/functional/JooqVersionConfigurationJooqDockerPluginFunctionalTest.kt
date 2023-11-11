@@ -11,26 +11,25 @@ import strikt.java.exists
 import strikt.java.notExists
 
 class JooqVersionConfigurationJooqDockerPluginFunctionalTest : JooqDockerPluginFunctionalTestBase() {
-
     @Test
     fun `should provide recommended jOOQ version`() {
         // given
         prepareBuildGradleFile {
             """
-                import dev.monosoul.jooq.RecommendedVersions
-                
-                plugins {
-                    id("dev.monosoul.jooq-docker")
-                }
+            import dev.monosoul.jooq.RecommendedVersions
+            
+            plugins {
+                id("dev.monosoul.jooq-docker")
+            }
 
-                repositories {
-                    mavenCentral()
-                }
+            repositories {
+                mavenCentral()
+            }
 
-                dependencies {
-                    jooqCodegen("org.jooq:jooq-codegen:${'$'}{RecommendedVersions.JOOQ_VERSION}")
-                    jooqCodegen("org.postgresql:postgresql:42.3.6")
-                }
+            dependencies {
+                jooqCodegen("org.jooq:jooq-codegen:${'$'}{RecommendedVersions.JOOQ_VERSION}")
+                jooqCodegen("org.postgresql:postgresql:42.3.6")
+            }
             """.trimIndent()
         }
         copyResource(from = "/V01__init.sql", to = "src/main/resources/db/migration/V01__init.sql")
@@ -42,7 +41,7 @@ class JooqVersionConfigurationJooqDockerPluginFunctionalTest : JooqDockerPluginF
         expect {
             that(result).generateJooqClassesTask.outcome isEqualTo SUCCESS
             that(
-                projectFile("build/generated-jooq/org/jooq/generated/tables/Foo.java")
+                projectFile("build/generated-jooq/org/jooq/generated/tables/Foo.java"),
             ).exists()
         }
     }
@@ -53,37 +52,37 @@ class JooqVersionConfigurationJooqDockerPluginFunctionalTest : JooqDockerPluginF
         // given
         prepareBuildGradleFile {
             """
-                import org.jooq.meta.jaxb.Strategy
-                
-                plugins {
-                    id("dev.monosoul.jooq-docker")
-                }
+            import org.jooq.meta.jaxb.Strategy
+            
+            plugins {
+                id("dev.monosoul.jooq-docker")
+            }
 
-                repositories {
-                    mavenCentral()
-                }
-                
-                tasks {
-                    generateJooqClasses {
-                        schemas.set(listOf("public", "other"))
-                        usingJavaConfig {
-                            database.withExcludes("BAR")
-                            withStrategy(
-                                Strategy().withName("org.jooq.codegen.KeepNamesGeneratorStrategy")
-                            )
-                        }
+            repositories {
+                mavenCentral()
+            }
+            
+            tasks {
+                generateJooqClasses {
+                    schemas.set(listOf("public", "other"))
+                    usingJavaConfig {
+                        database.withExcludes("BAR")
+                        withStrategy(
+                            Strategy().withName("org.jooq.codegen.KeepNamesGeneratorStrategy")
+                        )
                     }
                 }
+            }
 
-                dependencies {
-                    jooqCodegen("org.jooq:jooq-codegen:$jooqVersion")
-                    jooqCodegen("org.postgresql:postgresql:42.3.6")
-                }
+            dependencies {
+                jooqCodegen("org.jooq:jooq-codegen:$jooqVersion")
+                jooqCodegen("org.postgresql:postgresql:42.3.6")
+            }
             """.trimIndent()
         }
         copyResource(
             from = "/V01__init_multiple_schemas.sql",
-            to = "src/main/resources/db/migration/V01__init_multiple_schemas.sql"
+            to = "src/main/resources/db/migration/V01__init_multiple_schemas.sql",
         )
 
         // when
@@ -96,12 +95,12 @@ class JooqVersionConfigurationJooqDockerPluginFunctionalTest : JooqDockerPluginF
                 get { output } contains "Thank you for using jOOQ $jooqVersion"
             }
             that(
-                projectFile("build/generated-jooq/org/jooq/generated/public_/tables/foo.java")
+                projectFile("build/generated-jooq/org/jooq/generated/public_/tables/foo.java"),
             ).exists().and {
                 get { readText() } contains "jOOQ version:$jooqVersion"
             }
             that(
-                projectFile("build/generated-jooq/org/jooq/generated/other/tables/bar.java")
+                projectFile("build/generated-jooq/org/jooq/generated/other/tables/bar.java"),
             ).notExists()
         }
     }

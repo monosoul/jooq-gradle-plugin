@@ -10,12 +10,12 @@ import java.io.InputStream
 import kotlin.reflect.jvm.jvmName
 
 internal class ReflectiveJooqCodegenRunner(
-    codegenAwareClassLoader: ClassLoader
+    codegenAwareClassLoader: ClassLoader,
 ) : JooqCodegenRunner {
-
-    private val codeGenTool = ReflectiveGenerationTool(codegenAwareClassLoader).apply {
-        setClassLoader(codegenAwareClassLoader)
-    }
+    private val codeGenTool =
+        ReflectiveGenerationTool(codegenAwareClassLoader).apply {
+            setClassLoader(codegenAwareClassLoader)
+        }
 
     override fun generateJooqClasses(configuration: Configuration) = codeGenTool.run(configuration)
 
@@ -32,10 +32,11 @@ internal class ReflectiveJooqCodegenRunner(
          * @see GenerationTool.setClassLoader
          */
         fun setClassLoader(classLoader: ClassLoader) {
-            val setClassLoaderMethod = toolClass.getDeclaredMethod(
-                GenerationTool::setClassLoader.name,
-                ClassLoader::class.java
-            )
+            val setClassLoaderMethod =
+                toolClass.getDeclaredMethod(
+                    GenerationTool::setClassLoader.name,
+                    ClassLoader::class.java,
+                )
             setClassLoaderMethod.invoke(tool, classLoader)
         }
 
@@ -48,23 +49,25 @@ internal class ReflectiveJooqCodegenRunner(
             runMethod.invoke(tool, preparedConfiguration)
         }
 
-        private fun Configuration.sanitize() = apply {
-            // [#100] MiniJAXB class provided by jOOQ doesn't respect default value of XmlElement
-            // It serializes the value even if it's the same as the default value
-            generator?.strategy?.also {
-                if (it.name == defaultGeneratorStrategyName) {
-                    it.name = null
+        private fun Configuration.sanitize() =
+            apply {
+                // [#100] MiniJAXB class provided by jOOQ doesn't respect default value of XmlElement
+                // It serializes the value even if it's the same as the default value
+                generator?.strategy?.also {
+                    if (it.name == defaultGeneratorStrategyName) {
+                        it.name = null
+                    }
                 }
             }
-        }
 
-        private fun Configuration.toXmlByteArray() = ByteArrayOutputStream().also { stream ->
-            stream.writer().use { writer ->
-                @Suppress("UnstableApiUsage")
-                MiniJAXB.marshal(this, writer)
-                writer.flush()
-            }
-        }.toByteArray()
+        private fun Configuration.toXmlByteArray() =
+            ByteArrayOutputStream().also { stream ->
+                stream.writer().use { writer ->
+                    @Suppress("UnstableApiUsage")
+                    MiniJAXB.marshal(this, writer)
+                    writer.flush()
+                }
+            }.toByteArray()
 
         /**
          * @see GenerationTool.load

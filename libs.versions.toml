@@ -17,6 +17,8 @@ junit-jupiter = { module = "org.junit.jupiter:junit-jupiter" }
 strikt = "io.strikt:strikt-jvm:0.34.1"
 mockk = "io.mockk:mockk-jvm:1.13.7"
 
+ktlint = "com.pinterest.ktlint:ktlint-cli:1.0.1"
+
 # plugins
 gradle-plugin-publish = "com.gradle.publish:plugin-publish-plugin:1.2.1"
 shadow = "com.github.johnrengelman:shadow:8.1.1"

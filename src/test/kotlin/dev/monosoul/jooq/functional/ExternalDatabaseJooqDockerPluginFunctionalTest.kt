@@ -10,7 +10,6 @@ import strikt.assertions.isEqualTo
 import strikt.java.exists
 
 class ExternalDatabaseJooqDockerPluginFunctionalTest : JooqDockerPluginFunctionalTestBase() {
-
     private val postgresContainer = PostgresContainer()
 
     @BeforeEach
@@ -28,29 +27,29 @@ class ExternalDatabaseJooqDockerPluginFunctionalTest : JooqDockerPluginFunctiona
         // given
         prepareBuildGradleFile {
             """
-                plugins {
-                    id("dev.monosoul.jooq-docker")
-                }
+            plugins {
+                id("dev.monosoul.jooq-docker")
+            }
 
-                repositories {
-                    mavenCentral()
-                }
-                
-                jooq {
-                    withoutContainer {
-                        db {
-                            username = "${postgresContainer.username}"
-                            password = "${postgresContainer.password}"
-                            name = "${postgresContainer.databaseName}"
-                            host = "${postgresContainer.host}"
-                            port = ${postgresContainer.firstMappedPort}
-                        }
+            repositories {
+                mavenCentral()
+            }
+            
+            jooq {
+                withoutContainer {
+                    db {
+                        username = "${postgresContainer.username}"
+                        password = "${postgresContainer.password}"
+                        name = "${postgresContainer.databaseName}"
+                        host = "${postgresContainer.host}"
+                        port = ${postgresContainer.firstMappedPort}
                     }
                 }
+            }
 
-                dependencies {
-                    jooqCodegen("org.postgresql:postgresql:42.3.6")
-                }
+            dependencies {
+                jooqCodegen("org.postgresql:postgresql:42.3.6")
+            }
             """.trimIndent()
         }
         copyResource(from = "/V01__init.sql", to = "src/main/resources/db/migration/V01__init.sql")
@@ -62,7 +61,7 @@ class ExternalDatabaseJooqDockerPluginFunctionalTest : JooqDockerPluginFunctiona
         expect {
             that(result).generateJooqClassesTask.outcome isEqualTo SUCCESS
             that(
-                projectFile("build/generated-jooq/org/jooq/generated/tables/Foo.java")
+                projectFile("build/generated-jooq/org/jooq/generated/tables/Foo.java"),
             ).exists()
         }
     }

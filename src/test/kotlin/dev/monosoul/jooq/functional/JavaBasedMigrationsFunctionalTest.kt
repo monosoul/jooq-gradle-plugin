@@ -8,29 +8,28 @@ import strikt.assertions.isEqualTo
 import strikt.java.exists
 
 class JavaBasedMigrationsFunctionalTest : JooqDockerPluginFunctionalTestBase() {
-
     @Test
     fun `should be able to use a directory with compiled Java-based migrations for code gen`() {
         // given
         prepareBuildGradleFile {
             """
-                plugins {
-                    id("dev.monosoul.jooq-docker")
-                }
+            plugins {
+                id("dev.monosoul.jooq-docker")
+            }
 
-                repositories {
-                    mavenCentral()
+            repositories {
+                mavenCentral()
+            }
+            
+            tasks {
+                generateJooqClasses {
+                    migrationLocations.setFromClasspath(provider { "java-based-migrations/" })
                 }
-                
-                tasks {
-                    generateJooqClasses {
-                        migrationLocations.setFromClasspath(provider { "java-based-migrations/" })
-                    }
-                }
+            }
 
-                dependencies {
-                    jooqCodegen("org.postgresql:postgresql:42.3.6")
-                }
+            dependencies {
+                jooqCodegen("org.postgresql:postgresql:42.3.6")
+            }
             """.trimIndent()
         }
         copyResource(from = "/classes/compiled/V01__init.class", to = "java-based-migrations/db/migration/V01__init.class")
@@ -43,12 +42,12 @@ class JavaBasedMigrationsFunctionalTest : JooqDockerPluginFunctionalTestBase() {
         expect {
             that(result).generateJooqClassesTask.outcome isEqualTo SUCCESS
             that(
-                projectFile("build/generated-jooq/org/jooq/generated/tables/Foo.java")
+                projectFile("build/generated-jooq/org/jooq/generated/tables/Foo.java"),
             ).exists().and {
                 get { readText() } contains "schema version:02"
             }
             that(
-                projectFile("build/generated-jooq/org/jooq/generated/tables/Bar.java")
+                projectFile("build/generated-jooq/org/jooq/generated/tables/Bar.java"),
             ).exists().and {
                 get { readText() } contains "schema version:02"
             }
@@ -60,23 +59,23 @@ class JavaBasedMigrationsFunctionalTest : JooqDockerPluginFunctionalTestBase() {
         // given
         prepareBuildGradleFile {
             """
-                plugins {
-                    id("dev.monosoul.jooq-docker")
-                }
+            plugins {
+                id("dev.monosoul.jooq-docker")
+            }
 
-                repositories {
-                    mavenCentral()
+            repositories {
+                mavenCentral()
+            }
+            
+            tasks {
+                generateJooqClasses {
+                    migrationLocations.setFromClasspath(project.files("java-based-migrations/"))
                 }
-                
-                tasks {
-                    generateJooqClasses {
-                        migrationLocations.setFromClasspath(project.files("java-based-migrations/"))
-                    }
-                }
+            }
 
-                dependencies {
-                    jooqCodegen("org.postgresql:postgresql:42.3.6")
-                }
+            dependencies {
+                jooqCodegen("org.postgresql:postgresql:42.3.6")
+            }
             """.trimIndent()
         }
         copyResource(from = "/jars/migrations.jar", to = "java-based-migrations/migrations.jar")
@@ -88,12 +87,12 @@ class JavaBasedMigrationsFunctionalTest : JooqDockerPluginFunctionalTestBase() {
         expect {
             that(result).generateJooqClassesTask.outcome isEqualTo SUCCESS
             that(
-                projectFile("build/generated-jooq/org/jooq/generated/tables/Foo.java")
+                projectFile("build/generated-jooq/org/jooq/generated/tables/Foo.java"),
             ).exists().and {
                 get { readText() } contains "schema version:02"
             }
             that(
-                projectFile("build/generated-jooq/org/jooq/generated/tables/Bar.java")
+                projectFile("build/generated-jooq/org/jooq/generated/tables/Bar.java"),
             ).exists().and {
                 get { readText() } contains "schema version:02"
             }
@@ -105,50 +104,50 @@ class JavaBasedMigrationsFunctionalTest : JooqDockerPluginFunctionalTestBase() {
         // given
         writeProjectFile("settings.gradle.kts") {
             """
-                include("migrations")
+            include("migrations")
             """.trimIndent()
         }
         writeProjectFile("migrations/build.gradle.kts") {
             """
-                import dev.monosoul.jooq.RecommendedVersions.FLYWAY_VERSION
-                
-                plugins {
-                    kotlin("jvm")
-                    id("dev.monosoul.jooq-docker") apply false
-                }
-                
-                repositories {
-                    mavenCentral()
-                }
-                
-                dependencies {
-                    compileOnly("org.flywaydb:flyway-core:${'$'}FLYWAY_VERSION")
-                }
+            import dev.monosoul.jooq.RecommendedVersions.FLYWAY_VERSION
+            
+            plugins {
+                kotlin("jvm")
+                id("dev.monosoul.jooq-docker") apply false
+            }
+            
+            repositories {
+                mavenCentral()
+            }
+            
+            dependencies {
+                compileOnly("org.flywaydb:flyway-core:${'$'}FLYWAY_VERSION")
+            }
             """.trimIndent()
         }
         prepareBuildGradleFile {
             """
-                plugins {
-                    kotlin("jvm") version "1.6.21"
-                    id("dev.monosoul.jooq-docker")
-                }
+            plugins {
+                kotlin("jvm") version "1.6.21"
+                id("dev.monosoul.jooq-docker")
+            }
 
-                repositories {
-                    mavenCentral()
+            repositories {
+                mavenCentral()
+            }
+            
+            val migrationClasspath by configurations.creating
+            
+            dependencies {
+                jooqCodegen("org.postgresql:postgresql:42.3.6")
+                migrationClasspath(project(":migrations"))
+            }
+            
+            tasks {
+                generateJooqClasses {
+                    migrationLocations.setFromClasspath(migrationClasspath, "/some/pkg")
                 }
-                
-                val migrationClasspath by configurations.creating
-                
-                dependencies {
-                    jooqCodegen("org.postgresql:postgresql:42.3.6")
-                    migrationClasspath(project(":migrations"))
-                }
-                
-                tasks {
-                    generateJooqClasses {
-                        migrationLocations.setFromClasspath(migrationClasspath, "/some/pkg")
-                    }
-                }
+            }
             """.trimIndent()
         }
         copyResource(from = "/classes/source/V01__init.txt", to = "migrations/src/main/kotlin/some/pkg/V01__init.kt")
@@ -161,12 +160,12 @@ class JavaBasedMigrationsFunctionalTest : JooqDockerPluginFunctionalTestBase() {
         expect {
             that(result).generateJooqClassesTask.outcome isEqualTo SUCCESS
             that(
-                projectFile("build/generated-jooq/org/jooq/generated/tables/Foo.java")
+                projectFile("build/generated-jooq/org/jooq/generated/tables/Foo.java"),
             ).exists().and {
                 get { readText() } contains "schema version:02"
             }
             that(
-                projectFile("build/generated-jooq/org/jooq/generated/tables/Bar.java")
+                projectFile("build/generated-jooq/org/jooq/generated/tables/Bar.java"),
             ).exists().and {
                 get { readText() } contains "schema version:02"
             }
@@ -178,50 +177,50 @@ class JavaBasedMigrationsFunctionalTest : JooqDockerPluginFunctionalTestBase() {
         // given
         writeProjectFile("settings.gradle.kts") {
             """
-                include("migrations")
+            include("migrations")
             """.trimIndent()
         }
         writeProjectFile("migrations/build.gradle.kts") {
             """
-                import dev.monosoul.jooq.RecommendedVersions.FLYWAY_VERSION
-                
-                plugins {
-                    kotlin("jvm")
-                    id("dev.monosoul.jooq-docker") apply false
-                }
-                
-                repositories {
-                    mavenCentral()
-                }
-                
-                dependencies {
-                    implementation("org.flywaydb:flyway-core:${'$'}FLYWAY_VERSION")
-                }
+            import dev.monosoul.jooq.RecommendedVersions.FLYWAY_VERSION
+            
+            plugins {
+                kotlin("jvm")
+                id("dev.monosoul.jooq-docker") apply false
+            }
+            
+            repositories {
+                mavenCentral()
+            }
+            
+            dependencies {
+                implementation("org.flywaydb:flyway-core:${'$'}FLYWAY_VERSION")
+            }
             """.trimIndent()
         }
         prepareBuildGradleFile {
             """
-                plugins {
-                    kotlin("jvm") version "1.6.21"
-                    id("dev.monosoul.jooq-docker")
-                }
+            plugins {
+                kotlin("jvm") version "1.6.21"
+                id("dev.monosoul.jooq-docker")
+            }
 
-                repositories {
-                    mavenCentral()
+            repositories {
+                mavenCentral()
+            }
+            
+            val migrationClasspath by configurations.creating
+            
+            dependencies {
+                jooqCodegen("org.postgresql:postgresql:42.3.6")
+                migrationClasspath(files("java-based-migrations/migrations.jar"))
+            }
+            
+            tasks {
+                generateJooqClasses {
+                    migrationLocations.setFromClasspath(migrationClasspath)
                 }
-                
-                val migrationClasspath by configurations.creating
-                
-                dependencies {
-                    jooqCodegen("org.postgresql:postgresql:42.3.6")
-                    migrationClasspath(files("java-based-migrations/migrations.jar"))
-                }
-                
-                tasks {
-                    generateJooqClasses {
-                        migrationLocations.setFromClasspath(migrationClasspath)
-                    }
-                }
+            }
             """.trimIndent()
         }
         copyResource(from = "/jars/migrations.jar", to = "java-based-migrations/migrations.jar")
@@ -233,12 +232,12 @@ class JavaBasedMigrationsFunctionalTest : JooqDockerPluginFunctionalTestBase() {
         expect {
             that(result).generateJooqClassesTask.outcome isEqualTo SUCCESS
             that(
-                projectFile("build/generated-jooq/org/jooq/generated/tables/Foo.java")
+                projectFile("build/generated-jooq/org/jooq/generated/tables/Foo.java"),
             ).exists().and {
                 get { readText() } contains "schema version:02"
             }
             that(
-                projectFile("build/generated-jooq/org/jooq/generated/tables/Bar.java")
+                projectFile("build/generated-jooq/org/jooq/generated/tables/Bar.java"),
             ).exists().and {
                 get { readText() } contains "schema version:02"
             }
@@ -250,50 +249,50 @@ class JavaBasedMigrationsFunctionalTest : JooqDockerPluginFunctionalTestBase() {
         // given
         writeProjectFile("settings.gradle.kts") {
             """
-                include("migrations")
+            include("migrations")
             """.trimIndent()
         }
         writeProjectFile("migrations/build.gradle.kts") {
             """
-                import dev.monosoul.jooq.RecommendedVersions.FLYWAY_VERSION
-                
-                plugins {
-                    kotlin("jvm")
-                    id("dev.monosoul.jooq-docker") apply false
-                }
-                
-                repositories {
-                    mavenCentral()
-                }
-                
-                dependencies {
-                    implementation("org.flywaydb:flyway-core:${'$'}FLYWAY_VERSION")
-                }
+            import dev.monosoul.jooq.RecommendedVersions.FLYWAY_VERSION
+            
+            plugins {
+                kotlin("jvm")
+                id("dev.monosoul.jooq-docker") apply false
+            }
+            
+            repositories {
+                mavenCentral()
+            }
+            
+            dependencies {
+                implementation("org.flywaydb:flyway-core:${'$'}FLYWAY_VERSION")
+            }
             """.trimIndent()
         }
         prepareBuildGradleFile {
             """
-                plugins {
-                    kotlin("jvm") version "1.6.21"
-                    id("dev.monosoul.jooq-docker")
-                }
+            plugins {
+                kotlin("jvm") version "1.6.21"
+                id("dev.monosoul.jooq-docker")
+            }
 
-                repositories {
-                    mavenCentral()
+            repositories {
+                mavenCentral()
+            }
+            
+            dependencies {
+                jooqCodegen("org.postgresql:postgresql:42.3.6")
+            }
+            
+            tasks {
+                generateJooqClasses {
+                    migrationLocations.setFromClasspath(
+                        project(":migrations").sourceSets.main.map { it.output }, 
+                        "/some/pkg"
+                    )
                 }
-                
-                dependencies {
-                    jooqCodegen("org.postgresql:postgresql:42.3.6")
-                }
-                
-                tasks {
-                    generateJooqClasses {
-                        migrationLocations.setFromClasspath(
-                            project(":migrations").sourceSets.main.map { it.output }, 
-                            "/some/pkg"
-                        )
-                    }
-                }
+            }
             """.trimIndent()
         }
         copyResource(from = "/classes/source/V01__init.txt", to = "migrations/src/main/kotlin/some/pkg/V01__init.kt")
@@ -306,12 +305,12 @@ class JavaBasedMigrationsFunctionalTest : JooqDockerPluginFunctionalTestBase() {
         expect {
             that(result).generateJooqClassesTask.outcome isEqualTo SUCCESS
             that(
-                projectFile("build/generated-jooq/org/jooq/generated/tables/Foo.java")
+                projectFile("build/generated-jooq/org/jooq/generated/tables/Foo.java"),
             ).exists().and {
                 get { readText() } contains "schema version:02"
             }
             that(
-                projectFile("build/generated-jooq/org/jooq/generated/tables/Bar.java")
+                projectFile("build/generated-jooq/org/jooq/generated/tables/Bar.java"),
             ).exists().and {
                 get { readText() } contains "schema version:02"
             }

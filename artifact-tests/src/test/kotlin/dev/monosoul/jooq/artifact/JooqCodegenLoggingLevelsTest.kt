@@ -9,20 +9,21 @@ import strikt.assertions.contains
 import strikt.assertions.isSuccess
 
 class JooqCodegenLoggingLevelsTest {
-
     @ParameterizedTest
     @ValueSource(strings = ["", "--quiet"])
     fun `should not have jOOQ codegen warnings with non verbose log levels`(logLevel: String) {
         // given
-        val gradleContainer = GradleContainer().apply {
-            setUp()
-            val arguments = listOfNotNull(
-                "gradle",
-                "generateJooqClasses",
-                logLevel.takeIf { it.isNotBlank() }
-            ).toTypedArray()
-            withCommand(*arguments)
-        }
+        val gradleContainer =
+            GradleContainer().apply {
+                setUp()
+                val arguments =
+                    listOfNotNull(
+                        "gradle",
+                        "generateJooqClasses",
+                        logLevel.takeIf { it.isNotBlank() },
+                    ).toTypedArray()
+                withCommand(*arguments)
+            }
 
         // when & then
         expect {
@@ -41,10 +42,11 @@ class JooqCodegenLoggingLevelsTest {
     @ValueSource(strings = ["--info", "--warn", "--debug"])
     fun `should have jOOQ codegen warnings with verbose log levels`(logLevel: String) {
         // given
-        val gradleContainer = GradleContainer().apply {
-            setUp()
-            withCommand("gradle", "generateJooqClasses", logLevel)
-        }
+        val gradleContainer =
+            GradleContainer().apply {
+                setUp()
+                withCommand("gradle", "generateJooqClasses", logLevel)
+            }
 
         // when & then
         expect {
@@ -64,59 +66,59 @@ class JooqCodegenLoggingLevelsTest {
         withCopyToContainer(
             Transferable.of(
                 """
-                    import org.jooq.meta.jaxb.Logging
+                import org.jooq.meta.jaxb.Logging
 
-                    plugins {
-                        id("dev.monosoul.jooq-docker") version "${Versions.PLUGIN_VERSION}"
-                    }
+                plugins {
+                    id("dev.monosoul.jooq-docker") version "${Versions.PLUGIN_VERSION}"
+                }
 
-                    repositories {
-                        mavenCentral()
-                    }
+                repositories {
+                    mavenCentral()
+                }
 
-                    tasks {
-                        generateJooqClasses {
-                            withContainer {
-                                image {
-                                    name = "postgres:14.4-alpine"
-                                }
+                tasks {
+                    generateJooqClasses {
+                        withContainer {
+                            image {
+                                name = "postgres:14.4-alpine"
                             }
                         }
                     }
+                }
 
-                    dependencies {
-                        jooqCodegen("org.postgresql:postgresql:42.3.6")
-                    }
-                """.trimIndent()
+                dependencies {
+                    jooqCodegen("org.postgresql:postgresql:42.3.6")
+                }
+                """.trimIndent(),
             ),
-            "$projectPath/build.gradle.kts"
+            "$projectPath/build.gradle.kts",
         )
         withCopyToContainer(
             Transferable.of(
                 """
-                    pluginManagement {
-                        repositories {
-                            maven {
-                                name = "localBuild"
-                                url = uri("./local-repository")
-                            }
-                            mavenCentral()
-                            gradlePluginPortal {
-                                content {
-                                    excludeGroup("org.jooq")
-                                    excludeGroup("org.flywaydb")
-                                    excludeGroupByRegex("com\\.fasterxml.*")
-                                    excludeGroupByRegex("com\\.google.*")
-                                    excludeGroupByRegex("org\\.junit.*")
-                                    excludeGroupByRegex("net\\.java.*")
-                                    excludeGroupByRegex("jakarta.*")
-                                }
+                pluginManagement {
+                    repositories {
+                        maven {
+                            name = "localBuild"
+                            url = uri("./local-repository")
+                        }
+                        mavenCentral()
+                        gradlePluginPortal {
+                            content {
+                                excludeGroup("org.jooq")
+                                excludeGroup("org.flywaydb")
+                                excludeGroupByRegex("com\\.fasterxml.*")
+                                excludeGroupByRegex("com\\.google.*")
+                                excludeGroupByRegex("org\\.junit.*")
+                                excludeGroupByRegex("net\\.java.*")
+                                excludeGroupByRegex("jakarta.*")
                             }
                         }
                     }
-                """.trimIndent()
+                }
+                """.trimIndent(),
             ),
-            "$projectPath/settings.gradle.kts"
+            "$projectPath/settings.gradle.kts",
         )
     }
 }

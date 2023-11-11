@@ -10,7 +10,6 @@ import strikt.java.exists
 import java.io.File
 
 class CacheJooqDockerPluginFunctionalTest : JooqDockerPluginFunctionalTestBase() {
-
     @TempDir
     private lateinit var localBuildCacheDirectory: File
 
@@ -20,17 +19,17 @@ class CacheJooqDockerPluginFunctionalTest : JooqDockerPluginFunctionalTestBase()
         configureLocalGradleCache()
         prepareBuildGradleFile {
             """
-                plugins {
-                    id("dev.monosoul.jooq-docker")
-                }
+            plugins {
+                id("dev.monosoul.jooq-docker")
+            }
 
-                repositories {
-                    mavenCentral()
-                }
+            repositories {
+                mavenCentral()
+            }
 
-                dependencies {
-                    jooqCodegen("org.postgresql:postgresql:42.3.6")
-                }
+            dependencies {
+                jooqCodegen("org.postgresql:postgresql:42.3.6")
+            }
             """.trimIndent()
         }
         copyResource(from = "/V01__init.sql", to = "src/main/resources/db/migration/V01__init.sql")
@@ -54,10 +53,10 @@ class CacheJooqDockerPluginFunctionalTest : JooqDockerPluginFunctionalTestBase()
             that(resultAfterInputsChange).generateJooqClassesTask.outcome isEqualTo SUCCESS
 
             that(
-                projectFile("build/generated-jooq/org/jooq/generated/tables/Foo.java")
+                projectFile("build/generated-jooq/org/jooq/generated/tables/Foo.java"),
             ).exists()
             that(
-                projectFile("build/generated-jooq/org/jooq/generated/tables/Bar.java")
+                projectFile("build/generated-jooq/org/jooq/generated/tables/Bar.java"),
             ).exists()
         }
     }
@@ -65,11 +64,11 @@ class CacheJooqDockerPluginFunctionalTest : JooqDockerPluginFunctionalTestBase()
     private fun configureLocalGradleCache() {
         writeProjectFile("settings.gradle.kts") {
             """
-                buildCache {
-                    local {
-                        directory = "${localBuildCacheDirectory.path}"
-                    }
+            buildCache {
+                local {
+                    directory = "${localBuildCacheDirectory.path}"
                 }
+            }
             """.trimIndent()
         }
     }

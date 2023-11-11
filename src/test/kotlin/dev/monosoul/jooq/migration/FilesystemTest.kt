@@ -16,7 +16,6 @@ import strikt.assertions.withElementAt
 import kotlin.streams.asStream
 
 class FilesystemTest {
-
     private lateinit var project: Project
 
     @BeforeEach
@@ -49,32 +48,34 @@ class FilesystemTest {
     }
 
     @TestFactory
-    fun `given a files collection, when getting path, then return the collection as is`() = sequenceOf(
-        "multiple dirs" to project.files("someDir", "someOtherDir"),
-        "single dir" to project.files("someDir"),
-        "project dir" to project.files(),
-    ).map { (description, paths) ->
-        dynamicTest("given $description, should return path as is") {
-            // when
-            val actual = MigrationLocation.Filesystem(paths).path
+    fun `given a files collection, when getting path, then return the collection as is`() =
+        sequenceOf(
+            "multiple dirs" to project.files("someDir", "someOtherDir"),
+            "single dir" to project.files("someDir"),
+            "project dir" to project.files(),
+        ).map { (description, paths) ->
+            dynamicTest("given $description, should return path as is") {
+                // when
+                val actual = MigrationLocation.Filesystem(paths).path
 
-            // then
-            expectThat(actual) isEqualTo paths
-        }
-    }.asStream()
+                // then
+                expectThat(actual) isEqualTo paths
+            }
+        }.asStream()
 
     @TestFactory
-    fun `given a files collection, when getting extraClasspath, then return an empty list`() = sequenceOf(
-        "multiple dirs" to project.files("someDir", "someOtherDir"),
-        "single dir" to project.files("someDir"),
-        "project dir" to project.files(),
-    ).map { (description, paths) ->
-        dynamicTest("given $description, should return empty extra classpath") {
-            // when
-            val actual = MigrationLocation.Filesystem(paths).extraClasspath()
+    fun `given a files collection, when getting extraClasspath, then return an empty list`() =
+        sequenceOf(
+            "multiple dirs" to project.files("someDir", "someOtherDir"),
+            "single dir" to project.files("someDir"),
+            "project dir" to project.files(),
+        ).map { (description, paths) ->
+            dynamicTest("given $description, should return empty extra classpath") {
+                // when
+                val actual = MigrationLocation.Filesystem(paths).extraClasspath()
 
-            // then
-            expectThat(actual).isEmpty()
-        }
-    }.asStream()
+                // then
+                expectThat(actual).isEmpty()
+            }
+        }.asStream()
 }

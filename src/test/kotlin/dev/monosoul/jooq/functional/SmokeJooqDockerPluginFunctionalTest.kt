@@ -6,15 +6,14 @@ import strikt.api.expectThat
 import strikt.assertions.isEqualTo
 
 class SmokeJooqDockerPluginFunctionalTest : JooqDockerPluginFunctionalTestBase() {
-
     @Test
     fun `plugin is applicable`() {
         // given
         prepareBuildGradleFile {
             """
-                plugins {
-                    id("dev.monosoul.jooq-docker")
-                }
+            plugins {
+                id("dev.monosoul.jooq-docker")
+            }
             """.trimIndent()
         }
 

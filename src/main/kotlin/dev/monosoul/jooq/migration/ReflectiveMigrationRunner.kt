@@ -10,7 +10,6 @@ import kotlin.reflect.KFunction4
 import kotlin.reflect.jvm.jvmName
 
 internal class ReflectiveMigrationRunner(codegenAwareClassLoader: ClassLoader) : MigrationRunner {
-
     private val flyway = ReflectiveFlywayConfiguration(codegenAwareClassLoader)
 
     override fun migrateDb(
@@ -19,7 +18,7 @@ internal class ReflectiveMigrationRunner(codegenAwareClassLoader: ClassLoader) :
         flywayProperties: Map<String, String>,
         credentials: DatabaseCredentials,
         defaultFlywaySchema: String,
-        flywayTable: String
+        flywayTable: String,
     ) = flyway
         .dataSource(credentials)
         .schemas(*schemas)
@@ -46,80 +45,92 @@ internal class ReflectiveMigrationRunner(codegenAwareClassLoader: ClassLoader) :
          * FluentConfiguration.dataSource(String, String, String)
          * @see FluentConfiguration.dataSource
          */
-        fun dataSource(credentials: DatabaseCredentials) = also {
-            val dataSourceMethod = configurationClass.getMethod(
-                fourArgFunctionName(FluentConfiguration::dataSource),
-                String::class.java,
-                String::class.java,
-                String::class.java
-            )
-            dataSourceMethod.invoke(configuration, credentials.jdbcUrl, credentials.username, credentials.password)
-        }
+        fun dataSource(credentials: DatabaseCredentials) =
+            also {
+                val dataSourceMethod =
+                    configurationClass.getMethod(
+                        fourArgFunctionName(FluentConfiguration::dataSource),
+                        String::class.java,
+                        String::class.java,
+                        String::class.java,
+                    )
+                dataSourceMethod.invoke(configuration, credentials.jdbcUrl, credentials.username, credentials.password)
+            }
 
         /**
          * FluentConfiguration.schemas(String...)
          * @see FluentConfiguration.schemas
          */
-        fun schemas(vararg schemas: String) = also {
-            val schemasMethod = configurationClass.getMethod(
-                twoArgFunctionName(FluentConfiguration::schemas),
-                Array<String>::class.java
-            )
-            schemasMethod.invoke(configuration, schemas)
-        }
+        fun schemas(vararg schemas: String) =
+            also {
+                val schemasMethod =
+                    configurationClass.getMethod(
+                        twoArgFunctionName(FluentConfiguration::schemas),
+                        Array<String>::class.java,
+                    )
+                schemasMethod.invoke(configuration, schemas)
+            }
 
         /**
          * FluentConfiguration.locations(String...)
          * @see FluentConfiguration.locations
          */
-        fun locations(vararg locations: String) = also {
-            val locationsMethod = configurationClass.getMethod(
-                twoArgFunctionName<FluentConfiguration, Array<String>, FluentConfiguration>(
-                    FluentConfiguration::locations
-                ),
-                Array<String>::class.java
-            )
-            locationsMethod.invoke(configuration, locations)
-        }
+        fun locations(vararg locations: String) =
+            also {
+                val locationsMethod =
+                    configurationClass.getMethod(
+                        twoArgFunctionName<FluentConfiguration, Array<String>, FluentConfiguration>(
+                            FluentConfiguration::locations,
+                        ),
+                        Array<String>::class.java,
+                    )
+                locationsMethod.invoke(configuration, locations)
+            }
 
         /**
          * FluentConfiguration.defaultSchema(String)
          * @see FluentConfiguration.defaultSchema
          */
-        fun defaultSchema(schema: String) = also {
-            val defaultSchemaMethod = configurationClass.getMethod(
-                twoArgFunctionName(FluentConfiguration::defaultSchema),
-                String::class.java
-            )
-            defaultSchemaMethod.invoke(configuration, schema)
-        }
+        fun defaultSchema(schema: String) =
+            also {
+                val defaultSchemaMethod =
+                    configurationClass.getMethod(
+                        twoArgFunctionName(FluentConfiguration::defaultSchema),
+                        String::class.java,
+                    )
+                defaultSchemaMethod.invoke(configuration, schema)
+            }
 
         /**
          * FluentConfiguration.table(String)
          * @see FluentConfiguration.table
          */
-        fun table(table: String) = also {
-            val tableMethod = configurationClass.getMethod(
-                twoArgFunctionName(FluentConfiguration::table),
-                String::class.java
-            )
-            tableMethod.invoke(configuration, table)
-        }
+        fun table(table: String) =
+            also {
+                val tableMethod =
+                    configurationClass.getMethod(
+                        twoArgFunctionName(FluentConfiguration::table),
+                        String::class.java,
+                    )
+                tableMethod.invoke(configuration, table)
+            }
 
         /**
          *
          * FluentConfiguration.configuration(Map<String,String>)
          * @see FluentConfiguration.configuration
          */
-        fun configuration(props: Map<String, String>) = also {
-            val configurationMethod = configurationClass.getMethod(
-                twoArgFunctionName<FluentConfiguration, Map<String, String>, FluentConfiguration>(
-                    FluentConfiguration::configuration
-                ),
-                Map::class.java
-            )
-            configurationMethod.invoke(configuration, props)
-        }
+        fun configuration(props: Map<String, String>) =
+            also {
+                val configurationMethod =
+                    configurationClass.getMethod(
+                        twoArgFunctionName<FluentConfiguration, Map<String, String>, FluentConfiguration>(
+                            FluentConfiguration::configuration,
+                        ),
+                        Map::class.java,
+                    )
+                configurationMethod.invoke(configuration, props)
+            }
 
         /**
          * FluentConfiguration.load()
@@ -131,14 +142,16 @@ internal class ReflectiveMigrationRunner(codegenAwareClassLoader: ClassLoader) :
             return ReflectiveFlyway(
                 flywayClass = flywayClass,
                 migrateResultClass = codegenAwareClassLoader.loadClass(MigrateResult::class.jvmName),
-                flywayInstance = loadMethod.invoke(configuration)
+                flywayInstance = loadMethod.invoke(configuration),
             )
         }
 
         private companion object {
             // those functions are required to provide a hint for overloaded functions
             fun <P, R> oneArgFunctionName(ref: KFunction1<P, R>) = ref.name
+
             fun <T, P, R> twoArgFunctionName(ref: KFunction2<T, P, R>) = ref.name
+
             fun <T, P1, P2, P3, R> fourArgFunctionName(ref: KFunction4<T, P1, P2, P3, R>) = ref.name
         }
     }
@@ -152,7 +165,6 @@ internal class ReflectiveMigrationRunner(codegenAwareClassLoader: ClassLoader) :
         private val migrateResultClass: Class<*>,
         private val flywayInstance: Any,
     ) {
-
         /**
          * Flyway.migrate()
          * @see Flyway.migrate

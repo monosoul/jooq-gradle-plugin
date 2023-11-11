@@ -50,7 +50,8 @@
         "org.junit.jupiter:",
         "io.strikt:",
         "io.mockk:",
-        "ch.qos.logback:"
+        "ch.qos.logback:",
+        "com.pinterest.ktlint:ktlint-cli:"
       ]
     },
     {

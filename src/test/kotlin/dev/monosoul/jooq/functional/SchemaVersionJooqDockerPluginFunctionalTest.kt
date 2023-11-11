@@ -8,30 +8,29 @@ import strikt.assertions.isEqualTo
 import strikt.java.exists
 
 class SchemaVersionJooqDockerPluginFunctionalTest : JooqDockerPluginFunctionalTestBase() {
-
     @Test
     fun `schema version provider should be aware of flyway table name override`() {
         // given
         prepareBuildGradleFile {
             """
-                plugins {
-                    id("dev.monosoul.jooq-docker")
-                }
+            plugins {
+                id("dev.monosoul.jooq-docker")
+            }
 
-                repositories {
-                    mavenCentral()
-                }
+            repositories {
+                mavenCentral()
+            }
 
-                tasks {
-                    generateJooqClasses {
-                        flywayProperties.put("flyway.table", "some_schema_table")
-                        includeFlywayTable.set(true)
-                    }
+            tasks {
+                generateJooqClasses {
+                    flywayProperties.put("flyway.table", "some_schema_table")
+                    includeFlywayTable.set(true)
                 }
+            }
 
-                dependencies {
-                    jooqCodegen("org.postgresql:postgresql:42.3.6")
-                }
+            dependencies {
+                jooqCodegen("org.postgresql:postgresql:42.3.6")
+            }
             """.trimIndent()
         }
         copyResource(from = "/V01__init.sql", to = "src/main/resources/db/migration/V01__init.sql")
@@ -43,7 +42,7 @@ class SchemaVersionJooqDockerPluginFunctionalTest : JooqDockerPluginFunctionalTe
         expect {
             that(result).generateJooqClassesTask.outcome isEqualTo SUCCESS
             that(
-                projectFile("build/generated-jooq/org/jooq/generated/tables/SomeSchemaTable.java")
+                projectFile("build/generated-jooq/org/jooq/generated/tables/SomeSchemaTable.java"),
             ).exists().and {
                 get { readText() } contains "schema version:01"
             }
@@ -55,17 +54,17 @@ class SchemaVersionJooqDockerPluginFunctionalTest : JooqDockerPluginFunctionalTe
         // given
         prepareBuildGradleFile {
             """
-                plugins {
-                    id("dev.monosoul.jooq-docker")
-                }
+            plugins {
+                id("dev.monosoul.jooq-docker")
+            }
 
-                repositories {
-                    mavenCentral()
-                }
+            repositories {
+                mavenCentral()
+            }
 
-                dependencies {
-                    jooqCodegen("org.postgresql:postgresql:42.3.6")
-                }
+            dependencies {
+                jooqCodegen("org.postgresql:postgresql:42.3.6")
+            }
             """.trimIndent()
         }
         copyResource(from = "/V01__init.sql", to = "src/main/resources/db/migration/V01__init.sql")
@@ -78,12 +77,12 @@ class SchemaVersionJooqDockerPluginFunctionalTest : JooqDockerPluginFunctionalTe
         expect {
             that(result).generateJooqClassesTask.outcome isEqualTo SUCCESS
             that(
-                projectFile("build/generated-jooq/org/jooq/generated/tables/Foo.java")
+                projectFile("build/generated-jooq/org/jooq/generated/tables/Foo.java"),
             ).exists().and {
                 get { readText() } contains "schema version:02"
             }
             that(
-                projectFile("build/generated-jooq/org/jooq/generated/tables/Bar.java")
+                projectFile("build/generated-jooq/org/jooq/generated/tables/Bar.java"),
             ).exists().and {
                 get { readText() } contains "schema version:02"
             }

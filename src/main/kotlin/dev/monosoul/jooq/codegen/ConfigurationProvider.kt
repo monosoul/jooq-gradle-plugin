@@ -34,39 +34,41 @@ internal class ConfigurationProvider(
     private val schemas: ListProperty<String>,
     private val logLevel: Logging,
 ) {
-
     fun fromXml(file: FileContents) = file.asBytes.map { it.inputStream().use(::load).applyCommonConfiguration() }
 
-    fun defaultConfiguration() = Generator()
-        .withName(JavaGenerator::class.qualifiedName)
-        .withDatabase(
-            Database()
-                .withSchemata(schemas.get().map(this::toSchemaMappingType))
-                .withIncludes(".*")
-                .withExcludes("")
-        )
-        .withGenerate(Generate())
-        .let {
-            Configuration().withGenerator(it)
-        }
-        .applyCommonConfiguration()
+    fun defaultConfiguration() =
+        Generator()
+            .withName(JavaGenerator::class.qualifiedName)
+            .withDatabase(
+                Database()
+                    .withSchemata(schemas.get().map(this::toSchemaMappingType))
+                    .withIncludes(".*")
+                    .withExcludes(""),
+            )
+            .withGenerate(Generate())
+            .let {
+                Configuration().withGenerator(it)
+            }
+            .applyCommonConfiguration()
 
-    private fun Configuration.applyCommonConfiguration() = also { config ->
-        config.withLogging(logLevel)
-        config.generator.apply {
-            withTarget(codeGenTarget())
-            nonNullStrategy.apply(schemaToPackageMapping.get().toMappingApplier())
+    private fun Configuration.applyCommonConfiguration() =
+        also { config ->
+            config.withLogging(logLevel)
+            config.generator.apply {
+                withTarget(codeGenTarget())
+                nonNullStrategy.apply(schemaToPackageMapping.get().toMappingApplier())
+            }
         }
-    }
 
     private val Generator.nonNullStrategy get() = strategy ?: Strategy().also(::withStrategy)
     private val Strategy.nonNullMatchers get() = matchers ?: Matchers().also(::withMatchers)
 
-    private fun codeGenTarget() = Target()
-        .withPackageName(basePackageName.get())
-        .withDirectory(outputDirectory.asFile.get().toString())
-        .withEncoding("UTF-8")
-        .withClean(true)
+    private fun codeGenTarget() =
+        Target()
+            .withPackageName(basePackageName.get())
+            .withDirectory(outputDirectory.asFile.get().toString())
+            .withEncoding("UTF-8")
+            .withClean(true)
 
     private fun toSchemaMappingType(schemaName: String): SchemaMappingType {
         return SchemaMappingType()
@@ -74,34 +76,37 @@ internal class ConfigurationProvider(
             .withOutputSchemaToDefault(outputSchemaToDefault.get().contains(schemaName))
     }
 
-    private fun Map<String, String>.toMappingApplier(): (Strategy) -> Unit = { strategy ->
-        if (isNotEmpty()) {
-            strategy
-                .nonNullMatchers
-                .withSchemas(*toSchemasMatchers())
-                .withCatalogs(*toCatalogMatchers())
+    private fun Map<String, String>.toMappingApplier(): (Strategy) -> Unit =
+        { strategy ->
+            if (isNotEmpty()) {
+                strategy
+                    .nonNullMatchers
+                    .withSchemas(*toSchemasMatchers())
+                    .withCatalogs(*toCatalogMatchers())
+            }
         }
-    }
 
-    private fun Map<String, String>.toSchemasMatchers() = map { (schema, pkg) ->
-        MatchersSchemaType()
-            .withExpression(schema)
-            .withSchemaIdentifier(
-                MatcherRule()
-                    .withTransform(AS_IS)
-                    .withExpression(pkg)
-            )
-    }.toTypedArray()
+    private fun Map<String, String>.toSchemasMatchers() =
+        map { (schema, pkg) ->
+            MatchersSchemaType()
+                .withExpression(schema)
+                .withSchemaIdentifier(
+                    MatcherRule()
+                        .withTransform(AS_IS)
+                        .withExpression(pkg),
+                )
+        }.toTypedArray()
 
-    private fun Map<String, String>.toCatalogMatchers() = map { (schema, pkg) ->
-        MatchersCatalogType()
-            .withExpression(schema)
-            .withCatalogIdentifier(
-                MatcherRule()
-                    .withTransform(AS_IS)
-                    .withExpression(pkg)
-            )
-    }.toTypedArray()
+    private fun Map<String, String>.toCatalogMatchers() =
+        map { (schema, pkg) ->
+            MatchersCatalogType()
+                .withExpression(schema)
+                .withCatalogIdentifier(
+                    MatcherRule()
+                        .withTransform(AS_IS)
+                        .withExpression(pkg),
+                )
+        }.toTypedArray()
 
     internal companion object {
         private fun load(inputStream: InputStream): Configuration = GenerationTool.load(inputStream)
@@ -110,7 +115,7 @@ internal class ConfigurationProvider(
             database.withExcludes(
                 listOfNotNull(database.excludes, *excludes.toTypedArray())
                     .filterNot(String::isBlank)
-                    .joinToString("|")
+                    .joinToString("|"),
             )
         }
 
@@ -128,7 +133,7 @@ internal class ConfigurationProvider(
                     .withDriver(credentials.jdbcDriverClassName)
                     .withUrl(credentials.jdbcUrl)
                     .withUser(credentials.username)
-                    .withPassword(credentials.password)
+                    .withPassword(credentials.password),
             )
         }
     }

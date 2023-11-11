@@ -16,7 +16,6 @@ import strikt.assertions.withElementAt
 import kotlin.streams.asStream
 
 class ClasspathTest {
-
     private lateinit var project: Project
 
     @BeforeEach
@@ -49,22 +48,23 @@ class ClasspathTest {
     }
 
     @TestFactory
-    fun `given a files collection, when getting path, then return the collection as is`() = sequenceOf(
-        "multiple dirs" to project.files("someDir", "someOtherDir"),
-        "single dir" to project.files("someDir"),
-        "project dir" to project.files(),
-    ).map { (description, paths) ->
-        dynamicTest("given $description, should return path as is") {
-            // when
-            val actual = MigrationLocation.Classpath(paths)
+    fun `given a files collection, when getting path, then return the collection as is`() =
+        sequenceOf(
+            "multiple dirs" to project.files("someDir", "someOtherDir"),
+            "single dir" to project.files("someDir"),
+            "project dir" to project.files(),
+        ).map { (description, paths) ->
+            dynamicTest("given $description, should return path as is") {
+                // when
+                val actual = MigrationLocation.Classpath(paths)
 
-            // then
-            expectThat(actual) {
-                get { path } isEqualTo paths
-                get { locations } isEqualTo listOf("classpath:/db/migration")
+                // then
+                expectThat(actual) {
+                    get { path } isEqualTo paths
+                    get { locations } isEqualTo listOf("classpath:/db/migration")
+                }
             }
-        }
-    }.asStream()
+        }.asStream()
 
     @Test
     fun `given a file collection, when getting locations, then should prefix them all with classpath`() {

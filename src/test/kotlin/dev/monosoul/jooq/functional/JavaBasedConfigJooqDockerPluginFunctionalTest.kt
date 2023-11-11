@@ -8,42 +8,41 @@ import strikt.java.exists
 import strikt.java.notExists
 
 class JavaBasedConfigJooqDockerPluginFunctionalTest : JooqDockerPluginFunctionalTestBase() {
-
     @Test
     fun `should respect the generator customizations`() {
         // given
         prepareBuildGradleFile {
             """
-                import org.jooq.meta.jaxb.Strategy
-                
-                plugins {
-                    id("dev.monosoul.jooq-docker")
-                }
+            import org.jooq.meta.jaxb.Strategy
+            
+            plugins {
+                id("dev.monosoul.jooq-docker")
+            }
 
-                repositories {
-                    mavenCentral()
-                }
+            repositories {
+                mavenCentral()
+            }
 
-                tasks {
-                    generateJooqClasses {
-                        schemas.set(listOf("public", "other"))
-                        usingJavaConfig {
-                            database.withExcludes("BAR")
-                            withStrategy(
-                                Strategy().withName("org.jooq.codegen.KeepNamesGeneratorStrategy")
-                            )
-                        }
+            tasks {
+                generateJooqClasses {
+                    schemas.set(listOf("public", "other"))
+                    usingJavaConfig {
+                        database.withExcludes("BAR")
+                        withStrategy(
+                            Strategy().withName("org.jooq.codegen.KeepNamesGeneratorStrategy")
+                        )
                     }
                 }
+            }
 
-                dependencies {
-                    jooqCodegen("org.postgresql:postgresql:42.3.6")
-                }
+            dependencies {
+                jooqCodegen("org.postgresql:postgresql:42.3.6")
+            }
             """.trimIndent()
         }
         copyResource(
             from = "/V01__init_multiple_schemas.sql",
-            to = "src/main/resources/db/migration/V01__init_multiple_schemas.sql"
+            to = "src/main/resources/db/migration/V01__init_multiple_schemas.sql",
         )
 
         // when
@@ -53,10 +52,10 @@ class JavaBasedConfigJooqDockerPluginFunctionalTest : JooqDockerPluginFunctional
         expect {
             that(result).generateJooqClassesTask.outcome isEqualTo SUCCESS
             that(
-                projectFile("build/generated-jooq/org/jooq/generated/public_/tables/foo.java")
+                projectFile("build/generated-jooq/org/jooq/generated/public_/tables/foo.java"),
             ).exists()
             that(
-                projectFile("build/generated-jooq/org/jooq/generated/other/tables/bar.java")
+                projectFile("build/generated-jooq/org/jooq/generated/other/tables/bar.java"),
             ).notExists()
         }
     }
@@ -66,25 +65,25 @@ class JavaBasedConfigJooqDockerPluginFunctionalTest : JooqDockerPluginFunctional
         // given
         prepareBuildGradleFile {
             """
-                plugins {
-                    id("dev.monosoul.jooq-docker")
-                }
+            plugins {
+                id("dev.monosoul.jooq-docker")
+            }
 
-                repositories {
-                    mavenCentral()
-                }
+            repositories {
+                mavenCentral()
+            }
 
-                tasks {
-                    generateJooqClasses {
-                        usingJavaConfig {
-                            generate.setDeprecated(true)
-                        }
+            tasks {
+                generateJooqClasses {
+                    usingJavaConfig {
+                        generate.setDeprecated(true)
                     }
                 }
+            }
 
-                dependencies {
-                    jooqCodegen("org.postgresql:postgresql:42.3.6")
-                }
+            dependencies {
+                jooqCodegen("org.postgresql:postgresql:42.3.6")
+            }
             """.trimIndent()
         }
         copyResource(from = "/V01__init.sql", to = "src/main/resources/db/migration/V01__init.sql")
@@ -96,7 +95,7 @@ class JavaBasedConfigJooqDockerPluginFunctionalTest : JooqDockerPluginFunctional
         expect {
             that(result).generateJooqClassesTask.outcome isEqualTo SUCCESS
             that(
-                projectFile("build/generated-jooq/org/jooq/generated/tables/Foo.java")
+                projectFile("build/generated-jooq/org/jooq/generated/tables/Foo.java"),
             ).exists()
         }
     }

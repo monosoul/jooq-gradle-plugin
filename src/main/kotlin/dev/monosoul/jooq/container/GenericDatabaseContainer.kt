@@ -17,24 +17,23 @@ import kotlin.reflect.full.declaredMembers
 import kotlin.reflect.jvm.isAccessible
 
 class GenericDatabaseContainer(
-        private val image: Image,
-        private val database: Database.Internal,
-        private val jdbcAwareClassLoader: ClassLoader,
+    private val image: Image,
+    private val database: Database.Internal,
+    private val jdbcAwareClassLoader: ClassLoader,
 ) : JdbcDatabaseContainer<GenericDatabaseContainer>(
         image.let {
             failFastAlways.set(false)
             DockerImageName.parse(it.name)
-        }
-) {
-
+        },
+    ) {
     private val driverLoadLock = ReentrantLock()
     private var driver: Driver? = null
 
     init {
         withLogConsumer(
             Slf4jLogConsumer(
-                LoggerFactory.getLogger("JooqGenerationDb[$dockerImageName]")
-            )
+                LoggerFactory.getLogger("JooqGenerationDb[$dockerImageName]"),
+            ),
         )
         withEnv(image.envVars)
         withExposedPorts(database.port)
@@ -66,23 +65,25 @@ class GenericDatabaseContainer(
         return driver!!
     }
 
-    private fun getNewJdbcDriverInstance() = try {
-        @Suppress("DEPRECATION")
-        jdbcAwareClassLoader.loadClass(driverClassName).newInstance() as Driver
-    } catch (e: Exception) {
-        when (e) {
-            is InstantiationException, is IllegalAccessException, is ClassNotFoundException -> {
-                throw NoDriverFoundException("Could not get Driver", e)
+    private fun getNewJdbcDriverInstance() =
+        try {
+            @Suppress("DEPRECATION")
+            jdbcAwareClassLoader.loadClass(driverClassName).newInstance() as Driver
+        } catch (e: Exception) {
+            when (e) {
+                is InstantiationException, is IllegalAccessException, is ClassNotFoundException -> {
+                    throw NoDriverFoundException("Could not get Driver", e)
+                }
+                else -> throw e
             }
-            else -> throw e
         }
-    }
 
     private companion object {
         /**
          * Workaround for https://github.com/testcontainers/testcontainers-java/issues/6441
          */
-        val failFastAlways = DockerClientProviderStrategy::class.declaredMembers
+        val failFastAlways =
+            DockerClientProviderStrategy::class.declaredMembers
                 .single { it.name == "FAIL_FAST_ALWAYS" }
                 .apply { isAccessible = true }
                 .let {

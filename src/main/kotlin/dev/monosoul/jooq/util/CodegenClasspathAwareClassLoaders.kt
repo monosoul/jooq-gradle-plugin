@@ -8,13 +8,14 @@ internal class CodegenClasspathAwareClassLoaders(
     val buildscriptInclusive: URLClassLoader,
 ) {
     companion object {
-        fun from(classpath: FileCollection) = classpath.map {
-            it.toURI().toURL()
-        }.toTypedArray().let {
-            CodegenClasspathAwareClassLoaders(
-                buildscriptExclusive = URLClassLoader(it),
-                buildscriptInclusive = URLClassLoader(it, CodegenClasspathAwareClassLoaders::class.java.classLoader)
-            )
-        }
+        fun from(classpath: FileCollection) =
+            classpath.map {
+                it.toURI().toURL()
+            }.toTypedArray().let {
+                CodegenClasspathAwareClassLoaders(
+                    buildscriptExclusive = URLClassLoader(it),
+                    buildscriptInclusive = URLClassLoader(it, CodegenClasspathAwareClassLoaders::class.java.classLoader),
+                )
+            }
     }
 }

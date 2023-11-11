@@ -23,16 +23,21 @@ internal object PropertiesReader {
             onlyApplyPropertiesFrom(pluginProperties)
         }
 
-    private fun WithContainer.onlyApplyPropertiesFrom(pluginProperties: Map<String, String>) = apply {
-        image.applyPropertiesFrom(pluginProperties)
-        database.applyPropertiesFrom(pluginProperties)
-    }
+    private fun WithContainer.onlyApplyPropertiesFrom(pluginProperties: Map<String, String>) =
+        apply {
+            image.applyPropertiesFrom(pluginProperties)
+            database.applyPropertiesFrom(pluginProperties)
+        }
 
-    fun WithoutContainer.applyPropertiesFrom(pluginProperties: Map<String, String>): JooqDockerPluginSettings = apply {
-        database.applyPropertiesFrom(pluginProperties)
-    }
+    fun WithoutContainer.applyPropertiesFrom(pluginProperties: Map<String, String>): JooqDockerPluginSettings =
+        apply {
+            database.applyPropertiesFrom(pluginProperties)
+        }
 
-    private fun Jdbc.applyPropertiesFrom(pluginProperties: Map<String, String>, namespace: String) {
+    private fun Jdbc.applyPropertiesFrom(
+        pluginProperties: Map<String, String>,
+        namespace: String,
+    ) {
         val prefix = "$namespace$JDBC_PREFIX"
         pluginProperties.findAndSetProperty(prefix, ::schema)
         pluginProperties.findAndSetProperty(prefix, ::driverClassName)
@@ -76,7 +81,7 @@ internal object PropertiesReader {
     private fun <T> Map<String, String>.findAndSetProperty(
         prefix: String,
         property: KMutableProperty0<T>,
-        mapper: (String) -> T = { it as T }
+        mapper: (String) -> T = { it as T },
     ) {
         get("$prefix${property.name}")?.also {
             property.set(mapper(it))

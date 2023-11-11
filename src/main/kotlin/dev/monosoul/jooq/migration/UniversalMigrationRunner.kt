@@ -26,17 +26,21 @@ internal class UniversalMigrationRunner(
         flywayProperties.getting(TABLE).getOrElse("flyway_schema_history")
     }
 
-    fun migrateDb(classLoaders: CodegenClasspathAwareClassLoaders, credentials: DatabaseCredentials): SchemaVersion {
+    fun migrateDb(
+        classLoaders: CodegenClasspathAwareClassLoaders,
+        credentials: DatabaseCredentials,
+    ): SchemaVersion {
         val resolvedMigrationLocations = migrationLocations.get()
         logger.info("Migration locations: {}", resolvedMigrationLocations)
 
-        val extraClasspath = resolvedMigrationLocations.flatMap { it.extraClasspath() }.also {
-            logger.info("Migration will run using extra classpath: {}", it)
-        }.toTypedArray()
+        val extraClasspath =
+            resolvedMigrationLocations.flatMap { it.extraClasspath() }.also {
+                logger.info("Migration will run using extra classpath: {}", it)
+            }.toTypedArray()
 
         return runCatching {
             ReflectiveMigrationRunner(
-                URLClassLoader(extraClasspath, classLoaders.buildscriptExclusive)
+                URLClassLoader(extraClasspath, classLoaders.buildscriptExclusive),
             )
         }.onFailure {
             logger.debug("Failed to load Flyway from $CONFIGURATION_NAME classpath", it)
@@ -45,7 +49,7 @@ internal class UniversalMigrationRunner(
         }.getOrElse {
             logger.info("Loaded Flyway from buildscript classpath")
             BuiltInMigrationRunner(
-                URLClassLoader(extraClasspath, classLoaders.buildscriptInclusive)
+                URLClassLoader(extraClasspath, classLoaders.buildscriptInclusive),
             )
         }.migrateDb(
             schemas = schemas.get().toTypedArray(),

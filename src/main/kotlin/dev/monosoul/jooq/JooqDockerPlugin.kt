@@ -15,37 +15,42 @@ import org.gradle.kotlin.dsl.register
 import org.gradle.kotlin.dsl.withType
 import javax.inject.Inject
 
-open class JooqDockerPlugin @Inject constructor(
-    private val providerFactory: ProviderFactory
-) : Plugin<Project> {
-
-    override fun apply(project: Project) = with(project) {
-        configurations.create(CONFIGURATION_NAME) {
-            attributes {
-                attribute(BUNDLING_ATTRIBUTE, objects.named(Bundling::class, Bundling.EXTERNAL))
-            }
-        }
-        extensions.create<JooqExtension>("jooq", providerFactory.provider {
-            // TODO: this is a workaround for https://github.com/gradle/gradle/issues/21876
-            project.properties.entries.filter { (key, _) ->
-                key.startsWith(PropertiesReader.PREFIX)
-            }.mapNotNull { (key, value) ->
-                (value as? String)?.let { key to it }
-            }.toMap()
-        })
-        tasks.register<GenerateJooqClassesTask>("generateJooqClasses")
-        pluginManager.withPlugin("org.gradle.java") {
-            extensions.findByType<JavaPluginExtension>()?.run {
-                sourceSets.named(MAIN_SOURCE_SET_NAME) {
-                    java {
-                        srcDirs(tasks.withType<GenerateJooqClassesTask>())
+open class JooqDockerPlugin
+    @Inject
+    constructor(
+        private val providerFactory: ProviderFactory,
+    ) : Plugin<Project> {
+        override fun apply(project: Project) =
+            with(project) {
+                configurations.create(CONFIGURATION_NAME) {
+                    attributes {
+                        attribute(BUNDLING_ATTRIBUTE, objects.named(Bundling::class, Bundling.EXTERNAL))
+                    }
+                }
+                extensions.create<JooqExtension>(
+                    "jooq",
+                    providerFactory.provider {
+                        // TODO: this is a workaround for https://github.com/gradle/gradle/issues/21876
+                        project.properties.entries.filter { (key, _) ->
+                            key.startsWith(PropertiesReader.PREFIX)
+                        }.mapNotNull { (key, value) ->
+                            (value as? String)?.let { key to it }
+                        }.toMap()
+                    },
+                )
+                tasks.register<GenerateJooqClassesTask>("generateJooqClasses")
+                pluginManager.withPlugin("org.gradle.java") {
+                    extensions.findByType<JavaPluginExtension>()?.run {
+                        sourceSets.named(MAIN_SOURCE_SET_NAME) {
+                            java {
+                                srcDirs(tasks.withType<GenerateJooqClassesTask>())
+                            }
+                        }
                     }
                 }
             }
+
+        internal companion object {
+            const val CONFIGURATION_NAME = "jooqCodegen"
         }
     }
-
-    internal companion object {
-        const val CONFIGURATION_NAME = "jooqCodegen"
-    }
-}

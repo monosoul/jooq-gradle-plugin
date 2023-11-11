@@ -1,5 +1,6 @@
 plugins {
     `kotlin-convention`
+    `linter-convention`
 }
 
 dependencies {

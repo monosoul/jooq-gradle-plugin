@@ -9,7 +9,10 @@ import org.slf4j.LoggerFactory
 internal class UniversalJooqCodegenRunner {
     private val logger: Logger = LoggerFactory.getLogger(javaClass)
 
-    fun generateJooqClasses(codegenAwareClassLoader: CodegenClasspathAwareClassLoaders, configuration: Configuration) {
+    fun generateJooqClasses(
+        codegenAwareClassLoader: CodegenClasspathAwareClassLoaders,
+        configuration: Configuration,
+    ) {
         runCatching {
             ReflectiveJooqCodegenRunner(codegenAwareClassLoader.buildscriptExclusive)
         }.onFailure {

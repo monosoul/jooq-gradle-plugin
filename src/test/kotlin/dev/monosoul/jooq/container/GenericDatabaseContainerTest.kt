@@ -24,7 +24,6 @@ import kotlin.streams.asStream
 
 @ExtendWith(MockKExtension::class)
 class GenericDatabaseContainerTest {
-
     private lateinit var image: Image
 
     private lateinit var database: Database.Internal
@@ -39,11 +38,12 @@ class GenericDatabaseContainerTest {
         database = Database.Internal()
         image = Image()
 
-        container = GenericDatabaseContainer(
-            image = image,
-            database = database,
-            jdbcAwareClassLoader = jdbcAwareClassLoader,
-        )
+        container =
+            GenericDatabaseContainer(
+                image = image,
+                database = database,
+                jdbcAwareClassLoader = jdbcAwareClassLoader,
+            )
     }
 
     @Test
@@ -62,21 +62,22 @@ class GenericDatabaseContainerTest {
     }
 
     @TestFactory
-    fun `should rethrow expected exceptions as no driver found exception`() = sequenceOf(
-        InstantiationException(),
-        IllegalAccessException(),
-        ClassNotFoundException(),
-    ).map { exception ->
-        dynamicTest("should rethrow ${exception::class.simpleName} as no driver found exception") {
-            // given
-            every { jdbcAwareClassLoader.loadClass(any()) } throws exception
+    fun `should rethrow expected exceptions as no driver found exception`() =
+        sequenceOf(
+            InstantiationException(),
+            IllegalAccessException(),
+            ClassNotFoundException(),
+        ).map { exception ->
+            dynamicTest("should rethrow ${exception::class.simpleName} as no driver found exception") {
+                // given
+                every { jdbcAwareClassLoader.loadClass(any()) } throws exception
 
-            // when && then
-            expectThrows<NoDriverFoundException> {
-                container.jdbcDriverInstance
-            }.message isEqualTo "Could not get Driver"
-        }
-    }.asStream()
+                // when && then
+                expectThrows<NoDriverFoundException> {
+                    container.jdbcDriverInstance
+                }.message isEqualTo "Could not get Driver"
+            }
+        }.asStream()
 
     @Test
     fun `should rethrow unexpected exceptions as is`() {
@@ -102,12 +103,13 @@ class GenericDatabaseContainerTest {
         }
 
         // when
-        val futures = (1..2).map {
-            threadPool.submit {
-                startLatch.countDown()
-                container.jdbcDriverInstance
+        val futures =
+            (1..2).map {
+                threadPool.submit {
+                    startLatch.countDown()
+                    container.jdbcDriverInstance
+                }
             }
-        }
         driverGetLatch.countDown()
         futures.forEach { it.get() }
         threadPool.shutdown()

@@ -7,23 +7,22 @@ import strikt.assertions.isEqualTo
 import strikt.java.exists
 
 class ZeroConfigurationJooqDockerPluginFunctionalTest : JooqDockerPluginFunctionalTestBase() {
-
     @Test
     fun `should generate jooq classes for PostgreSQL db with default config`() {
         // given
         prepareBuildGradleFile {
             """
-                plugins {
-                    id("dev.monosoul.jooq-docker")
-                }
+            plugins {
+                id("dev.monosoul.jooq-docker")
+            }
 
-                repositories {
-                    mavenCentral()
-                }
+            repositories {
+                mavenCentral()
+            }
 
-                dependencies {
-                    jooqCodegen("org.postgresql:postgresql:42.3.6")
-                }
+            dependencies {
+                jooqCodegen("org.postgresql:postgresql:42.3.6")
+            }
             """.trimIndent()
         }
         copyResource(from = "/V01__init.sql", to = "src/main/resources/db/migration/V01__init.sql")
@@ -35,7 +34,7 @@ class ZeroConfigurationJooqDockerPluginFunctionalTest : JooqDockerPluginFunction
         expect {
             that(result).generateJooqClassesTask.outcome isEqualTo SUCCESS
             that(
-                projectFile("build/generated-jooq/org/jooq/generated/tables/Foo.java")
+                projectFile("build/generated-jooq/org/jooq/generated/tables/Foo.java"),
             ).exists()
         }
     }

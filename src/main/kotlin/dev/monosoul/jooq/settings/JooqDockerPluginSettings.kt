@@ -10,9 +10,10 @@ import org.testcontainers.shaded.org.apache.commons.lang3.builder.HashCodeBuilde
 sealed class JooqDockerPluginSettings : SettingsElement {
     @get:Nested
     internal abstract val database: Database
+
     internal abstract fun runWithDatabaseCredentials(
         classloaders: CodegenClasspathAwareClassLoaders,
-        block: (CodegenClasspathAwareClassLoaders, DatabaseCredentials) -> Unit
+        block: (CodegenClasspathAwareClassLoaders, DatabaseCredentials) -> Unit,
     )
 
     internal abstract fun copy(): JooqDockerPluginSettings
@@ -28,13 +29,14 @@ sealed class JooqDockerPluginSettings : SettingsElement {
 
         override fun runWithDatabaseCredentials(
             classloaders: CodegenClasspathAwareClassLoaders,
-            block: (CodegenClasspathAwareClassLoaders, DatabaseCredentials) -> Unit
+            block: (CodegenClasspathAwareClassLoaders, DatabaseCredentials) -> Unit,
         ) {
-            val dbContainer = GenericDatabaseContainer(
-                image = image,
-                database = database,
-                jdbcAwareClassLoader = classloaders.buildscriptInclusive,
-            ).also { it.start() }
+            val dbContainer =
+                GenericDatabaseContainer(
+                    image = image,
+                    database = database,
+                    jdbcAwareClassLoader = classloaders.buildscriptInclusive,
+                ).also { it.start() }
 
             try {
                 block(
@@ -44,27 +46,30 @@ sealed class JooqDockerPluginSettings : SettingsElement {
                         jdbcUrl = dbContainer.jdbcUrl,
                         username = dbContainer.username,
                         password = dbContainer.password,
-                    )
+                    ),
                 )
             } finally {
                 dbContainer.stop()
             }
         }
 
-        override fun copy(): WithContainer = WithContainer(
-            database = database.run { copy(jdbc = jdbc.copy()) },
-            image = image.copy()
-        )
+        override fun copy(): WithContainer =
+            WithContainer(
+                database = database.run { copy(jdbc = jdbc.copy()) },
+                image = image.copy(),
+            )
 
         override fun db(customizer: Action<Database.Internal>) = customizer.execute(database)
+
         override fun image(customizer: Action<Image>) = customizer.execute(image)
 
         override fun equals(other: Any?) = reflectionEquals(this, other)
+
         override fun hashCode(): Int = reflectionHashCode(this)
     }
 
     class WithoutContainer private constructor(
-        override val database: Database.External
+        override val database: Database.External,
     ) : JooqDockerPluginSettings(), DbAware<Database.External> {
         constructor(customizer: Action<WithoutContainer> = Action<WithoutContainer> { }) : this(Database.External()) {
             customizer.execute(this)
@@ -72,7 +77,7 @@ sealed class JooqDockerPluginSettings : SettingsElement {
 
         override fun runWithDatabaseCredentials(
             classloaders: CodegenClasspathAwareClassLoaders,
-            block: (CodegenClasspathAwareClassLoaders, DatabaseCredentials) -> Unit
+            block: (CodegenClasspathAwareClassLoaders, DatabaseCredentials) -> Unit,
         ) {
             block(
                 classloaders,
@@ -80,18 +85,20 @@ sealed class JooqDockerPluginSettings : SettingsElement {
                     jdbcDriverClassName = database.jdbc.driverClassName,
                     jdbcUrl = database.getJdbcUrl(),
                     username = database.username,
-                    password = database.password
-                )
+                    password = database.password,
+                ),
             )
         }
 
-        override fun copy(): WithoutContainer = WithoutContainer(
-            database = database.run { copy(jdbc = jdbc.copy()) }
-        )
+        override fun copy(): WithoutContainer =
+            WithoutContainer(
+                database = database.run { copy(jdbc = jdbc.copy()) },
+            )
 
         override fun db(customizer: Action<Database.External>) = customizer.execute(database)
 
         override fun equals(other: Any?) = reflectionEquals(this, other)
+
         override fun hashCode(): Int = reflectionHashCode(this)
     }
 }

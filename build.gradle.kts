@@ -5,6 +5,7 @@ plugins {
     `coverage-convention`
     `shadow-convention`
     `test-fixtures-convention`
+    `linter-convention`
 }
 
 group = "dev.monosoul.jooq"
@@ -16,7 +17,7 @@ tasks {
         relocate("docker.client.strategy", "${project.group}.docker.client.strategy")
         relocate(
             "TESTCONTAINERS_DOCKER_CLIENT_STRATEGY",
-            "${project.group.toString().uppercase().replace(".", "_")}_TESTCONTAINERS_DOCKER_CLIENT_STRATEGY"
+            "${project.group.toString().uppercase().replace(".", "_")}_TESTCONTAINERS_DOCKER_CLIENT_STRATEGY",
         )
     }
 

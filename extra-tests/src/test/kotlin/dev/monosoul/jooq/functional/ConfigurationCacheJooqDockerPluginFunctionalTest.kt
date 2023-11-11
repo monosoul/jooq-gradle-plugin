@@ -12,7 +12,6 @@ import strikt.java.notExists
 import java.io.File
 
 class ConfigurationCacheJooqDockerPluginFunctionalTest : FunctionalTestBase() {
-
     @TempDir
     private lateinit var localBuildCacheDirectory: File
 
@@ -22,17 +21,17 @@ class ConfigurationCacheJooqDockerPluginFunctionalTest : FunctionalTestBase() {
         configureLocalGradleCache()
         prepareBuildGradleFile {
             """
-                plugins {
-                    id("dev.monosoul.jooq-docker")
-                }
+            plugins {
+                id("dev.monosoul.jooq-docker")
+            }
 
-                repositories {
-                    mavenCentral()
-                }
+            repositories {
+                mavenCentral()
+            }
 
-                dependencies {
-                    jooqCodegen("org.postgresql:postgresql:42.3.6")
-                }
+            dependencies {
+                jooqCodegen("org.postgresql:postgresql:42.3.6")
+            }
             """.trimIndent()
         }
         copyResource(from = "/V01__init.sql", to = "src/main/resources/db/migration/V01__init.sql")
@@ -57,7 +56,7 @@ class ConfigurationCacheJooqDockerPluginFunctionalTest : FunctionalTestBase() {
                 }
             }
             that(
-                projectFile("build/generated-jooq/org/jooq/generated/tables/Foo.java")
+                projectFile("build/generated-jooq/org/jooq/generated/tables/Foo.java"),
             ).exists()
         }
     }
@@ -68,29 +67,29 @@ class ConfigurationCacheJooqDockerPluginFunctionalTest : FunctionalTestBase() {
         configureLocalGradleCache()
         prepareBuildGradleFile {
             """
-                plugins {
-                    id("dev.monosoul.jooq-docker")
-                }
+            plugins {
+                id("dev.monosoul.jooq-docker")
+            }
 
-                repositories {
-                    mavenCentral()
+            repositories {
+                mavenCentral()
+            }
+            
+            tasks {
+                generateJooqClasses {
+                    schemas.set(listOf("public", "other"))
+                    usingXmlConfig()
                 }
-                
-                tasks {
-                    generateJooqClasses {
-                        schemas.set(listOf("public", "other"))
-                        usingXmlConfig()
-                    }
-                }
+            }
 
-                dependencies {
-                    jooqCodegen("org.postgresql:postgresql:42.3.6")
-                }
+            dependencies {
+                jooqCodegen("org.postgresql:postgresql:42.3.6")
+            }
             """.trimIndent()
         }
         copyResource(
             from = "/V01__init_multiple_schemas.sql",
-            to = "src/main/resources/db/migration/V01__init_multiple_schemas.sql"
+            to = "src/main/resources/db/migration/V01__init_multiple_schemas.sql",
         )
         copyResource(from = "/jooq-generator.xml", to = "src/main/resources/db/jooq.xml")
 
@@ -105,10 +104,10 @@ class ConfigurationCacheJooqDockerPluginFunctionalTest : FunctionalTestBase() {
                 get { output }.contains("Configuration cache entry stored")
             }
             that(
-                projectFile("build/generated-jooq/org/jooq/generated/public_/tables/Foo.java")
+                projectFile("build/generated-jooq/org/jooq/generated/public_/tables/Foo.java"),
             ).exists()
             that(
-                projectFile("build/generated-jooq/org/jooq/generated/other/tables/Bar.java")
+                projectFile("build/generated-jooq/org/jooq/generated/other/tables/Bar.java"),
             ).notExists()
         }
 
@@ -123,10 +122,10 @@ class ConfigurationCacheJooqDockerPluginFunctionalTest : FunctionalTestBase() {
                 get { output }.contains("Configuration cache entry reused")
             }
             that(
-                projectFile("build/generated-jooq/org/jooq/generated/public_/tables/Foo.java")
+                projectFile("build/generated-jooq/org/jooq/generated/public_/tables/Foo.java"),
             ).exists()
             that(
-                projectFile("build/generated-jooq/org/jooq/generated/other/tables/Bar.java")
+                projectFile("build/generated-jooq/org/jooq/generated/other/tables/Bar.java"),
             ).exists()
         }
     }
@@ -134,11 +133,11 @@ class ConfigurationCacheJooqDockerPluginFunctionalTest : FunctionalTestBase() {
     private fun configureLocalGradleCache() {
         writeProjectFile("settings.gradle.kts") {
             """
-                buildCache {
-                    local {
-                        directory = "${localBuildCacheDirectory.path}"
-                    }
+            buildCache {
+                local {
+                    directory = "${localBuildCacheDirectory.path}"
                 }
+            }
             """.trimIndent()
         }
     }

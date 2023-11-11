@@ -7,35 +7,34 @@ import strikt.assertions.isEqualTo
 import strikt.java.exists
 
 class RunContainerWithCommandJooqDockerPluginFunctionalTest : JooqDockerPluginFunctionalTestBase() {
-
     @Test
     fun `should support running DB containers with command`() {
         // given
         prepareBuildGradleFile {
             """
-                plugins {
-                    id("dev.monosoul.jooq-docker")
-                }
+            plugins {
+                id("dev.monosoul.jooq-docker")
+            }
 
-                repositories {
-                    mavenCentral()
-                }
-                
-                jooq {
-                    withContainer {
-                        image {
-                            command = "postgres -p 6666"
-                        }
+            repositories {
+                mavenCentral()
+            }
+            
+            jooq {
+                withContainer {
+                    image {
+                        command = "postgres -p 6666"
+                    }
 
-                        db {
-                            port = 6666
-                        }
+                    db {
+                        port = 6666
                     }
                 }
+            }
 
-                dependencies {
-                    jooqCodegen("org.postgresql:postgresql:42.3.6")
-                }
+            dependencies {
+                jooqCodegen("org.postgresql:postgresql:42.3.6")
+            }
             """.trimIndent()
         }
         copyResource(from = "/V01__init.sql", to = "src/main/resources/db/migration/V01__init.sql")
@@ -47,7 +46,7 @@ class RunContainerWithCommandJooqDockerPluginFunctionalTest : JooqDockerPluginFu
         expect {
             that(result).generateJooqClassesTask.outcome isEqualTo SUCCESS
             that(
-                projectFile("build/generated-jooq/org/jooq/generated/tables/Foo.java")
+                projectFile("build/generated-jooq/org/jooq/generated/tables/Foo.java"),
             ).exists()
         }
     }

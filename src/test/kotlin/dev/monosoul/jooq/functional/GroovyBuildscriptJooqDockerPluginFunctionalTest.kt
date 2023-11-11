@@ -10,43 +10,42 @@ import strikt.java.exists
 import strikt.java.notExists
 
 class GroovyBuildscriptJooqDockerPluginFunctionalTest : JooqDockerPluginFunctionalTestBase() {
-
     @Test
     fun `should respect global configuration regardless of declaration order`() {
         // given
         prepareBuildGradleFile("build.gradle") {
             // language=gradle
             """
-                plugins {
-                    id "dev.monosoul.jooq-docker"
-                }
+            plugins {
+                id "dev.monosoul.jooq-docker"
+            }
 
-                repositories {
-                    mavenCentral()
+            repositories {
+                mavenCentral()
+            }
+            
+            tasks {
+                generateJooqClasses {
+                    flywayProperties.put("flyway.placeholderReplacement", "false")
                 }
-                
-                tasks {
-                    generateJooqClasses {
-                        flywayProperties.put("flyway.placeholderReplacement", "false")
+            }
+            
+            jooq {
+                withContainer {
+                    image {
+                        name = "postgres:13.4-alpine"
                     }
                 }
-                
-                jooq {
-                    withContainer {
-                        image {
-                            name = "postgres:13.4-alpine"
-                        }
-                    }
-                }
+            }
 
-                dependencies {
-                    jooqCodegen "org.postgresql:postgresql:42.3.6"
-                }
+            dependencies {
+                jooqCodegen "org.postgresql:postgresql:42.3.6"
+            }
             """.trimIndent()
         }
         copyResource(
             from = "/V01__init_with_placeholders.sql",
-            to = "src/main/resources/db/migration/V01__init_with_placeholders.sql"
+            to = "src/main/resources/db/migration/V01__init_with_placeholders.sql",
         )
 
         // when
@@ -59,7 +58,7 @@ class GroovyBuildscriptJooqDockerPluginFunctionalTest : JooqDockerPluginFunction
                 get { output } contains "postgres:13.4-alpine"
             }
             that(
-                projectFile("build/generated-jooq/org/jooq/generated/tables/Foo.java")
+                projectFile("build/generated-jooq/org/jooq/generated/tables/Foo.java"),
             ).exists()
         }
     }
@@ -70,51 +69,51 @@ class GroovyBuildscriptJooqDockerPluginFunctionalTest : JooqDockerPluginFunction
         prepareBuildGradleFile("build.gradle") {
             // language=gradle
             """
-                plugins {
-                    id "dev.monosoul.jooq-docker"
-                }
+            plugins {
+                id "dev.monosoul.jooq-docker"
+            }
 
-                repositories {
-                    mavenCentral()
-                }
-                
-                jooq {
-                    withContainer {
-                        db {
-                            username = "customusername"
-                            password = "custompassword"
-                            
-                            jdbc {
-                                schema = "jdbc:postgresql"
-                            }
-                        }
-                        image {
-                            envVars = [
-                                "POSTGRES_USER": "customusername",
-                                "POSTGRES_PASSWORD": "custompassword",
-                                "POSTGRES_DB": "postgres"
-                            ]
+            repositories {
+                mavenCentral()
+            }
+            
+            jooq {
+                withContainer {
+                    db {
+                        username = "customusername"
+                        password = "custompassword"
+                        
+                        jdbc {
+                            schema = "jdbc:postgresql"
                         }
                     }
-                }
-
-                tasks {
-                    generateJooqClasses {
-                        flywayProperties.put("flyway.placeholderReplacement", "false")
-                        usingJavaConfig {
-                            database.withExcludes("BAR")
-                        }
+                    image {
+                        envVars = [
+                            "POSTGRES_USER": "customusername",
+                            "POSTGRES_PASSWORD": "custompassword",
+                            "POSTGRES_DB": "postgres"
+                        ]
                     }
                 }
+            }
 
-                dependencies {
-                    jooqCodegen "org.postgresql:postgresql:42.3.6"
+            tasks {
+                generateJooqClasses {
+                    flywayProperties.put("flyway.placeholderReplacement", "false")
+                    usingJavaConfig {
+                        database.withExcludes("BAR")
+                    }
                 }
+            }
+
+            dependencies {
+                jooqCodegen "org.postgresql:postgresql:42.3.6"
+            }
             """.trimIndent()
         }
         copyResource(
             from = "/V01__init_with_placeholders.sql",
-            to = "src/main/resources/db/migration/V01__init_with_placeholders.sql"
+            to = "src/main/resources/db/migration/V01__init_with_placeholders.sql",
         )
         copyResource(from = "/V02__add_bar.sql", to = "src/main/resources/db/migration/V02__add_bar.sql")
 
@@ -125,10 +124,10 @@ class GroovyBuildscriptJooqDockerPluginFunctionalTest : JooqDockerPluginFunction
         expect {
             that(result).generateJooqClassesTask.outcome isEqualTo SUCCESS
             that(
-                projectFile("build/generated-jooq/org/jooq/generated/tables/Foo.java")
+                projectFile("build/generated-jooq/org/jooq/generated/tables/Foo.java"),
             ).exists()
             that(
-                projectFile("build/generated-jooq/org/jooq/generated/tables/Bar.java")
+                projectFile("build/generated-jooq/org/jooq/generated/tables/Bar.java"),
             ).notExists()
         }
     }
@@ -140,65 +139,66 @@ class GroovyBuildscriptJooqDockerPluginFunctionalTest : JooqDockerPluginFunction
         prepareBuildGradleFile("build.gradle") {
             // language=gradle
             """
-                plugins {
-                    id "dev.monosoul.jooq-docker"
-                }
+            plugins {
+                id "dev.monosoul.jooq-docker"
+            }
 
-                repositories {
-                    mavenCentral()
-                }
-                
-                jooq {
-                    withoutContainer {
-                        db {
-                            username = "${postgresContainer.username}"
-                            password = "${postgresContainer.password}"
-                            name = "${postgresContainer.databaseName}"
-                            host = "${postgresContainer.host}"
-                            port = ${postgresContainer.firstMappedPort}
-                            
-                            jdbc {
-                                schema = "jdbc:postgresql"
-                            }
+            repositories {
+                mavenCentral()
+            }
+            
+            jooq {
+                withoutContainer {
+                    db {
+                        username = "${postgresContainer.username}"
+                        password = "${postgresContainer.password}"
+                        name = "${postgresContainer.databaseName}"
+                        host = "${postgresContainer.host}"
+                        port = ${postgresContainer.firstMappedPort}
+                        
+                        jdbc {
+                            schema = "jdbc:postgresql"
                         }
                     }
                 }
+            }
 
-                tasks {
-                    generateJooqClasses {
-                        flywayProperties.put("flyway.placeholderReplacement", "false")
-                        usingJavaConfig {
-                            database.withExcludes("BAR")
-                        }
+            tasks {
+                generateJooqClasses {
+                    flywayProperties.put("flyway.placeholderReplacement", "false")
+                    usingJavaConfig {
+                        database.withExcludes("BAR")
                     }
                 }
+            }
 
-                dependencies {
-                    jooqCodegen "org.postgresql:postgresql:42.3.6"
-                }
+            dependencies {
+                jooqCodegen "org.postgresql:postgresql:42.3.6"
+            }
             """.trimIndent()
         }
         copyResource(
             from = "/V01__init_with_placeholders.sql",
-            to = "src/main/resources/db/migration/V01__init_with_placeholders.sql"
+            to = "src/main/resources/db/migration/V01__init_with_placeholders.sql",
         )
         copyResource(from = "/V02__add_bar.sql", to = "src/main/resources/db/migration/V02__add_bar.sql")
 
         // when
-        val result = try {
-            runGradleWithArguments("generateJooqClasses")
-        } finally {
-            postgresContainer.stop()
-        }
+        val result =
+            try {
+                runGradleWithArguments("generateJooqClasses")
+            } finally {
+                postgresContainer.stop()
+            }
 
         // then
         expect {
             that(result).generateJooqClassesTask.outcome isEqualTo SUCCESS
             that(
-                projectFile("build/generated-jooq/org/jooq/generated/tables/Foo.java")
+                projectFile("build/generated-jooq/org/jooq/generated/tables/Foo.java"),
             ).exists()
             that(
-                projectFile("build/generated-jooq/org/jooq/generated/tables/Bar.java")
+                projectFile("build/generated-jooq/org/jooq/generated/tables/Bar.java"),
             ).notExists()
         }
     }
@@ -209,31 +209,31 @@ class GroovyBuildscriptJooqDockerPluginFunctionalTest : JooqDockerPluginFunction
         prepareBuildGradleFile("build.gradle") {
             // language=gradle
             """
-                plugins {
-                    id "dev.monosoul.jooq-docker"
-                }
+            plugins {
+                id "dev.monosoul.jooq-docker"
+            }
 
-                repositories {
-                    mavenCentral()
-                }
+            repositories {
+                mavenCentral()
+            }
 
-                tasks {
-                    generateJooqClasses {
-                        flywayProperties.put("flyway.placeholderReplacement", "false")
-                        usingXmlConfig(project.layout.projectDirectory.file("src/main/resources/db/jooq.xml")) {
-                            database.withExcludes("BAR")
-                        }
+            tasks {
+                generateJooqClasses {
+                    flywayProperties.put("flyway.placeholderReplacement", "false")
+                    usingXmlConfig(project.layout.projectDirectory.file("src/main/resources/db/jooq.xml")) {
+                        database.withExcludes("BAR")
                     }
                 }
+            }
 
-                dependencies {
-                    jooqCodegen "org.postgresql:postgresql:42.3.6"
-                }
+            dependencies {
+                jooqCodegen "org.postgresql:postgresql:42.3.6"
+            }
             """.trimIndent()
         }
         copyResource(
             from = "/V01__init_with_placeholders.sql",
-            to = "src/main/resources/db/migration/V01__init_with_placeholders.sql"
+            to = "src/main/resources/db/migration/V01__init_with_placeholders.sql",
         )
         copyResource(from = "/V02__add_bar.sql", to = "src/main/resources/db/migration/V02__add_bar.sql")
         copyResource(from = "/jooq-generator.xml", to = "src/main/resources/db/jooq.xml")
@@ -245,10 +245,10 @@ class GroovyBuildscriptJooqDockerPluginFunctionalTest : JooqDockerPluginFunction
         expect {
             that(result).generateJooqClassesTask.outcome isEqualTo SUCCESS
             that(
-                projectFile("build/generated-jooq/org/jooq/generated/tables/Foo.java")
+                projectFile("build/generated-jooq/org/jooq/generated/tables/Foo.java"),
             ).exists()
             that(
-                projectFile("build/generated-jooq/org/jooq/generated/tables/Bar.java")
+                projectFile("build/generated-jooq/org/jooq/generated/tables/Bar.java"),
             ).notExists()
         }
     }
@@ -260,46 +260,46 @@ class GroovyBuildscriptJooqDockerPluginFunctionalTest : JooqDockerPluginFunction
         prepareBuildGradleFile("build.gradle") {
             // language=gradle
             """
-                import dev.monosoul.jooq.GenerateJooqClassesTask
-                import dev.monosoul.jooq.RecommendedVersions
-                
-                plugins {
-                    id "org.jetbrains.kotlin.jvm" version "1.6.21"
-                    id "dev.monosoul.jooq-docker"
-                }
+            import dev.monosoul.jooq.GenerateJooqClassesTask
+            import dev.monosoul.jooq.RecommendedVersions
+            
+            plugins {
+                id "org.jetbrains.kotlin.jvm" version "1.6.21"
+                id "dev.monosoul.jooq-docker"
+            }
 
-                repositories {
-                    mavenCentral()
+            repositories {
+                mavenCentral()
+            }
+            
+            tasks {
+                generateJooqClasses {
+                    basePackageName.set("org.jooq.generated.local")
+                    outputDirectory.set(project.layout.buildDirectory.dir("local"))
                 }
+            }
+            
+            tasks.register('generateJooqClassesForExternal', GenerateJooqClassesTask) {
+                basePackageName.set("org.jooq.generated.remote")
+                outputDirectory.set(project.layout.buildDirectory.dir("remote"))
+                includeFlywayTable.set(true)
                 
-                tasks {
-                    generateJooqClasses {
-                        basePackageName.set("org.jooq.generated.local")
-                        outputDirectory.set(project.layout.buildDirectory.dir("local"))
+                withoutContainer {
+                    db {
+                        username = "${postgresContainer.username}"
+                        password = "${postgresContainer.password}"
+                        name = "${postgresContainer.databaseName}"
+                        host = "${postgresContainer.host}"
+                        port = ${postgresContainer.firstMappedPort}
                     }
                 }
-                
-                tasks.register('generateJooqClassesForExternal', GenerateJooqClassesTask) {
-                    basePackageName.set("org.jooq.generated.remote")
-                    outputDirectory.set(project.layout.buildDirectory.dir("remote"))
-                    includeFlywayTable.set(true)
-                    
-                    withoutContainer {
-                        db {
-                            username = "${postgresContainer.username}"
-                            password = "${postgresContainer.password}"
-                            name = "${postgresContainer.databaseName}"
-                            host = "${postgresContainer.host}"
-                            port = ${postgresContainer.firstMappedPort}
-                        }
-                    }
-                }
+            }
 
-                dependencies {
-                    implementation("org.jetbrains.kotlin:kotlin-stdlib")
-                    jooqCodegen("org.postgresql:postgresql:42.3.6")
-                    implementation("org.jooq:jooq:" + RecommendedVersions.JOOQ_VERSION)
-                }
+            dependencies {
+                implementation("org.jetbrains.kotlin:kotlin-stdlib")
+                jooqCodegen("org.postgresql:postgresql:42.3.6")
+                implementation("org.jooq:jooq:" + RecommendedVersions.JOOQ_VERSION)
+            }
             """.trimIndent()
         }
         copyResource(from = "/V01__init.sql", to = "src/main/resources/db/migration/V01__init.sql")
@@ -312,13 +312,13 @@ class GroovyBuildscriptJooqDockerPluginFunctionalTest : JooqDockerPluginFunction
         expect {
             that(result).generateJooqClassesTask.outcome isEqualTo SUCCESS
             that(
-                projectFile("build/local/org/jooq/generated/local/tables/Foo.java")
+                projectFile("build/local/org/jooq/generated/local/tables/Foo.java"),
             ).exists()
             that(
-                projectFile("build/remote/org/jooq/generated/remote/tables/Foo.java")
+                projectFile("build/remote/org/jooq/generated/remote/tables/Foo.java"),
             ).exists()
             that(
-                projectFile("build/remote/org/jooq/generated/remote/tables/FlywaySchemaHistory.java")
+                projectFile("build/remote/org/jooq/generated/remote/tables/FlywaySchemaHistory.java"),
             ).exists()
         }
     }

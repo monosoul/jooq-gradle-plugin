@@ -30,7 +30,10 @@ sealed class Database : JdbcAware, SettingsElement {
         override var port: Int = 5432,
         override val jdbc: Jdbc = Jdbc(),
     ) : Database() {
-        internal fun getJdbcUrl(host: String, port: Int) = "${jdbc.schema}://$host:$port/$name${jdbc.urlQueryParams}"
+        internal fun getJdbcUrl(
+            host: String,
+            port: Int,
+        ) = "${jdbc.schema}://$host:$port/$name${jdbc.urlQueryParams}"
     }
 
     data class External(

@@ -47,9 +47,8 @@ sealed class MigrationLocation {
         /**
          * One or multiple locations of migration SQL scripts
          */
-        override val path: FileCollection
+        override val path: FileCollection,
     ) : MigrationLocation() {
-
         /**
          * Migration locations in Flyway accepted format.
          *
@@ -57,6 +56,7 @@ sealed class MigrationLocation {
          */
         @get:Internal
         override val locations: List<String> get() = path.map { "${Location.FILESYSTEM_PREFIX}${it.absolutePath}" }
+
         override fun extraClasspath(): List<URL> = emptyList()
     }
 
@@ -110,7 +110,7 @@ sealed class MigrationLocation {
      */
     data class Classpath(
         override val path: FileCollection,
-        private val classpathLocations: List<String>
+        private val classpathLocations: List<String>,
     ) : MigrationLocation() {
         override val locations: List<String> = classpathLocations.map { "classpath:$it" }
 
@@ -119,7 +119,7 @@ sealed class MigrationLocation {
          */
         constructor(
             path: FileCollection,
-            classpathLocation: String
+            classpathLocation: String,
         ) : this(path, listOf(classpathLocation))
 
         /**
@@ -128,13 +128,14 @@ sealed class MigrationLocation {
         @Suppress("unused")
         constructor(path: FileCollection) : this(path, "/db/migration")
 
-        override fun extraClasspath(): List<URL> = path.asSequence()
-            .flatMap { file ->
-                listOf(file).plus(
-                    file.listFiles { _, name -> name.endsWith(".jar") }?.asList() ?: emptyList()
-                )
-            }
-            .map { it.toURI().toURL() }
-            .toList()
+        override fun extraClasspath(): List<URL> =
+            path.asSequence()
+                .flatMap { file ->
+                    listOf(file).plus(
+                        file.listFiles { _, name -> name.endsWith(".jar") }?.asList() ?: emptyList(),
+                    )
+                }
+                .map { it.toURI().toURL() }
+                .toList()
     }
 }

@@ -8,6 +8,7 @@
 plugins {
     `kotlin-dsl`
     `kotlin-convention`
+    `linter-convention`
 }
 
 dependencies {

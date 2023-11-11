@@ -51,7 +51,7 @@
         "io.strikt:",
         "io.mockk:",
         "ch.qos.logback:",
-        "com.pinterest.ktlint:ktlint-cli:"
+        "com.pinterest.ktlint:"
       ]
     },
     {

@@ -2,7 +2,6 @@ package dev.monosoul.jooq.codegen
 
 import dev.monosoul.jooq.migration.SchemaVersion
 import dev.monosoul.jooq.settings.DatabaseCredentials
-import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.FileContents
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.MapProperty
@@ -28,7 +27,6 @@ import java.io.InputStream
 
 internal class ConfigurationProvider(
     private val basePackageName: Property<String>,
-    private val outputDirectory: DirectoryProperty,
     private val outputSchemaToDefault: SetProperty<String>,
     private val schemaToPackageMapping: MapProperty<String, String>,
     private val schemas: ListProperty<String>,
@@ -66,7 +64,7 @@ internal class ConfigurationProvider(
     private fun codeGenTarget() =
         Target()
             .withPackageName(basePackageName.get())
-            .withDirectory(outputDirectory.asFile.get().toString())
+            .withDirectory("./generated-jooq-placeholder")
             .withEncoding("UTF-8")
             .withClean(true)
 

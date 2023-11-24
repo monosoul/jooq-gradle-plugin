@@ -13,6 +13,7 @@ import dev.monosoul.jooq.settings.JooqDockerPluginSettings.WithoutContainer
 import dev.monosoul.jooq.settings.SettingsAware
 import dev.monosoul.jooq.util.CodegenClasspathAwareClassLoaders
 import dev.monosoul.jooq.util.callWith
+import dev.monosoul.jooq.util.copy
 import dev.monosoul.jooq.util.getCodegenLogging
 import groovy.lang.Closure
 import org.gradle.api.Action
@@ -162,7 +163,6 @@ open class GenerateJooqClassesTask
         private val configurationProvider =
             ConfigurationProvider(
                 basePackageName = basePackageName,
-                outputDirectory = outputDirectory,
                 outputSchemaToDefault = outputSchemaToDefault,
                 schemaToPackageMapping = schemaToPackageMapping,
                 schemas = schemas,
@@ -254,7 +254,7 @@ open class GenerateJooqClassesTask
             codegenRunner.generateJooqClasses(
                 codegenAwareClassLoader = jdbcAwareClassLoader,
                 configuration =
-                    _generatorConfig.get().value.postProcess(
+                    _generatorConfig.get().value.copy().postProcess(
                         schemaVersion = schemaVersion,
                         credentials = credentials,
                         extraTableExclusions =
@@ -262,6 +262,7 @@ open class GenerateJooqClassesTask
                                 migrationRunner.flywayTableName.takeUnless { includeFlywayTable.get() },
                             ),
                     ),
+                outputDirectory = outputDirectory,
             )
         }
 

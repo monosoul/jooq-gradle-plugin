@@ -14,13 +14,15 @@ abstract class FunctionalTestBase {
     private lateinit var projectDir: File
 
     protected open fun recreateProjectDir() {
-        projectDir.deleteRecursively()
-        projectDir.mkdirs()
+        projectDir.recreate()
     }
 
-    protected fun runGradleWithArguments(vararg arguments: String): BuildResult =
+    protected fun runGradleWithArguments(
+        vararg arguments: String,
+        projectDirectory: File = projectDir,
+    ): BuildResult =
         GradleRunner.create()
-            .withProjectDir(projectDir)
+            .withProjectDir(projectDirectory)
             .withPluginClasspath()
             .forwardOutput()
             .withArguments(*arguments, "--stacktrace", "--info")
@@ -29,27 +31,19 @@ abstract class FunctionalTestBase {
     protected fun copyResource(
         from: String,
         to: String,
-    ) {
-        val destinationFile = projectFile(to)
-        javaClass.getResourceAsStream(from)?.use { sourceStream ->
-            FileOutputStream(destinationFile).use { destinationStream ->
-                sourceStream.copyTo(destinationStream)
-            }
-        } ?: throw IllegalStateException("Resource not found: $from")
-    }
+    ) = projectDir.copy(from, to)
 
     protected fun prepareBuildGradleFile(
         scriptName: String = "build.gradle.kts",
         scriptSupplier: () -> String,
-    ) = writeProjectFile(scriptName, scriptSupplier)
+    ) = projectDir.writeBuildGradleFile(scriptName, scriptSupplier)
 
     protected fun writeProjectFile(
         fileName: String,
         bodySupplier: () -> String,
-    ) = projectFile(fileName)
-        .writeText(bodySupplier())
+    ) = projectDir.writeChild(fileName, bodySupplier)
 
-    protected fun projectFile(fileName: String) = File(projectDir, fileName).also { it.parentFile.mkdirs() }
+    protected fun projectFile(fileName: String) = projectDir.getChild(fileName)
 
     protected fun Assertion.Builder<BuildResult>.getTask(taskName: String) =
         get { task(":$taskName") }
@@ -60,4 +54,34 @@ abstract class FunctionalTestBase {
     protected fun Assertion.Builder<BuildResult>.getTaskOutcome(taskName: String) = getTask(taskName).outcome
 
     protected val Assertion.Builder<BuildResult>.generateJooqClassesTask get() = getTask("generateJooqClasses")
+
+    protected fun File.recreate() {
+        deleteRecursively()
+        mkdirs()
+    }
+
+    protected fun File.getChild(fileName: String) = File(this, fileName).also { it.parentFile.mkdirs() }
+
+    protected fun File.writeChild(
+        fileName: String,
+        bodySupplier: () -> String,
+    ) = getChild(fileName)
+        .writeText(bodySupplier())
+
+    protected fun File.writeBuildGradleFile(
+        scriptName: String = "build.gradle.kts",
+        scriptSupplier: () -> String,
+    ) = writeChild(scriptName, scriptSupplier)
+
+    protected fun File.copy(
+        from: String,
+        to: String,
+    ) {
+        val destinationFile = getChild(to)
+        this@FunctionalTestBase.javaClass.getResourceAsStream(from)?.use { sourceStream ->
+            FileOutputStream(destinationFile).use { destinationStream ->
+                sourceStream.copyTo(destinationStream)
+            }
+        } ?: throw IllegalStateException("Resource not found: $from")
+    }
 }

@@ -17,7 +17,7 @@ junit-jupiter = { module = "org.junit.jupiter:junit-jupiter" }
 strikt = "io.strikt:strikt-jvm:0.34.1"
 mockk = "io.mockk:mockk-jvm:1.13.9"
 
-ktlint = "com.pinterest.ktlint:ktlint-cli:1.1.0"
+ktlint = "com.pinterest.ktlint:ktlint-cli:1.1.1"
 
 # plugins
 gradle-plugin-publish = "com.gradle.publish:plugin-publish-plugin:1.2.1"

@@ -1,7 +1,7 @@
 [versions]
 jooq = "3.19.3"
 flyway = "10.6.0"
-testcontainers = "1.19.3"
+testcontainers = "1.19.4"
 jna = "5.14.0"
 
 [libraries]

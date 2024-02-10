@@ -17,7 +17,7 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
       - name: Run tests
-        uses: gradle/gradle-build-action@v3
+        uses: gradle/actions/setup-gradle@v3
         with:
           arguments: |
             --stacktrace
@@ -30,7 +30,7 @@ jobs:
           report_paths: '**/build/test-results/**/TEST-*.xml'
           annotate_notice: false
       - name: Publish plugin
-        uses: gradle/gradle-build-action@v3
+        uses: gradle/actions/setup-gradle@v3
         env:
           ORG_GRADLE_PROJECT_signingKeyId: ${{ secrets.OSSRH_GPG_SECRET_KEY_ID }}
           ORG_GRADLE_PROJECT_signingKey: ${{ secrets.OSSRH_GPG_SECRET_KEY }}

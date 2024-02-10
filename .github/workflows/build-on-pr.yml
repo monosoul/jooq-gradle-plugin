@@ -19,13 +19,13 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
       - name: Run tests
-        uses: gradle/gradle-build-action@v3
+        uses: gradle/actions/setup-gradle@v3
         with:
           arguments: |
             --stacktrace
             check jacocoTestReport
       - name: Test publishing
-        uses: gradle/gradle-build-action@v3
+        uses: gradle/actions/setup-gradle@v3
         with:
           arguments: |
             --stacktrace
@@ -57,7 +57,7 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
       - name: Publish plugin
-        uses: gradle/gradle-build-action@v3
+        uses: gradle/actions/setup-gradle@v3
         with:
           arguments: |
             -Pversion=SNAPSHOT-${{ github.sha }}

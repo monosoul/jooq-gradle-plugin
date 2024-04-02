@@ -70,7 +70,9 @@
   "automerge": true,
   "automergeStrategy": "squash",
   "platformAutomerge": true,
-  "ignoreDeps": [],
+  "ignoreDeps": [
+    "gradle"
+  ],
   "reviewers": [
     "monosoul"
   ]

@@ -64,9 +64,10 @@ dependencies {
 }
 
 val functionalTestSuiteName = "functionalTest"
+val extraTestSuiteName = "extraTest"
 
+@Suppress("UnstableApiUsage")
 testing {
-    @Suppress("UnstableApiUsage")
     suites {
         register<JvmTestSuite>(functionalTestSuiteName) {
             useJUnitJupiter()
@@ -95,6 +96,34 @@ testing {
                 }
             }
         }
+
+        register<JvmTestSuite>(extraTestSuiteName) {
+            /**
+             * This test suite is required because Gradle doesn't support Java agents
+             * when using TestKit with configuration cache enabled
+             *
+             * https://docs.gradle.org/7.5.1/userguide/configuration_cache.html#config_cache:not_yet_implemented:testkit_build_with_java_agent
+             */
+
+            useJUnitJupiter()
+            dependencies {
+                implementation(project())
+                implementation(testFixtures(project()))
+                runtimeOnly(files(tasks.pluginUnderTestMetadata))
+            }
+
+            targets {
+                all {
+                    testTask.configure {
+                        dependsOn(tasks.pluginUnderTestMetadata)
+                        shouldRunAfter(tasks.test)
+                        extensions.configure<JacocoTaskExtension> {
+                            isEnabled = false
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -103,5 +132,5 @@ jacocoTestKit {
 }
 
 tasks.check {
-    dependsOn(tasks.named(functionalTestSuiteName))
+    dependsOn(tasks.named(functionalTestSuiteName), tasks.named(extraTestSuiteName))
 }

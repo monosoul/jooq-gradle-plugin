@@ -6,7 +6,7 @@ import strikt.api.expect
 import strikt.assertions.isEqualTo
 import strikt.java.exists
 
-class ConfigurabilityJooqDockerPluginFunctionalTest : JooqDockerPluginFunctionalTestBase() {
+class ConfigurabilityJooqDockerPluginFunctionalTest : dev.monosoul.jooq.functional.JooqDockerPluginFunctionalTestBase() {
     @Test
     fun `should generate jooq classes for PostgreSQL db with default config for multiple schemas`() {
         // given

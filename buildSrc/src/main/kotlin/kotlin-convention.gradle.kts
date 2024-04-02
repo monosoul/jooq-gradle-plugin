@@ -18,6 +18,15 @@ java {
     targetCompatibility = targetJava
 }
 
+testing {
+    suites {
+        @Suppress("UnstableApiUsage")
+        named<JvmTestSuite>("test") {
+            useJUnitJupiter()
+        }
+    }
+}
+
 tasks {
     withType<Test> {
         useJUnitPlatform()

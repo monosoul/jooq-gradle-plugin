@@ -1,3 +1,6 @@
+import java.lang.Thread.sleep
+import java.time.Duration
+
 plugins {
     `kotlin-dsl`
     `kotlin-convention`
@@ -58,4 +61,76 @@ dependencies {
     testFixturesApi(libs.strikt)
     testFixturesApi(libs.mockk)
     testFixturesApi(gradleTestKit())
+}
+
+val functionalTestSuiteName = "functionalTest"
+val extraTestSuiteName = "extraTest"
+
+@Suppress("UnstableApiUsage")
+testing {
+    suites {
+        register<JvmTestSuite>(functionalTestSuiteName) {
+            useJUnitJupiter()
+            dependencies {
+                implementation(project())
+                implementation(testFixtures(project()))
+                runtimeOnly(files(tasks.pluginUnderTestMetadata))
+            }
+
+            targets {
+                all {
+                    testTask.configure {
+                        dependsOn(tasks.pluginUnderTestMetadata)
+                        shouldRunAfter(tasks.test)
+                        extensions.configure<JacocoTaskExtension> {
+                            isEnabled = false
+                        }
+
+                        // workaround for https://github.com/gradle/gradle/issues/16603
+                        doLast {
+                            sleep(
+                                Duration.ofSeconds(2).toMillis(),
+                            )
+                        }
+                    }
+                }
+            }
+        }
+
+        register<JvmTestSuite>(extraTestSuiteName) {
+            /**
+             * This test suite is required because Gradle doesn't support Java agents
+             * when using TestKit with configuration cache enabled
+             *
+             * https://docs.gradle.org/7.5.1/userguide/configuration_cache.html#config_cache:not_yet_implemented:testkit_build_with_java_agent
+             */
+
+            useJUnitJupiter()
+            dependencies {
+                implementation(project())
+                implementation(testFixtures(project()))
+                runtimeOnly(files(tasks.pluginUnderTestMetadata))
+            }
+
+            targets {
+                all {
+                    testTask.configure {
+                        dependsOn(tasks.pluginUnderTestMetadata)
+                        shouldRunAfter(tasks.test)
+                        extensions.configure<JacocoTaskExtension> {
+                            isEnabled = false
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+jacocoTestKit {
+    applyTo("${functionalTestSuiteName}RuntimeOnly", tasks.named(functionalTestSuiteName))
+}
+
+tasks.check {
+    dependsOn(tasks.named(functionalTestSuiteName), tasks.named(extraTestSuiteName))
 }

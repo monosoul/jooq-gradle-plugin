@@ -37,6 +37,13 @@ jobs:
           check_name: JUnit Test Report
           report_paths: '**/build/test-results/**/TEST-*.xml'
           annotate_notice: false
+      - name: Publish Coverage Report
+        id: jacoco
+        uses: madrapps/jacoco-report@v1.6.1
+        with:
+          paths: |
+            ${{ github.workspace }}/**/build/reports/jacoco/**/jacocoTestReport.xml
+          token: ${{ github.token }}
       - name: Coverage Report
         uses: codecov/codecov-action@v4
         with:

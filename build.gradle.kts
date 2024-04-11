@@ -24,6 +24,13 @@ tasks {
         )
     }
 
+    withType<Jar> {
+        outputs.cacheIf { System.getenv("ENABLE_JAR_CACHING")?.lowercase() == "true" }
+        if (System.getenv("ENABLE_JAR_CACHING")?.lowercase() == "true") {
+            outputs.doNotCacheIfSpecs.clear()
+        }
+    }
+
     assemble {
         dependsOn(shadowJar)
     }

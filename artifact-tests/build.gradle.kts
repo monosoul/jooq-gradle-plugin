@@ -22,6 +22,16 @@ tasks {
         dependsOn(publishAllPublicationsToLocalBuildRepository)
 
         from(rootProject.layout.buildDirectory.dir(localRepositoryDirName))
+        exclude(
+            "**/*.module",
+            "**/maven-metadata.xml",
+            "**/*-javadoc.jar",
+            "**/*-sources.jar",
+            "**/*.md5",
+            "**/*.sha1",
+            "**/*.sha256",
+            "**/*.sha512",
+        )
         into(layout.buildDirectory.dir(localRepositoryDirName))
     }
 

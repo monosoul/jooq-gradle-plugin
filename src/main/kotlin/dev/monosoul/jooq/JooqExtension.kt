@@ -18,9 +18,11 @@ open class JooqExtension
     constructor(
         private val propertiesProvider: Provider<Map<String, String>>,
         objectFactory: ObjectFactory,
-    ) : Serializable, SettingsAware {
+    ) : Serializable,
+        SettingsAware {
         internal val pluginSettings: Property<JooqDockerPluginSettings> =
-            objectFactory.property<JooqDockerPluginSettings>()
+            objectFactory
+                .property<JooqDockerPluginSettings>()
                 .convention(
                     propertiesProvider.map {
                         WithContainer().applyPropertiesFrom(it)

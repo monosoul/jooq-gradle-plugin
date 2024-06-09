@@ -21,7 +21,9 @@ sealed class JooqDockerPluginSettings : SettingsElement {
     class WithContainer private constructor(
         override val database: Database.Internal,
         @get:Nested internal val image: Image,
-    ) : JooqDockerPluginSettings(), DbAware<Database.Internal>, ImageAware {
+    ) : JooqDockerPluginSettings(),
+        DbAware<Database.Internal>,
+        ImageAware {
         private constructor(database: Database.Internal) : this(database, Image(database))
         constructor(customizer: Action<WithContainer> = Action<WithContainer> { }) : this(Database.Internal()) {
             customizer.execute(this)
@@ -70,7 +72,8 @@ sealed class JooqDockerPluginSettings : SettingsElement {
 
     class WithoutContainer private constructor(
         override val database: Database.External,
-    ) : JooqDockerPluginSettings(), DbAware<Database.External> {
+    ) : JooqDockerPluginSettings(),
+        DbAware<Database.External> {
         constructor(customizer: Action<WithoutContainer> = Action<WithoutContainer> { }) : this(Database.External()) {
             customizer.execute(this)
         }

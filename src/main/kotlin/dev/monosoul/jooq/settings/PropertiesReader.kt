@@ -70,11 +70,14 @@ internal object PropertiesReader {
         pluginProperties.findAndSetProperty(prefix, ::testQuery)
 
         val envVarsPrefix = "$prefix${::envVars.name}."
-        pluginProperties.filterKeys { it.startsWith(envVarsPrefix) }.map { (key, value) ->
-            key.removePrefix(envVarsPrefix) to value.toString()
-        }.takeIf { it.isNotEmpty() }?.also {
-            envVars = it.toMap()
-        }
+        pluginProperties
+            .filterKeys { it.startsWith(envVarsPrefix) }
+            .map { (key, value) ->
+                key.removePrefix(envVarsPrefix) to value.toString()
+            }.takeIf { it.isNotEmpty() }
+            ?.also {
+                envVars = it.toMap()
+            }
     }
 
     @Suppress("UNCHECKED_CAST")

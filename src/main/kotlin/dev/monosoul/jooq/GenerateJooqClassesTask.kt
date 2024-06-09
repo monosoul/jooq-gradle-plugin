@@ -52,7 +52,8 @@ open class GenerateJooqClassesTask
         private val providerFactory: ProviderFactory,
         private val fsOperations: FileSystemOperations,
         private val projectLayout: ProjectLayout,
-    ) : DefaultTask(), SettingsAware {
+    ) : DefaultTask(),
+        SettingsAware {
         /**
          * List of schemas to take into account when running migrations and generating code.
          */
@@ -91,9 +92,10 @@ open class GenerateJooqClassesTask
 
         private val _generatorConfig =
             objectFactory.property<PrivateValueHolder<Configuration>>().convention(
-                providerFactory.provider {
-                    configurationProvider.defaultConfiguration()
-                }.map(::PrivateValueHolder),
+                providerFactory
+                    .provider {
+                        configurationProvider.defaultConfiguration()
+                    }.map(::PrivateValueHolder),
             )
 
         /**
@@ -199,9 +201,11 @@ open class GenerateJooqClassesTask
             customizer: Action<Generator> = Action<Generator> { },
         ) {
             _generatorConfig.set(
-                configurationProvider.fromXml(providerFactory.fileContents(file)).map { config ->
-                    config.also { customizer.execute(it.generator) }
-                }.map(::PrivateValueHolder),
+                configurationProvider
+                    .fromXml(providerFactory.fileContents(file))
+                    .map { config ->
+                        config.also { customizer.execute(it.generator) }
+                    }.map(::PrivateValueHolder),
             )
         }
 
@@ -220,11 +224,12 @@ open class GenerateJooqClassesTask
         @Suppress("unused")
         fun usingJavaConfig(customizer: Action<Generator>) {
             _generatorConfig.set(
-                providerFactory.provider {
-                    configurationProvider.defaultConfiguration().also {
-                        customizer.execute(it.generator)
-                    }
-                }.map(::PrivateValueHolder),
+                providerFactory
+                    .provider {
+                        configurationProvider.defaultConfiguration().also {
+                            customizer.execute(it.generator)
+                        }
+                    }.map(::PrivateValueHolder),
             )
         }
 
@@ -236,7 +241,9 @@ open class GenerateJooqClassesTask
 
         @TaskAction
         fun generateClasses() {
-            _pluginSettings.get().value
+            _pluginSettings
+                .get()
+                .value
                 .runWithDatabaseCredentials(classLoaders()) { classLoaders, credentials ->
                     val schemaVersion = migrationRunner.migrateDb(classLoaders, credentials)
                     generateJooqClasses(classLoaders, credentials, schemaVersion)

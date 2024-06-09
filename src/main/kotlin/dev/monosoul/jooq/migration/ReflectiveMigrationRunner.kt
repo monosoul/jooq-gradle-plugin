@@ -9,7 +9,9 @@ import kotlin.reflect.KFunction2
 import kotlin.reflect.KFunction4
 import kotlin.reflect.jvm.jvmName
 
-internal class ReflectiveMigrationRunner(codegenAwareClassLoader: ClassLoader) : MigrationRunner {
+internal class ReflectiveMigrationRunner(
+    codegenAwareClassLoader: ClassLoader,
+) : MigrationRunner {
     private val flyway = ReflectiveFlywayConfiguration(codegenAwareClassLoader)
 
     override fun migrateDb(
@@ -33,7 +35,9 @@ internal class ReflectiveMigrationRunner(codegenAwareClassLoader: ClassLoader) :
      * Wrapper for Flyway configuration object obtained via reflection.
      * @see FluentConfiguration
      */
-    private class ReflectiveFlywayConfiguration(private val codegenAwareClassLoader: ClassLoader) {
+    private class ReflectiveFlywayConfiguration(
+        private val codegenAwareClassLoader: ClassLoader,
+    ) {
         private val flywayClass = codegenAwareClassLoader.loadClass(Flyway::class.jvmName)
         private val configurationClass = codegenAwareClassLoader.loadClass(FluentConfiguration::class.jvmName)
 

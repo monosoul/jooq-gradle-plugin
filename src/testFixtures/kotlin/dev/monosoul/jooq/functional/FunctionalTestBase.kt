@@ -21,7 +21,8 @@ abstract class FunctionalTestBase {
         vararg arguments: String,
         projectDirectory: File = projectDir,
     ): BuildResult =
-        GradleRunner.create()
+        GradleRunner
+            .create()
             .withProjectDir(projectDirectory)
             .withPluginClasspath()
             .forwardOutput()

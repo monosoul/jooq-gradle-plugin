@@ -3,7 +3,9 @@ package dev.monosoul.jooq.migration
 import dev.monosoul.jooq.settings.DatabaseCredentials
 import org.flywaydb.core.Flyway
 
-internal class BuiltInMigrationRunner(codegenAwareClassLoader: ClassLoader) : MigrationRunner {
+internal class BuiltInMigrationRunner(
+    codegenAwareClassLoader: ClassLoader,
+) : MigrationRunner {
     private val flyway = Flyway.configure(codegenAwareClassLoader)
 
     override fun migrateDb(

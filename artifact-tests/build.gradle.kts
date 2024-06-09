@@ -46,7 +46,8 @@ tasks {
     withType<ProcessResources> {
         filesMatching("**/build.gradle.kts") {
             filter {
-                it.replace("@plugin.version@", rootProject.version.toString())
+                it
+                    .replace("@plugin.version@", rootProject.version.toString())
                     .replace("@testcontainers.version@", libs.versions.testcontainers.get())
             }
         }
@@ -54,7 +55,8 @@ tasks {
 
     processTestTemplates {
         filter {
-            it.replace("@gradle.version@", gradle.gradleVersion)
+            it
+                .replace("@gradle.version@", gradle.gradleVersion)
                 .replace("@plugin.version@", rootProject.version.toString())
         }
     }

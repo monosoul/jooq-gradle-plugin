@@ -41,7 +41,8 @@ tasks {
 
     processTemplates {
         filter {
-            it.replace("@jooq.version@", libs.versions.jooq.get())
+            it
+                .replace("@jooq.version@", libs.versions.jooq.get())
                 .replace("@flyway.version@", libs.versions.flyway.get())
         }
     }

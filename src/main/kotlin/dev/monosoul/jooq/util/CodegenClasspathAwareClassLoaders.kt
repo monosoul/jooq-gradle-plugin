@@ -9,13 +9,15 @@ internal class CodegenClasspathAwareClassLoaders(
 ) {
     companion object {
         fun from(classpath: FileCollection) =
-            classpath.map {
-                it.toURI().toURL()
-            }.toTypedArray().let {
-                CodegenClasspathAwareClassLoaders(
-                    buildscriptExclusive = URLClassLoader(it),
-                    buildscriptInclusive = URLClassLoader(it, CodegenClasspathAwareClassLoaders::class.java.classLoader),
-                )
-            }
+            classpath
+                .map {
+                    it.toURI().toURL()
+                }.toTypedArray()
+                .let {
+                    CodegenClasspathAwareClassLoaders(
+                        buildscriptExclusive = URLClassLoader(it),
+                        buildscriptInclusive = URLClassLoader(it, CodegenClasspathAwareClassLoaders::class.java.classLoader),
+                    )
+                }
     }
 }

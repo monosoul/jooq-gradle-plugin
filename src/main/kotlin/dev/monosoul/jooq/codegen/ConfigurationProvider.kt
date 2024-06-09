@@ -42,12 +42,10 @@ internal class ConfigurationProvider(
                     .withSchemata(schemas.get().map(this::toSchemaMappingType))
                     .withIncludes(".*")
                     .withExcludes(""),
-            )
-            .withGenerate(Generate())
+            ).withGenerate(Generate())
             .let {
                 Configuration().withGenerator(it)
-            }
-            .applyCommonConfiguration()
+            }.applyCommonConfiguration()
 
     private fun Configuration.applyCommonConfiguration() =
         also { config ->
@@ -68,11 +66,10 @@ internal class ConfigurationProvider(
             .withEncoding("UTF-8")
             .withClean(true)
 
-    private fun toSchemaMappingType(schemaName: String): SchemaMappingType {
-        return SchemaMappingType()
+    private fun toSchemaMappingType(schemaName: String): SchemaMappingType =
+        SchemaMappingType()
             .withInputSchema(schemaName)
             .withOutputSchemaToDefault(outputSchemaToDefault.get().contains(schemaName))
-    }
 
     private fun Map<String, String>.toMappingApplier(): (Strategy) -> Unit =
         { strategy ->

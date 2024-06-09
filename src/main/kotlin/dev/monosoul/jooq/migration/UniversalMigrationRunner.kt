@@ -34,9 +34,11 @@ internal class UniversalMigrationRunner(
         logger.info("Migration locations: {}", resolvedMigrationLocations)
 
         val extraClasspath =
-            resolvedMigrationLocations.flatMap { it.extraClasspath() }.also {
-                logger.info("Migration will run using extra classpath: {}", it)
-            }.toTypedArray()
+            resolvedMigrationLocations
+                .flatMap { it.extraClasspath() }
+                .also {
+                    logger.info("Migration will run using extra classpath: {}", it)
+                }.toTypedArray()
 
         return runCatching {
             ReflectiveMigrationRunner(

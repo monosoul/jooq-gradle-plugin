@@ -8,11 +8,12 @@ import java.io.ObjectOutputStream
 
 internal fun Configuration.copy(): Configuration {
     val serialized =
-        ByteArrayOutputStream().apply {
-            ObjectOutputStream(this).use { oos ->
-                oos.writeObject(this@copy)
-            }
-        }.toByteArray()
+        ByteArrayOutputStream()
+            .apply {
+                ObjectOutputStream(this).use { oos ->
+                    oos.writeObject(this@copy)
+                }
+            }.toByteArray()
 
     return ObjectInputStream(ByteArrayInputStream(serialized)).use { ois ->
         ois.readObject() as Configuration

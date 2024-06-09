@@ -156,5 +156,7 @@ class GenericDatabaseContainerTest {
         expectThat(actual) isEqualTo database.password
     }
 
-    private class TestDriver(val mockDriver: Driver = mockk()) : Driver by mockDriver
+    private class TestDriver(
+        val mockDriver: Driver = mockk(),
+    ) : Driver by mockDriver
 }

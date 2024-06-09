@@ -23,7 +23,9 @@ internal class ReflectiveJooqCodegenRunner(
      * Wrapper for jOOQ code generation tool object obtained via reflection.
      * @see GenerationTool
      */
-    private class ReflectiveGenerationTool(codegenAwareClassLoader: ClassLoader) {
+    private class ReflectiveGenerationTool(
+        codegenAwareClassLoader: ClassLoader,
+    ) {
         private val toolClass = codegenAwareClassLoader.loadClass(GenerationTool::class.jvmName)
         private val configurationClass = codegenAwareClassLoader.loadClass(Configuration::class.jvmName)
         private val tool = toolClass.getDeclaredConstructor().newInstance()
@@ -61,13 +63,14 @@ internal class ReflectiveJooqCodegenRunner(
             }
 
         private fun Configuration.toXmlByteArray() =
-            ByteArrayOutputStream().also { stream ->
-                stream.writer().use { writer ->
-                    @Suppress("UnstableApiUsage")
-                    MiniJAXB.marshal(this, writer)
-                    writer.flush()
-                }
-            }.toByteArray()
+            ByteArrayOutputStream()
+                .also { stream ->
+                    stream.writer().use { writer ->
+                        @Suppress("UnstableApiUsage")
+                        MiniJAXB.marshal(this, writer)
+                        writer.flush()
+                    }
+                }.toByteArray()
 
         /**
          * @see GenerationTool.load

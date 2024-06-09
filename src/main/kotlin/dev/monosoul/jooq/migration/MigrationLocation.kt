@@ -129,13 +129,13 @@ sealed class MigrationLocation {
         constructor(path: FileCollection) : this(path, "/db/migration")
 
         override fun extraClasspath(): List<URL> =
-            path.asSequence()
+            path
+                .asSequence()
                 .flatMap { file ->
                     listOf(file).plus(
                         file.listFiles { _, name -> name.endsWith(".jar") }?.asList() ?: emptyList(),
                     )
-                }
-                .map { it.toURI().toURL() }
+                }.map { it.toURI().toURL() }
                 .toList()
     }
 }

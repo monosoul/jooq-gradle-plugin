@@ -5,7 +5,9 @@ import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Nested
 import org.gradle.api.tasks.Internal as GradleInternal
 
-sealed class Database : JdbcAware, SettingsElement {
+sealed class Database :
+    JdbcAware,
+    SettingsElement {
     @get:Input
     abstract var username: String
 

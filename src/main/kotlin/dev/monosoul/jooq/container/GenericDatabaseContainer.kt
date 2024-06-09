@@ -83,13 +83,13 @@ class GenericDatabaseContainer(
          * Workaround for https://github.com/testcontainers/testcontainers-java/issues/6441
          */
         val failFastAlways =
-            DockerClientProviderStrategy::class.declaredMembers
+            DockerClientProviderStrategy::class
+                .declaredMembers
                 .single { it.name == "FAIL_FAST_ALWAYS" }
                 .apply { isAccessible = true }
                 .let {
                     @Suppress("UNCHECKED_CAST")
                     it as KCallable<AtomicBoolean>
-                }
-                .call()
+                }.call()
     }
 }

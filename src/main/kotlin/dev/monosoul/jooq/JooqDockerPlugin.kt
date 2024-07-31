@@ -7,7 +7,6 @@ import org.gradle.api.attributes.Bundling
 import org.gradle.api.attributes.Bundling.BUNDLING_ATTRIBUTE
 import org.gradle.api.plugins.JavaPluginExtension
 import org.gradle.api.provider.ProviderFactory
-import org.gradle.api.tasks.SourceSet.MAIN_SOURCE_SET_NAME
 import org.gradle.kotlin.dsl.create
 import org.gradle.kotlin.dsl.findByType
 import org.gradle.kotlin.dsl.named
@@ -42,9 +41,13 @@ open class JooqDockerPlugin
                 tasks.register<GenerateJooqClassesTask>("generateJooqClasses")
                 pluginManager.withPlugin("org.gradle.java") {
                     extensions.findByType<JavaPluginExtension>()?.run {
-                        sourceSets.named(MAIN_SOURCE_SET_NAME) {
+                        sourceSets.configureEach {
                             java {
-                                srcDirs(tasks.withType<GenerateJooqClassesTask>())
+                                srcDirs(
+                                    tasks
+                                        .withType<GenerateJooqClassesTask>()
+                                        .matching { it.targetSourceSet.get() == this@configureEach.name },
+                                )
                             }
                         }
                     }

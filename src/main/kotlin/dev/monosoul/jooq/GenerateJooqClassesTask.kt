@@ -33,6 +33,7 @@ import org.gradle.api.tasks.Classpath
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Nested
 import org.gradle.api.tasks.OutputDirectory
+import org.gradle.api.tasks.SourceSet.MAIN_SOURCE_SET_NAME
 import org.gradle.api.tasks.TaskAction
 import org.gradle.kotlin.dsl.getByType
 import org.gradle.kotlin.dsl.listProperty
@@ -54,6 +55,12 @@ open class GenerateJooqClassesTask
         private val projectLayout: ProjectLayout,
     ) : DefaultTask(),
         SettingsAware {
+        /**
+         * Source set name to include generated sources into.
+         */
+        @Input
+        val targetSourceSet = objectFactory.property<String>().convention(MAIN_SOURCE_SET_NAME)
+
         /**
          * List of schemas to take into account when running migrations and generating code.
          */

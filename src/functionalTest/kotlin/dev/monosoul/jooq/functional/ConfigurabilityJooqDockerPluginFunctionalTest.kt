@@ -4,7 +4,9 @@ import org.gradle.testkit.runner.TaskOutcome.SUCCESS
 import org.junit.jupiter.api.Test
 import strikt.api.expect
 import strikt.assertions.isEqualTo
+import strikt.assertions.isNull
 import strikt.java.exists
+import strikt.java.notExists
 
 class ConfigurabilityJooqDockerPluginFunctionalTest : dev.monosoul.jooq.functional.JooqDockerPluginFunctionalTestBase() {
     @Test
@@ -215,6 +217,70 @@ class ConfigurabilityJooqDockerPluginFunctionalTest : dev.monosoul.jooq.function
             that(result).generateJooqClassesTask.outcome isEqualTo SUCCESS
             that(
                 projectFile("build/gen/org/jooq/generated/tables/Foo.java"),
+            ).exists()
+        }
+    }
+
+    @Test
+    fun `should respect targetSourceSet task property`() {
+        // given
+        prepareBuildGradleFile {
+            """
+            import dev.monosoul.jooq.RecommendedVersions
+                
+            plugins {
+                kotlin("jvm") version "1.9.20"
+                id("dev.monosoul.jooq-docker")
+            }
+
+            repositories {
+                mavenCentral()
+            }
+            
+            sourceSets {
+                create("custom") {
+                    compileClasspath = files(main.map { it.compileClasspath })
+                    runtimeClasspath = files(main.map { it.runtimeClasspath })
+                }
+            }
+
+            tasks.generateJooqClasses {
+                targetSourceSet.set("custom")
+            }
+
+            dependencies {
+                jooqCodegen("org.postgresql:postgresql:42.3.6")
+                
+                implementation("org.postgresql:postgresql:42.5.4")
+                implementation("org.jooq:jooq:${'$'}{RecommendedVersions.JOOQ_VERSION}")
+                implementation("org.flywaydb:flyway-core:${'$'}{RecommendedVersions.FLYWAY_VERSION}")
+            }
+            """.trimIndent()
+        }
+        copyResource(
+            from = "/V01__init_multiple_schemas.sql",
+            to = "src/main/resources/db/migration/V01__init_multiple_schemas.sql",
+        )
+
+        // when
+        val mainSourceSetCompilationResult = runGradleWithArguments("classes")
+
+        // then
+        expect {
+            that(mainSourceSetCompilationResult).getTask("generateJooqClasses").isNull()
+            that(
+                projectFile("build/generated-jooq/org/jooq/generated/tables/Foo.java"),
+            ).notExists()
+        }
+
+        // and when
+        val testSourceSetCompilationResult = runGradleWithArguments("customClasses")
+
+        // then
+        expect {
+            that(testSourceSetCompilationResult).generateJooqClassesTask.outcome isEqualTo SUCCESS
+            that(
+                projectFile("build/generated-jooq/org/jooq/generated/tables/Foo.java"),
             ).exists()
         }
     }

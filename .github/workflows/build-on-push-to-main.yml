@@ -20,13 +20,13 @@ jobs:
           distribution: 'temurin'
           java-version: '21'
       - name: Run tests
-        uses: gradle/actions/setup-gradle@v3
+        uses: gradle/actions/setup-gradle@v4
         with:
           arguments: |
             --stacktrace
             check jacocoTestReport -x :artifact-tests:test
       - name: Test publishing
-        uses: gradle/actions/setup-gradle@v3
+        uses: gradle/actions/setup-gradle@v4
         with:
           arguments: |
             --stacktrace
@@ -57,7 +57,7 @@ jobs:
           distribution: 'temurin'
           java-version: '21'
       - name: Run artifact tests
-        uses: gradle/actions/setup-gradle@v3
+        uses: gradle/actions/setup-gradle@v4
         with:
           arguments: |
             --stacktrace

@@ -17,7 +17,7 @@ jobs:
           distribution: 'temurin'
           java-version: '21'
       - name: Run tests
-        uses: gradle/actions/setup-gradle@v3
+        uses: gradle/actions/setup-gradle@v4
         with:
           arguments: |
             --stacktrace
@@ -43,7 +43,7 @@ jobs:
           distribution: 'temurin'
           java-version: '21'
       - name: Run artifact tests
-        uses: gradle/actions/setup-gradle@v3
+        uses: gradle/actions/setup-gradle@v4
         with:
           arguments: |
             --stacktrace
@@ -71,7 +71,7 @@ jobs:
           distribution: 'temurin'
           java-version: '21'
       - name: Publish plugin
-        uses: gradle/actions/setup-gradle@v3
+        uses: gradle/actions/setup-gradle@v4
         env:
           ORG_GRADLE_PROJECT_signingKeyId: ${{ secrets.OSSRH_GPG_SECRET_KEY_ID }}
           ORG_GRADLE_PROJECT_signingKey: ${{ secrets.OSSRH_GPG_SECRET_KEY }}

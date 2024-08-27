@@ -14,7 +14,7 @@ testcontainers-jdbc = { module = "org.testcontainers:jdbc", version.ref = "testc
 testcontainers-postgresql = { module = "org.testcontainers:postgresql", version.ref = "testcontainers" }
 junit-bom = "org.junit:junit-bom:5.11.0"
 junit-jupiter = { module = "org.junit.jupiter:junit-jupiter" }
-strikt = { module = "io.strikt:strikt-jvm", version = { strictly = "0.35.1" } }
+strikt = "io.strikt:strikt-jvm:0.34.1"
 mockk = "io.mockk:mockk-jvm:1.13.12"
 
 ktlint = "com.pinterest.ktlint:ktlint-cli:1.3.1"

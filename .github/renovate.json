@@ -71,7 +71,8 @@
   "automergeStrategy": "squash",
   "platformAutomerge": true,
   "ignoreDeps": [
-    "gradle"
+    "gradle",
+    "io.strikt:strikt-jvm"
   ],
   "reviewers": [
     "monosoul"

@@ -11,6 +11,7 @@ dependencies {
     testImplementation(libs.junit.jupiter)
     testImplementation(libs.strikt)
     testImplementation("ch.qos.logback:logback-classic:1.5.7")
+    testImplementation(libs.jna)
 }
 
 tasks {

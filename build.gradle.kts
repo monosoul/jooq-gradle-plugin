@@ -69,6 +69,7 @@ dependencies {
     testFixturesApi(libs.strikt)
     testFixturesApi(libs.mockk)
     testFixturesApi(gradleTestKit())
+    testFixturesApi(libs.jna)
 }
 
 val functionalTestSuiteName = "functionalTest"

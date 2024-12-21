@@ -12,10 +12,10 @@ jna = { module = "net.java.dev.jna:jna", version.ref = "jna" }
 testcontainers-jdbc = { module = "org.testcontainers:jdbc", version.ref = "testcontainers" }
 
 testcontainers-postgresql = { module = "org.testcontainers:postgresql", version.ref = "testcontainers" }
-junit-bom = "org.junit:junit-bom:5.11.3"
+junit-bom = "org.junit:junit-bom:5.11.4"
 junit-jupiter = { module = "org.junit.jupiter:junit-jupiter" }
 strikt = "io.strikt:strikt-jvm:0.34.1"
-mockk = "io.mockk:mockk-jvm:1.13.13"
+mockk = "io.mockk:mockk-jvm:1.13.14"
 
 ktlint = "com.pinterest.ktlint:ktlint-cli:1.5.0"
 

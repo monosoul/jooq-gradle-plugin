@@ -28,4 +28,5 @@ includeTree {
         }
         module("third-party-jar")
     }
+    module("kotlin-data-classes")
 }

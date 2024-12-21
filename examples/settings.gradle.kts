@@ -1,4 +1,10 @@
+import dev.monosoul.gradle.module.tree.includeTree
+
 rootProject.name = "jooq-gradle-plugin-examples"
+
+plugins {
+    id("dev.monosoul.module-tree") version "0.0.2"
+}
 
 includeTree {
     dir("spring-boot") {
@@ -22,38 +28,5 @@ includeTree {
         }
         module("third-party-jar")
     }
-}
-
-
-
-// Module declaration DSL, feel free to ignore it
-data class IncludeTree(
-    private val path: String,
-    private val parentProject: String
-) {
-    fun dir(path: String, block: IncludeTree.() -> Unit) {
-        val nestedPath = "${this.path}/$path"
-        includeTree(nestedPath, parentProject, block)
-    }
-
-    fun module(name: String, block: IncludeTree.() -> Unit = {}) {
-        val projectName = "$parentProject:$name"
-        val projectDir = "$path/$name"
-
-        include(projectName)
-        project(projectName).also {
-            it.projectDir = file(projectDir)
-
-            it.buildFile.takeUnless(File::exists)
-                ?.also { buildFile ->
-                    buildFile.parentFile.mkdirs()
-                    file("${buildFile.absolutePath}.kts").createNewFile()
-                }
-        }
-        includeTree(projectDir, projectName, block)
-    }
-}
-
-fun includeTree(path: String = ".", parentProject: String = "", block: IncludeTree.() -> Unit) {
-    IncludeTree(path, parentProject).block()
+    module("kotlin-data-classes")
 }

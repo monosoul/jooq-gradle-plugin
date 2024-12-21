@@ -7,8 +7,8 @@
 import dev.monosoul.jooq.RecommendedVersions
 
 plugins {
-    kotlin("jvm") version "1.9.20"
-    id("dev.monosoul.jooq-docker") version "6.0.0"
+    kotlin("jvm") version "2.1.0"
+    id("dev.monosoul.jooq-docker") version "6.1.14"
     id("com.avast.gradle.docker-compose") version "0.16.11"
 }
 

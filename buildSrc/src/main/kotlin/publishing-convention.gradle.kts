@@ -1,3 +1,5 @@
+import java.time.Duration
+
 plugins {
     id("com.gradle.plugin-publish")
     signing
@@ -27,6 +29,10 @@ nexusPublishing {
             nexusUrl.set(uri("https://s01.oss.sonatype.org/service/local/"))
             snapshotRepositoryUrl.set(uri("https://s01.oss.sonatype.org/content/repositories/snapshots/"))
         }
+    }
+    transitionCheckOptions {
+        maxRetries = 300
+        delayBetween = Duration.ofSeconds(20)
     }
 }
 

@@ -1,33 +1,51 @@
 {
   "extends": [
-    "config:base",
+    "config:recommended",
     ":timezone(Europe/Berlin)"
   ],
   "packageRules": [
     {
       "groupName": "Gradle dependencies",
       "groupSlug": "gradle",
-      "matchLanguages": [ "java" ],
-      "labels": [ "gradle-dependencies" ],
-      "schedule": [ "after 7am and before 1pm on Saturday every 1 week" ],
+      "matchCategories": [
+        "java"
+      ],
+      "labels": [
+        "gradle-dependencies"
+      ],
+      "schedule": [
+        "after 7am and before 1pm on Saturday every 1 week"
+      ],
       "separateMajorMinor": false,
       "commitMessagePrefix": "fix: "
     },
     {
       "groupName": "GH Actions dependencies",
       "groupSlug": "ghactions",
-      "matchManagers": [ "github-actions" ],
-      "labels": [ "gh-actions-dependencies" ],
-      "schedule": [ "before 9am on Saturday every 1 month" ],
+      "matchManagers": [
+        "github-actions"
+      ],
+      "labels": [
+        "gh-actions-dependencies"
+      ],
+      "schedule": [
+        "before 9am on Saturday every 1 month"
+      ],
       "separateMajorMinor": false,
       "commitMessagePrefix": "chore: "
     },
     {
       "groupName": "Gradle plugins",
       "groupSlug": "gradle-plugins",
-      "matchLanguages": [ "java" ],
-      "labels": [ "gradle-plugins" ],
-      "schedule": [ "before 9am on Saturday every 1 week" ],
+      "matchCategories": [
+        "java"
+      ],
+      "labels": [
+        "gradle-plugins"
+      ],
+      "schedule": [
+        "before 9am on Saturday every 1 week"
+      ],
       "separateMajorMinor": false,
       "commitMessagePrefix": "chore: ",
       "matchPackageNames": [
@@ -40,30 +58,42 @@
     {
       "groupName": "Test dependencies",
       "groupSlug": "test-dependencies",
-      "matchLanguages": [ "java" ],
-      "labels": [ "gradle-test-dependencies" ],
-      "schedule": [ "before 9am on Saturday every 1 week" ],
+      "matchCategories": [
+        "java"
+      ],
+      "labels": [
+        "gradle-test-dependencies"
+      ],
+      "schedule": [
+        "before 9am on Saturday every 1 week"
+      ],
       "separateMajorMinor": false,
       "commitMessagePrefix": "chore: ",
-      "matchPackagePrefixes": [
-        "org.junit:",
-        "org.junit.jupiter:",
-        "io.strikt:",
-        "io.mockk:",
-        "ch.qos.logback:",
-        "com.pinterest.ktlint:"
+      "matchPackageNames": [
+        "org.junit:{/,}**",
+        "org.junit.jupiter:{/,}**",
+        "io.strikt:{/,}**",
+        "io.mockk:{/,}**",
+        "ch.qos.logback:{/,}**",
+        "com.pinterest.ktlint:{/,}**"
       ]
     },
     {
       "groupName": "Build dependencies",
       "groupSlug": "build-dependencies",
-      "matchLanguages": [ "java" ],
-      "labels": [ "gradle-build-dependencies" ],
-      "schedule": [ "before 9am on Saturday every 1 week" ],
+      "matchCategories": [
+        "java"
+      ],
+      "labels": [
+        "gradle-build-dependencies"
+      ],
+      "schedule": [
+        "before 9am on Saturday every 1 week"
+      ],
       "separateMajorMinor": false,
       "commitMessagePrefix": "build: ",
-      "matchPackagePrefixes": [
-        "gradle"
+      "matchPackageNames": [
+        "gradle{/,}**"
       ]
     }
   ],

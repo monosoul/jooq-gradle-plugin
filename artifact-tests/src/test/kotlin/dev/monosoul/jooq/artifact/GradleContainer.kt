@@ -10,7 +10,7 @@ import org.testcontainers.containers.startupcheck.IndefiniteWaitOneShotStartupCh
 
 class GradleContainer(
     dockerSocketPath: String = "/var/run/docker.sock",
-) : GenericContainer<GradleContainer>("gradle:8.6.0-jdk17-alpine") {
+) : GenericContainer<GradleContainer>("gradle:8.12.1-jdk21-alpine") {
     private val toStringLogConsumer = ToStringConsumer()
     val output: String get() = toStringLogConsumer.toUtf8String()
     val projectPath = "/home/gradle/project"

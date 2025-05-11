@@ -56,6 +56,10 @@ dependencies {
      */
     shadow(libs.jooq.codegen)
     shadow(libs.bundles.flyway)
+    shadow(platform(libs.jackson.bom))
+    shadow("com.fasterxml.jackson.core:jackson-databind")
+    shadow("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
+    shadow("com.fasterxml.jackson.datatype:jackson-datatype-jdk8")
 
     implementation(libs.testcontainers.jdbc) {
         exclude(group = libs.jna.get().group) // cannot be shadowed

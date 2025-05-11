@@ -3,6 +3,7 @@ jooq = "3.20.4"
 flyway = "11.8.1"
 testcontainers = "1.21.0"
 jna = "5.17.0"
+jackson = "2.19.0"
 
 [libraries]
 jooq-codegen = { module = "org.jooq:jooq-codegen", version.ref = "jooq" }
@@ -18,6 +19,8 @@ strikt = "io.strikt:strikt-jvm:0.34.1"
 mockk = "io.mockk:mockk-jvm:1.14.2"
 
 ktlint = "com.pinterest.ktlint:ktlint-cli:1.5.0"
+
+jackson-bom = { module = "com.fasterxml.jackson:jackson-bom", version.ref = "jackson" }
 
 # plugins
 gradle-plugin-publish = "com.gradle.publish:plugin-publish-plugin:1.3.1"

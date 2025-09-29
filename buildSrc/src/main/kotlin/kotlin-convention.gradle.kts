@@ -2,7 +2,7 @@ import org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
 import org.gradle.api.tasks.testing.logging.TestLogEvent.FAILED
 import org.gradle.api.tasks.testing.logging.TestLogEvent.PASSED
 import org.gradle.api.tasks.testing.logging.TestLogEvent.STARTED
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     kotlin("jvm")
@@ -16,6 +16,13 @@ val targetJava = JavaVersion.VERSION_1_8
 java {
     sourceCompatibility = targetJava
     targetCompatibility = targetJava
+}
+
+kotlin {
+    compilerOptions {
+        jvmTarget = JvmTarget.fromTarget("$targetJava")
+        freeCompilerArgs = listOf("-Xjsr305=strict")
+    }
 }
 
 testing {
@@ -36,13 +43,6 @@ tasks {
             showStackTraces = true
             showCauses = true
             exceptionFormat = FULL
-        }
-    }
-
-    withType<KotlinCompile> {
-        kotlinOptions {
-            jvmTarget = "$targetJava"
-            freeCompilerArgs = listOf("-Xjsr305=strict")
         }
     }
 }

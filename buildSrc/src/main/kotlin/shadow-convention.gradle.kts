@@ -1,12 +1,14 @@
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.shadowJar
+
 plugins {
     kotlin("jvm")
-    id("com.github.johnrengelman.shadow")
+    id("com.gradleup.shadow")
 }
 
 tasks {
 
     shadowJar {
-        isEnableRelocation = true
+        enableAutoRelocation = true
         relocationPrefix = "${project.group}.shadow"
 
         mergeServiceFiles()

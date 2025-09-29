@@ -18,7 +18,7 @@ class MultipleDatabasesJooqDockerPluginFunctionalTest : JooqDockerPluginFunction
             import dev.monosoul.jooq.migration.MigrationLocation
             
             plugins {
-                kotlin("jvm") version "1.6.21"
+                kotlin("jvm") version "2.2.20"
                 id("dev.monosoul.jooq-docker")
             }
 
@@ -229,7 +229,7 @@ class MultipleDatabasesJooqDockerPluginFunctionalTest : JooqDockerPluginFunction
             import dev.monosoul.jooq.RecommendedVersions
             
             plugins {
-                kotlin("jvm") version "1.6.21"
+                kotlin("jvm") version "2.2.20"
                 id("dev.monosoul.jooq-docker")
             }
 

@@ -364,7 +364,7 @@ import dev.monosoul.jooq.GenerateJooqClassesTask
 import dev.monosoul.jooq.RecommendedVersions
 
 plugins {
-    kotlin("jvm") version "1.6.21"
+    kotlin("jvm") version "2.2.20"
     id("dev.monosoul.jooq-docker")
 }
 
@@ -461,7 +461,7 @@ dev.monosoul.jooq.withContainer.image.envVars.MYSQL_DATABASE=mysql
 import dev.monosoul.jooq.RecommendedVersions
 
 plugins {
-    kotlin("jvm") version "1.6.21"
+    kotlin("jvm") version "2.2.20"
     id("dev.monosoul.jooq-docker")
 }
 

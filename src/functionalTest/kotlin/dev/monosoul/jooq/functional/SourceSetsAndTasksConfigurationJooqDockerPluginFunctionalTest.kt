@@ -118,7 +118,7 @@ class SourceSetsAndTasksConfigurationJooqDockerPluginFunctionalTest : JooqDocker
                 import dev.monosoul.jooq.RecommendedVersions
                 
                 plugins {
-                    kotlin("jvm") version "1.6.21"
+                    kotlin("jvm") version "2.2.20"
                     id("dev.monosoul.jooq-docker")
                 }
 
@@ -139,7 +139,7 @@ class SourceSetsAndTasksConfigurationJooqDockerPluginFunctionalTest : JooqDocker
                 
                 buildscript {
                     dependencies {
-                        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.6.21")
+                        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:2.2.20")
                     }
                 }
 

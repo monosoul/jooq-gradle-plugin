@@ -128,7 +128,7 @@ class JavaBasedMigrationsFunctionalTest : JooqDockerPluginFunctionalTestBase() {
         prepareBuildGradleFile {
             """
             plugins {
-                kotlin("jvm") version "1.6.21"
+                kotlin("jvm") version "2.2.20"
                 id("dev.monosoul.jooq-docker")
             }
 
@@ -201,7 +201,7 @@ class JavaBasedMigrationsFunctionalTest : JooqDockerPluginFunctionalTestBase() {
         prepareBuildGradleFile {
             """
             plugins {
-                kotlin("jvm") version "1.6.21"
+                kotlin("jvm") version "2.2.20"
                 id("dev.monosoul.jooq-docker")
             }
 
@@ -273,7 +273,7 @@ class JavaBasedMigrationsFunctionalTest : JooqDockerPluginFunctionalTestBase() {
         prepareBuildGradleFile {
             """
             plugins {
-                kotlin("jvm") version "1.6.21"
+                kotlin("jvm") version "2.2.20"
                 id("dev.monosoul.jooq-docker")
             }
 

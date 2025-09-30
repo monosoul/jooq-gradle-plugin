@@ -5,6 +5,10 @@ plugins {
     id("com.gradleup.shadow")
 }
 
+shadow {
+    addShadowVariantIntoJavaComponent = false
+}
+
 tasks {
 
     shadowJar {

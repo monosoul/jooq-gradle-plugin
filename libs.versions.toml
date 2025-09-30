@@ -21,7 +21,7 @@ ktlint = "com.pinterest.ktlint:ktlint-cli:1.7.1"
 
 # plugins
 gradle-plugin-publish = "com.gradle.publish:plugin-publish-plugin:2.0.0"
-shadow = "com.gradleup.shadow:com.gradleup.shadow.gradle.plugin:9.0.2"
+shadow = "com.gradleup.shadow:com.gradleup.shadow.gradle.plugin:9.2.2"
 jacoco-testkit = "pl.droidsonroids.gradle.jacoco:pl.droidsonroids.gradle.jacoco:1.0.12"
 nexus-publish = "io.github.gradle-nexus:publish-plugin:2.0.0"
 

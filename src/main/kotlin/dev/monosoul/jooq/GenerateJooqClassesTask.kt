@@ -373,7 +373,7 @@ open class GenerateJooqClassesTask
          * @see MigrationLocation
          * @see Project.project
          */
-        fun <T> ListProperty<MigrationLocation>.setFromClasspath(
+        fun <T : Any> ListProperty<MigrationLocation>.setFromClasspath(
             pathProvider: Provider<T>,
             location: String = "/db/migration",
         ) = setFromClasspath(project.files(pathProvider), location)

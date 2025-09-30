@@ -229,7 +229,7 @@ class ConfigurabilityJooqDockerPluginFunctionalTest : dev.monosoul.jooq.function
             import dev.monosoul.jooq.RecommendedVersions
                 
             plugins {
-                kotlin("jvm") version "1.9.20"
+                kotlin("jvm") version "2.2.20"
                 id("dev.monosoul.jooq-docker")
             }
 

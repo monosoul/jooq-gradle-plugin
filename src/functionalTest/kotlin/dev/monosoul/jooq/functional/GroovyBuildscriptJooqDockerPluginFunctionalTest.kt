@@ -264,7 +264,7 @@ class GroovyBuildscriptJooqDockerPluginFunctionalTest : JooqDockerPluginFunction
             import dev.monosoul.jooq.RecommendedVersions
             
             plugins {
-                id "org.jetbrains.kotlin.jvm" version "1.6.21"
+                id "org.jetbrains.kotlin.jvm" version "2.2.20"
                 id "dev.monosoul.jooq-docker"
             }
 

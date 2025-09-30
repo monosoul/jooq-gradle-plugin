@@ -91,5 +91,5 @@ internal object PropertiesReader {
         }
     }
 
-    private fun <T, O> functionName(ref: KFunction2<O, Action<T>, Unit>) = ref.name
+    private fun <T : Any, O> functionName(ref: KFunction2<O, Action<T>, Unit>) = ref.name
 }

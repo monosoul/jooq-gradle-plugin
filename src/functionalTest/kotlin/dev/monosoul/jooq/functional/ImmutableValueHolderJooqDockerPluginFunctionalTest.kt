@@ -35,10 +35,10 @@ class ImmutableValueHolderJooqDockerPluginFunctionalTest : JooqDockerPluginFunct
         // when & then
         expectThrows<UnexpectedBuildFailure> {
             runGradleWithArguments("tasks")
-        }.get { stackTraceToString() }.contains(
-            "Caused by: java.lang.IllegalAccessError: " +
-                "class InternalValueHolder tried to access private method " +
-                "'void dev.monosoul.jooq.ValueHolder.<init>()'",
+        }.get {
+            stackTraceToString()
+        }.contains(
+            "The class 'InternalValueHolder' is not a permitted subclass of the sealed class 'dev.monosoul.jooq.ValueHolder'",
         )
     }
 }

@@ -1,3 +1,4 @@
+import org.gradle.api.JavaVersion
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
 import org.gradle.api.tasks.testing.logging.TestLogEvent.FAILED
 import org.gradle.api.tasks.testing.logging.TestLogEvent.PASSED
@@ -12,7 +13,7 @@ repositories {
     mavenCentral()
 }
 
-val targetJava = JavaVersion.VERSION_1_8
+val targetJava = JavaVersion.VERSION_17
 java {
     sourceCompatibility = targetJava
     targetCompatibility = targetJava

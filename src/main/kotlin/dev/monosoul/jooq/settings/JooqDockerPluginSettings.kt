@@ -2,10 +2,10 @@ package dev.monosoul.jooq.settings
 
 import dev.monosoul.jooq.container.GenericDatabaseContainer
 import dev.monosoul.jooq.util.CodegenClasspathAwareClassLoaders
+import org.apache.commons.lang3.builder.EqualsBuilder.reflectionEquals
+import org.apache.commons.lang3.builder.HashCodeBuilder.reflectionHashCode
 import org.gradle.api.Action
 import org.gradle.api.tasks.Nested
-import org.testcontainers.shaded.org.apache.commons.lang3.builder.EqualsBuilder.reflectionEquals
-import org.testcontainers.shaded.org.apache.commons.lang3.builder.HashCodeBuilder.reflectionHashCode
 
 sealed class JooqDockerPluginSettings : SettingsElement {
     @get:Nested

@@ -49,11 +49,9 @@ tasks {
 }
 
 dependencies {
-    /**
-     * This is counter-intuitive, but dependencies in implementation or api configuration will actually
-     * be shadowed, while dependencies in shadow configuration will be skipped from shadowing and just added as
-     * transitive. This is a quirk of the shadow plugin.
-     */
+    // This is counter-intuitive, but dependencies in implementation or api configuration will actually be shadowed,
+    // while dependencies in shadow configuration will be skipped from shadowing and just added as transitive.
+    // This is a quirk of the shadow plugin.
     shadow(libs.jooq.codegen)
     shadow(libs.bundles.flyway)
 
@@ -107,12 +105,9 @@ testing {
         }
 
         register<JvmTestSuite>(extraTestSuiteName) {
-            /**
-             * This test suite is required because Gradle doesn't support Java agents
-             * when using TestKit with configuration cache enabled
-             *
-             * https://docs.gradle.org/7.5.1/userguide/configuration_cache.html#config_cache:not_yet_implemented:testkit_build_with_java_agent
-             */
+            // This test suite is required because Gradle doesn't support Java agents when using TestKit with
+            // configuration cache enabled
+            // https://docs.gradle.org/7.5.1/userguide/configuration_cache.html#config_cache:not_yet_implemented:testkit_build_with_java_agent
 
             useJUnitJupiter()
             dependencies {

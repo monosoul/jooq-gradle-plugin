@@ -10,7 +10,7 @@ dependencies {
     testImplementation(enforcedPlatform(libs.junit.bom))
     testImplementation(libs.junit.jupiter)
     testImplementation(libs.strikt)
-    testImplementation("ch.qos.logback:logback-classic:1.5.20")
+    testImplementation("ch.qos.logback:logback-classic:1.5.21")
     testImplementation(libs.jna)
 }
 

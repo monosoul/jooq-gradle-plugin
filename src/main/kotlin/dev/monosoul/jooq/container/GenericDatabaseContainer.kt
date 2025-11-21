@@ -74,7 +74,10 @@ class GenericDatabaseContainer(
                 is InstantiationException, is IllegalAccessException, is ClassNotFoundException -> {
                     throw NoDriverFoundException("Could not get Driver", e)
                 }
-                else -> throw e
+
+                else -> {
+                    throw e
+                }
             }
         }
 

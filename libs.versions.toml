@@ -1,6 +1,6 @@
 [versions]
-jooq = "3.20.9"
-flyway = "11.18.0"
+jooq = "3.20.10"
+flyway = "11.19.0"
 testcontainers = "2.0.2"
 jna = "5.18.1"
 
@@ -21,7 +21,7 @@ ktlint = "com.pinterest.ktlint:ktlint-cli:1.8.0"
 
 # plugins
 gradle-plugin-publish = "com.gradle.publish:plugin-publish-plugin:2.0.0"
-shadow = "com.gradleup.shadow:com.gradleup.shadow.gradle.plugin:9.2.2"
+shadow = "com.gradleup.shadow:com.gradleup.shadow.gradle.plugin:9.3.0"
 jacoco-testkit = "pl.droidsonroids.gradle.jacoco:pl.droidsonroids.gradle.jacoco:1.0.12"
 nexus-publish = "io.github.gradle-nexus:publish-plugin:2.0.0"
 

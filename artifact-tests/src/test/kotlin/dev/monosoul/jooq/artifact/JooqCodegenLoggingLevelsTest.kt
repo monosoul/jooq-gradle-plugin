@@ -33,7 +33,7 @@ class JooqCodegenLoggingLevelsTest {
             }.isSuccess()
 
             that(gradleContainer.output).apply {
-                not().contains("Database version is older than what dialect POSTGRES supports")
+                not().contains("Database version is older than what dialect SQLDialect.POSTGRES supports")
             }
         }
     }
@@ -56,7 +56,7 @@ class JooqCodegenLoggingLevelsTest {
             }.isSuccess()
 
             that(gradleContainer.output).apply {
-                contains("Database version is older than what dialect POSTGRES supports")
+                contains("Database version is older than what dialect SQLDialect.POSTGRES supports")
             }
         }
     }

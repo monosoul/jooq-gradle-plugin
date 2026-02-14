@@ -11,7 +11,7 @@ Copyright 2021 [Adrian Skrobacz](https://github.com/adrianskrobaczrevolut)
 
 Copyright 2021 Revolut Ltd
 
-Copyright 2022 - 2024 [Andrei Nevedomskii](https://github.com/monosoul)
+Copyright 2022 - 2026 [Andrei Nevedomskii](https://github.com/monosoul)
 
 ---
 

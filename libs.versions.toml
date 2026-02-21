@@ -12,7 +12,7 @@ jna = { module = "net.java.dev.jna:jna", version.ref = "jna" }
 testcontainers-jdbc = { module = "org.testcontainers:testcontainers-jdbc", version.ref = "testcontainers" }
 
 testcontainers-postgresql = { module = "org.testcontainers:testcontainers-postgresql", version.ref = "testcontainers" }
-junit-bom = "org.junit:junit-bom:6.0.2"
+junit-bom = "org.junit:junit-bom:6.0.3"
 junit-jupiter = { module = "org.junit.jupiter:junit-jupiter" }
 strikt = "io.strikt:strikt-jvm:0.34.1"
 mockk = "io.mockk:mockk-jvm:1.14.9"

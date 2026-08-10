@@ -28,15 +28,7 @@ open class JooqDockerPlugin
                 }
                 extensions.create<JooqExtension>(
                     "jooq",
-                    providerFactory.provider {
-                        // TODO: this is a workaround for https://github.com/gradle/gradle/issues/21876
-                        project.properties.entries
-                            .filter { (key, _) ->
-                                key.startsWith(PropertiesReader.PREFIX)
-                            }.mapNotNull { (key, value) ->
-                                (value as? String)?.let { key to it }
-                            }.toMap()
-                    },
+                    providerFactory.gradlePropertiesPrefixedBy(PropertiesReader.PREFIX),
                 )
                 tasks.register<GenerateJooqClassesTask>("generateJooqClasses")
                 pluginManager.withPlugin("org.gradle.java") {

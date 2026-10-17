@@ -1,6 +1,6 @@
 [versions]
 jooq = "3.21.9"
-flyway = "13.10.0"
+flyway = "13.10.3"
 testcontainers = "2.0.5"
 jna = "5.19.1"
 

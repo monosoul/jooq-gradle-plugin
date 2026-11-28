@@ -18,7 +18,7 @@ jobs:
         uses: actions/setup-java@v6
         with:
           distribution: 'temurin'
-          java-version: '21'
+          java-version: '25'
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v6
       - name: Run tests
@@ -55,7 +55,7 @@ jobs:
         uses: actions/setup-java@v6
         with:
           distribution: 'temurin'
-          java-version: '21'
+          java-version: '25'
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v6
       - name: Run artifact tests
@@ -86,7 +86,7 @@ jobs:
         uses: actions/setup-java@v6
         with:
           distribution: 'temurin'
-          java-version: '21'
+          java-version: '25'
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v6
       - name: Publish plugin
